@@ -258,18 +258,37 @@ class StageBasedCRMTester:
         """Test client-related endpoints"""
         print("\n📋 Testing Client Endpoints...")
         
-        # Create a client (this creates a client record for the current user)
-        success, response = self.run_test(
-            "Create Client", 
-            "POST", 
-            "clients", 
-            200,
-            data={
-                "full_name": "Test Client",
-                "email": "testclient@example.com",
-                "phone": "123-456-7890"
-            }
-        )
+        # Create a client using query parameters (as expected by the API)
+        url = f"{self.api_url}/clients?full_name=Test Client&email=testclient@example.com&phone=123-456-7890"
+        headers = {'Content-Type': 'application/json'}
+        if self.session_token:
+            headers['Authorization'] = f'Bearer {self.session_token}'
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Create Client...")
+        
+        try:
+            response = requests.post(url, headers=headers, timeout=10)
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                response_data = response.json()
+                if response_data.get('client_id'):
+                    self.client_id = response_data['client_id']
+                    print(f"   Created client ID: {self.client_id}")
+            else:
+                self.failed_tests.append(f"Create Client - Expected 200, got {response.status_code}")
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                try:
+                    error_detail = response.json()
+                    print(f"   Error details: {error_detail}")
+                except:
+                    print(f"   Response text: {response.text}")
+        except Exception as e:
+            self.failed_tests.append(f"Create Client - Error: {str(e)}")
+            print(f"❌ Failed - Error: {str(e)}")
+            success = False
         
         if success and response.get('client_id'):
             self.client_id = response['client_id']
