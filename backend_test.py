@@ -290,10 +290,6 @@ class StageBasedCRMTester:
             print(f"❌ Failed - Error: {str(e)}")
             success = False
         
-        if success and response.get('client_id'):
-            self.client_id = response['client_id']
-            print(f"   Created client ID: {self.client_id}")
-        
         # Get all clients
         success2, clients = self.run_test("Get All Clients", "GET", "clients", 200)
         if success2:
