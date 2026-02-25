@@ -27,11 +27,13 @@ api_router = APIRouter(prefix="/api")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-UPLOAD_DIR = ROOT_DIR / "uploads"
-UPLOAD_DIR.mkdir(exist_ok=True)
+TMP_DIR = Path("/tmp")
 
-REPORTS_DIR = ROOT_DIR / "reports"
-REPORTS_DIR.mkdir(exist_ok=True)
+UPLOAD_DIR = TMP_DIR / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+REPORTS_DIR = TMP_DIR / "reports"
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
