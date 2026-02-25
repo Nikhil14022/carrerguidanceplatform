@@ -330,7 +330,14 @@ async def update_client(client_id: str, request: Request):
     if not client_doc:
         raise HTTPException(status_code=404, detail="Client not found")
     
-    if user.role not in ["admin", "team"]:
+    # Allow clients to update their own progress, but restrict other fields
+    if user.role == "client":
+        if client_doc["user_id"] != user.user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        # Clients can only update current_stage and progress_percentage
+        allowed_fields = ["current_stage", "progress_percentage"]
+        body = {k: v for k, v in body.items() if k in allowed_fields}
+    elif user.role not in ["admin", "team"]:
         raise HTTPException(status_code=403, detail="Access denied")
     
     body["updated_at"] = datetime.now(timezone.utc)
