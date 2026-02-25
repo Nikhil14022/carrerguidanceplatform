@@ -13,6 +13,7 @@ from datetime import datetime, timezone, timedelta
 import requests
 from passlib.context import CryptContext
 import shutil
+from utils.pdf_generator import generate_client_report
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -28,6 +29,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 UPLOAD_DIR = ROOT_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
+
+REPORTS_DIR = ROOT_DIR / "reports"
+REPORTS_DIR.mkdir(exist_ok=True)
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
