@@ -247,21 +247,58 @@ export default function ClientProfile() {
 
           <TabsContent value="reports">
             <Card className="bg-card border border-border/50 shadow-sm rounded-2xl p-8">
-              <h3 className="text-2xl font-medium text-primary mb-6 flex items-center">
-                <FileText className="mr-3 h-6 w-6" />
-                Reports
-              </h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-medium text-primary flex items-center">
+                  <FileText className="mr-3 h-6 w-6" />
+                  Reports
+                </h3>
+                <Button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`${API}/clients/${clientId}/generate-report`, {
+                        method: 'POST',
+                        credentials: 'include'
+                      });
+                      if (!response.ok) throw new Error('Failed to generate report');
+                      toast.success("Report generated successfully!");
+                      fetchData();
+                    } catch (error) {
+                      console.error('Error generating report:', error);
+                      toast.error("Failed to generate report");
+                    }
+                  }}
+                  data-testid="generate-report-btn"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 font-medium"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Generate Report
+                </Button>
+              </div>
               {reports.length === 0 ? (
                 <p className="text-muted-foreground">No reports generated yet</p>
               ) : (
                 <div className="space-y-4">
                   {reports.map((report) => (
-                    <div key={report.report_id} className="p-4 bg-muted/30 rounded-xl" data-testid={`report-${report.report_id}`}>
-                      <h4 className="font-medium text-primary mb-2">{report.report_title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Generated: {new Date(report.generated_at).toLocaleDateString()}
-                      </p>
-                      {report.is_finalized && <Badge className="mt-2">Finalized</Badge>}
+                    <div key={report.report_id} className="p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors" data-testid={`report-${report.report_id}`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-primary mb-2">{report.report_title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Generated: {new Date(report.generated_at).toLocaleDateString()}
+                          </p>
+                          {report.is_finalized && <Badge className="mt-2">Finalized</Badge>}
+                        </div>
+                        {report.report_content?.filename && (
+                          <a
+                            href={`${API}/reports/${report.report_id}/download`}
+                            download
+                            className="text-primary hover:text-primary/80 transition-colors"
+                            data-testid={`download-report-${report.report_id}`}
+                          >
+                            <FileText className="h-6 w-6" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
