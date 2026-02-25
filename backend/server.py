@@ -468,6 +468,81 @@ async def get_client_reports(client_id: str, request: Request):
     reports = await db.reports.find({"client_id": client_id}, {"_id": 0}).to_list(100)
     return reports
 
+@api_router.post("/clients/{client_id}/generate-report")
+async def generate_report(client_id: str, request: Request):
+    user = await get_current_user(request)
+    
+    if user.role not in ["admin", "team"]:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get client data
+    client_doc = await db.clients.find_one({"client_id": client_id}, {"_id": 0})
+    if not client_doc:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Get responses with question details
+    responses = await db.responses.find({"client_id": client_id}, {"_id": 0}).to_list(1000)
+    
+    # Enrich responses with question text
+    enriched_responses = []
+    for response in responses:
+        question = await db.questions.find_one({"question_id": response["question_id"]}, {"_id": 0})
+        if question:
+            enriched_responses.append({
+                "question_text": question["question_text"],
+                "answer": response["answer"]
+            })
+    
+    # Generate PDF
+    report_filename = f"report_{client_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    report_path = REPORTS_DIR / report_filename
+    
+    try:
+        generate_client_report(client_doc, enriched_responses, str(report_path))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate report: {str(e)}")
+    
+    # Save report metadata to database
+    report_id = f"report_{uuid.uuid4().hex[:12]}"
+    report_doc = {
+        "report_id": report_id,
+        "client_id": client_id,
+        "report_title": f"Journey Report - {client_doc['full_name']}",
+        "report_content": {"file_path": str(report_path), "filename": report_filename},
+        "generated_by": user.user_id,
+        "generated_at": datetime.now(timezone.utc),
+        "is_finalized": True
+    }
+    await db.reports.insert_one(report_doc)
+    
+    return {
+        "report_id": report_id,
+        "message": "Report generated successfully",
+        "download_url": f"/api/reports/{report_id}/download"
+    }
+
+@api_router.get("/reports/{report_id}/download")
+async def download_report(report_id: str, request: Request):
+    user = await get_current_user(request)
+    
+    report_doc = await db.reports.find_one({"report_id": report_id}, {"_id": 0})
+    if not report_doc:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    # Check access
+    client_doc = await db.clients.find_one({"client_id": report_doc["client_id"]}, {"_id": 0})
+    if user.role not in ["admin", "team"] and client_doc["user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    file_path = report_doc["report_content"]["file_path"]
+    filename = report_doc["report_content"]["filename"]
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Report file not found")
+    
+    return FileResponse(file_path, filename=filename, media_type="application/pdf")
+
+
 @api_router.post("/action-plans")
 async def create_action_plan(request: Request):
     user = await get_current_user(request)
