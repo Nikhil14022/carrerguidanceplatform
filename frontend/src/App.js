@@ -8,6 +8,7 @@ import QuestionnaireView from "@/pages/QuestionnaireView";
 import TeamDashboard from "@/pages/TeamDashboard";
 import ClientProfile from "@/pages/ClientProfile";
 import AdminPanel from "@/pages/AdminPanel";
+import ActionPlanView from "@/pages/ActionPlanView";
 import { Toaster } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -25,6 +26,7 @@ function AppRouter() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><ClientDashboard /></ProtectedRoute>} />
       <Route path="/questionnaire/:stageId" element={<ProtectedRoute><QuestionnaireView /></ProtectedRoute>} />
+      <Route path="/action-plan" element={<ProtectedRoute><ActionPlanView /></ProtectedRoute>} />
       <Route path="/team" element={<ProtectedRoute requireRole="team"><TeamDashboard /></ProtectedRoute>} />
       <Route path="/client/:clientId" element={<ProtectedRoute requireRole="team"><ClientProfile /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminPanel /></ProtectedRoute>} />
