@@ -88,6 +88,7 @@ export default function QuestionnaireView() {
       // Calculate total stages to determine progress
       const totalStages = 5; // We have 5 stages
       const currentStage = client.current_stage;
+      const isLastStage = currentStage === totalStages;
       
       // Advance to next stage and update progress
       const nextStage = currentStage + 1;
@@ -103,8 +104,40 @@ export default function QuestionnaireView() {
         })
       });
 
-      toast.success("Stage completed! Moving to next stage...");
-      navigate('/dashboard');
+      if (isLastStage) {
+        // Journey completed! Generate report and action plan
+        toast.success("🎉 Congratulations! You've completed your journey!");
+        
+        // Generate report
+        try {
+          await fetch(`${API}/clients/${client.client_id}/generate-report`, {
+            method: 'POST',
+            credentials: 'include'
+          });
+          console.log('Report generated successfully');
+        } catch (err) {
+          console.error('Failed to generate report:', err);
+        }
+        
+        // Generate action plan
+        try {
+          await fetch(`${API}/action-plans/auto-generate/${client.client_id}`, {
+            method: 'POST',
+            credentials: 'include'
+          });
+          console.log('Action plan generated successfully');
+        } catch (err) {
+          console.error('Failed to generate action plan:', err);
+        }
+        
+        // Redirect to action plan view
+        setTimeout(() => {
+          navigate('/action-plan', { replace: true });
+        }, 2000);
+      } else {
+        toast.success("Stage completed! Moving to next stage...");
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('Error submitting responses:', error);
       toast.error("Failed to save responses");
