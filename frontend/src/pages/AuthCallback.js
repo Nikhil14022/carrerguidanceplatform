@@ -25,6 +25,7 @@ export default function AuthCallback() {
 
     const exchangeSession = async () => {
       try {
+        console.log('Exchanging session_id for session_token...');
         const response = await fetch(`${API}/auth/session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -32,14 +33,19 @@ export default function AuthCallback() {
           body: JSON.stringify({ session_id: sessionId })
         });
 
-        if (!response.ok) throw new Error('Session exchange failed');
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Session exchange failed:', response.status, errorText);
+          throw new Error(`Session exchange failed: ${response.status}`);
+        }
 
         const data = await response.json();
-        toast.success("Welcome back!");
+        console.log('Session exchange successful, user:', data.user);
+        toast.success(`Welcome back, ${data.user.name}!`);
         navigate('/dashboard', { replace: true, state: { user: data.user } });
       } catch (error) {
         console.error('Auth error:', error);
-        toast.error("Authentication failed");
+        toast.error(`Authentication failed: ${error.message}`);
         navigate('/', { replace: true });
       }
     };
