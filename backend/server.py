@@ -249,7 +249,7 @@ async def create_session(request: Request, http_response: Response):
     }
     await db.user_sessions.insert_one(session_doc)
     
-    response.set_cookie(
+    http_response.set_cookie(
         key="session_token",
         value=session_token,
         httponly=True,
