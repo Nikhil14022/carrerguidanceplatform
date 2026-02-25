@@ -196,11 +196,24 @@ export default function ClientDashboard() {
             ) : (
               <div className="space-y-4">
                 {reports.map((report) => (
-                  <div key={report.report_id} className="p-4 bg-muted/30 rounded-xl" data-testid={`report-${report.report_id}`}>
-                    <h4 className="font-medium text-primary">{report.report_title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Generated on {new Date(report.generated_at).toLocaleDateString()}
-                    </p>
+                  <div key={report.report_id} className="p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors" data-testid={`report-${report.report_id}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-primary">{report.report_title}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Generated on {new Date(report.generated_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {report.report_content?.filename && (
+                        <a
+                          href={`${API}/reports/${report.report_id}/download`}
+                          download
+                          className="text-accent hover:text-accent/80 transition-colors"
+                        >
+                          <FileText className="h-5 w-5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
