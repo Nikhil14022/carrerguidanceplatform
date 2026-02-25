@@ -108,6 +108,30 @@ export default function ClientDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Journey Complete Banner */}
+        {client?.progress_percentage >= 100 && (
+          <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl p-6 mb-8 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-1">🎉 Journey Complete!</h3>
+                  <p className="text-white/90 text-sm">Your personalized action plan is ready</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate('/action-plan')}
+                data-testid="view-action-plan-btn"
+                className="bg-white text-primary hover:bg-white/90 shadow-lg rounded-full px-6 py-2 font-medium"
+              >
+                View Action Plan
+              </Button>
+            </div>
+          </Card>
+        )}
+        
         {/* Progress Overview */}
         <Card className="bg-card border border-border/50 shadow-sm rounded-2xl p-8 mb-8">
           <h2 className="text-2xl md:text-3xl font-medium text-primary mb-4">Overall Progress</h2>
