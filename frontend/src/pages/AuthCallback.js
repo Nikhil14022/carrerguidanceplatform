@@ -33,13 +33,13 @@ export default function AuthCallback() {
           body: JSON.stringify({ session_id: sessionId })
         });
 
+        const data = await response.json();
+        
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Session exchange failed:', response.status, errorText);
-          throw new Error(`Session exchange failed: ${response.status}`);
+          console.error('Session exchange failed:', response.status, data);
+          throw new Error(data.detail || `Session exchange failed: ${response.status}`);
         }
 
-        const data = await response.json();
         console.log('Session exchange successful, user:', data.user);
         toast.success(`Welcome back, ${data.user.name}!`);
         navigate('/dashboard', { replace: true, state: { user: data.user } });
