@@ -33,30 +33,28 @@ export default function AuthCallback() {
           body: JSON.stringify({ session_id: sessionId })
         });
 
-        // Clone response to allow reading body multiple times if needed
-        const responseClone = response.clone();
-        
+        let data;
         try {
-          const data = await response.json();
-          
-          if (!response.ok) {
-            console.error('Session exchange failed:', response.status, data);
-            throw new Error(data.detail || `Authentication failed`);
-          }
-
-          console.log('Session exchange successful, user:', data.user);
-          toast.success(`Welcome back, ${data.user.name}!`);
-          navigate('/dashboard', { replace: true, state: { user: data.user } });
-        } catch (jsonError) {
-          // If JSON parsing fails, try reading as text
-          const errorText = await responseClone.text();
-          console.error('Response parsing error:', jsonError, 'Response:', errorText);
-          throw new Error('Failed to process authentication response');
+          data = await response.json();
+        } catch (parseError) {
+          console.error('Failed to parse response:', parseError);
+          throw new Error('Invalid response from server');
         }
+        
+        if (!response.ok) {
+          console.error('Session exchange failed:', response.status, data);
+          throw new Error(data.detail || 'Authentication failed');
+        }
+
+        console.log('Session exchange successful, user:', data.user);
+        toast.success(`Welcome back, ${data.user.name}!`);
+        navigate('/dashboard', { replace: true, state: { user: data.user } });
       } catch (error) {
         console.error('Auth error:', error);
         toast.error(`Authentication failed: ${error.message}`);
-        navigate('/', { replace: true });
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 2000);
       }
     };
 
