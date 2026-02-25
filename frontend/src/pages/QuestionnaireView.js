@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,50 +22,57 @@ export default function QuestionnaireView() {
   const [responses, setResponses] = useState({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, [stageId]);
-
-  const fetchData = async () => {
+  // ✅ fetchData wrapped in useCallback with proper dependency
+  const fetchData = useCallback(async () => {
     try {
-      const clientsRes = await fetch(`${API}/clients`, { credentials: 'include' });
+      // Fetch clients
+      const clientsRes = await fetch(`${API}/clients`, { credentials: "include" });
       const clientsData = await clientsRes.json();
       if (clientsData.length > 0) {
         setClient(clientsData[0]);
-        
-        const responsesRes = await fetch(`${API}/clients/${clientsData[0].client_id}/responses`, { credentials: 'include' });
+
+        const responsesRes = await fetch(`${API}/clients/${clientsData[0].client_id}/responses`, {
+          credentials: "include",
+        });
         const responsesData = await responsesRes.json();
-        
         const responsesMap = {};
-        responsesData.forEach(r => {
+        responsesData.forEach((r) => {
           responsesMap[r.question_id] = r.answer;
         });
         setResponses(responsesMap);
       }
 
-      const stagesRes = await fetch(`${API}/stages`, { credentials: 'include' });
+      // Fetch stage
+      const stagesRes = await fetch(`${API}/stages`, { credentials: "include" });
       const stagesData = await stagesRes.json();
-      const currentStage = stagesData.find(s => s.stage_id === stageId);
-      setStage(currentStage);
+      setStage(stagesData.find((s) => s.stage_id === stageId));
 
-      const questionsRes = await fetch(`${API}/stages/${stageId}/questions`, { credentials: 'include' });
+      // Fetch questions
+      const questionsRes = await fetch(`${API}/stages/${stageId}/questions`, { credentials: "include" });
       const questionsData = await questionsRes.json();
       setQuestions(questionsData);
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       toast.error("Failed to load questionnaire");
       setLoading(false);
     }
-  };
+  }, [stageId]);
+
+  // ✅ Call fetchData on mount or when stageId changes
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleResponseChange = (questionId, value) => {
-    setResponses(prev => ({ ...prev, [questionId]: value }));
+    setResponses((prev) => ({ ...prev, [questionId]: value }));
   };
 
   const handleSubmit = async () => {
     try {
+      if (!client) return;
+
       for (const question of questions) {
         if (question.is_required && !responses[question.question_id]) {
           toast.error(`Please answer: ${question.question_text}`);
@@ -73,73 +80,66 @@ export default function QuestionnaireView() {
         }
 
         await fetch(`${API}/responses`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({
             client_id: client.client_id,
             question_id: question.question_id,
             stage_id: stageId,
-            answer: responses[question.question_id]
-          })
+            answer: responses[question.question_id],
+          }),
         });
       }
 
-      // Calculate total stages to determine progress
-      const totalStages = 5; // We have 5 stages
+      const totalStages = 5;
       const currentStage = client.current_stage;
       const isLastStage = currentStage === totalStages;
-      
-      // Advance to next stage and update progress
       const nextStage = currentStage + 1;
       const progressPercentage = Math.round((currentStage / totalStages) * 100);
-      
+
       await fetch(`${API}/clients/${client.client_id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           current_stage: nextStage <= totalStages ? nextStage : currentStage,
-          progress_percentage: progressPercentage
-        })
+          progress_percentage: progressPercentage,
+        }),
       });
 
       if (isLastStage) {
-        // Journey completed! Generate report and action plan
         toast.success("🎉 Congratulations! You've completed your journey!");
-        
-        // Generate report
+
         try {
           await fetch(`${API}/clients/${client.client_id}/generate-report`, {
-            method: 'POST',
-            credentials: 'include'
+            method: "POST",
+            credentials: "include",
           });
-          console.log('Report generated successfully');
+          console.log("Report generated successfully");
         } catch (err) {
-          console.error('Failed to generate report:', err);
+          console.error("Failed to generate report:", err);
         }
-        
-        // Generate action plan
+
         try {
           await fetch(`${API}/action-plans/auto-generate/${client.client_id}`, {
-            method: 'POST',
-            credentials: 'include'
+            method: "POST",
+            credentials: "include",
           });
-          console.log('Action plan generated successfully');
+          console.log("Action plan generated successfully");
         } catch (err) {
-          console.error('Failed to generate action plan:', err);
+          console.error("Failed to generate action plan:", err);
         }
-        
-        // Redirect to action plan view
+
         setTimeout(() => {
-          navigate('/action-plan', { replace: true });
+          navigate("/action-plan", { replace: true });
         }, 2000);
       } else {
         toast.success("Stage completed! Moving to next stage...");
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (error) {
-      console.error('Error submitting responses:', error);
+      console.error("Error submitting responses:", error);
       toast.error("Failed to save responses");
     }
   };
@@ -160,9 +160,9 @@ export default function QuestionnaireView() {
       {/* Header */}
       <header className="bg-white border-b border-border/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dashboard")}
             data-testid="back-to-dashboard-btn"
             className="mb-4 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors rounded-lg px-4 py-2"
           >
@@ -174,6 +174,7 @@ export default function QuestionnaireView() {
         </div>
       </header>
 
+      {/* Main */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Card className="bg-card border border-border/50 shadow-sm rounded-2xl p-8">
           <div className="space-y-8">
@@ -184,9 +185,9 @@ export default function QuestionnaireView() {
                   {question.is_required && <span className="text-destructive ml-1">*</span>}
                 </Label>
 
-                {question.question_type === 'text' && (
+                {question.question_type === "text" && (
                   <Input
-                    value={responses[question.question_id] || ''}
+                    value={responses[question.question_id] || ""}
                     onChange={(e) => handleResponseChange(question.question_id, e.target.value)}
                     placeholder="Your answer"
                     data-testid={`answer-${index + 1}`}
@@ -194,9 +195,9 @@ export default function QuestionnaireView() {
                   />
                 )}
 
-                {question.question_type === 'textarea' && (
+                {question.question_type === "textarea" && (
                   <Textarea
-                    value={responses[question.question_id] || ''}
+                    value={responses[question.question_id] || ""}
                     onChange={(e) => handleResponseChange(question.question_id, e.target.value)}
                     placeholder="Your detailed answer"
                     rows={5}
@@ -205,7 +206,7 @@ export default function QuestionnaireView() {
                   />
                 )}
 
-                {question.question_type === 'multiple_choice' && question.options && (
+                {question.question_type === "multiple_choice" && question.options && (
                   <div className="space-y-3">
                     {question.options.map((option, optIndex) => (
                       <div key={optIndex} className="flex items-center space-x-3">
@@ -214,11 +215,8 @@ export default function QuestionnaireView() {
                           checked={(responses[question.question_id] || []).includes(option)}
                           onCheckedChange={(checked) => {
                             const current = responses[question.question_id] || [];
-                            if (checked) {
-                              handleResponseChange(question.question_id, [...current, option]);
-                            } else {
-                              handleResponseChange(question.question_id, current.filter(o => o !== option));
-                            }
+                            if (checked) handleResponseChange(question.question_id, [...current, option]);
+                            else handleResponseChange(question.question_id, current.filter((o) => o !== option));
                           }}
                           data-testid={`option-${index + 1}-${optIndex + 1}`}
                         />
@@ -230,19 +228,24 @@ export default function QuestionnaireView() {
                   </div>
                 )}
 
-                {question.question_type === 'scale' && (
+                {question.question_type === "scale" && (
                   <RadioGroup
-                    value={responses[question.question_id]?.toString() || ''}
+                    value={responses[question.question_id]?.toString() || ""}
                     onValueChange={(value) => handleResponseChange(question.question_id, parseInt(value))}
                     data-testid={`answer-${index + 1}`}
                   >
                     <div className="flex flex-wrap gap-4">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                        <div key={num} className="flex items-center space-x-2">
-                          <RadioGroupItem value={num.toString()} id={`scale-${question.question_id}-${num}`} />
-                          <Label htmlFor={`scale-${question.question_id}-${num}`} className="cursor-pointer">{num}</Label>
-                        </div>
-                      ))}
+                      {[...Array(10)].map((_, i) => {
+                        const num = i + 1;
+                        return (
+                          <div key={num} className="flex items-center space-x-2">
+                            <RadioGroupItem value={num.toString()} id={`scale-${question.question_id}-${num}`} />
+                            <Label htmlFor={`scale-${question.question_id}-${num}`} className="cursor-pointer">
+                              {num}
+                            </Label>
+                          </div>
+                        );
+                      })}
                     </div>
                   </RadioGroup>
                 )}
