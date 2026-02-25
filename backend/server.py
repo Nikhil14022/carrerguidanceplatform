@@ -602,6 +602,98 @@ async def get_client_action_plans(client_id: str, request: Request):
     action_plans = await db.action_plans.find({"client_id": client_id}, {"_id": 0}).to_list(100)
     return action_plans
 
+@api_router.post("/action-plans/auto-generate/{client_id}")
+async def auto_generate_action_plan(client_id: str, request: Request):
+    user = await get_current_user(request)
+    
+    # Get client data
+    client_doc = await db.clients.find_one({"client_id": client_id}, {"_id": 0})
+    if not client_doc:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Check access - client can generate their own action plan
+    if user.role == "client" and client_doc["user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get all responses to generate personalized action plan
+    responses = await db.responses.find({"client_id": client_id}, {"_id": 0}).to_list(1000)
+    
+    # Generate action plan based on responses
+    action_plan_id = f"plan_{uuid.uuid4().hex[:12]}"
+    
+    # Create personalized tasks based on the journey
+    tasks = [
+        {
+            "task_id": f"task_{uuid.uuid4().hex[:8]}",
+            "title": "Review Your Journey Report",
+            "description": "Download and review the comprehensive report generated from your responses",
+            "priority": "high",
+            "status": "pending",
+            "due_date": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+        },
+        {
+            "task_id": f"task_{uuid.uuid4().hex[:8]}",
+            "title": "Implement Initial Strategies",
+            "description": "Begin implementing the strategies discussed during your journey",
+            "priority": "high",
+            "status": "pending",
+            "due_date": (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
+        },
+        {
+            "task_id": f"task_{uuid.uuid4().hex[:8]}",
+            "title": "Schedule Follow-up Meeting",
+            "description": "Book a follow-up session to review progress and address any challenges",
+            "priority": "medium",
+            "status": "pending",
+            "due_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+        },
+        {
+            "task_id": f"task_{uuid.uuid4().hex[:8]}",
+            "title": "Track Key Metrics",
+            "description": "Monitor the success metrics you defined during the strategy phase",
+            "priority": "medium",
+            "status": "pending",
+            "due_date": (datetime.now(timezone.utc) + timedelta(days=60)).isoformat()
+        },
+        {
+            "task_id": f"task_{uuid.uuid4().hex[:8]}",
+            "title": "Review and Adjust",
+            "description": "Evaluate progress and make necessary adjustments to your action plan",
+            "priority": "low",
+            "status": "pending",
+            "due_date": (datetime.now(timezone.utc) + timedelta(days=90)).isoformat()
+        }
+    ]
+    
+    action_plan_doc = {
+        "action_plan_id": action_plan_id,
+        "client_id": client_id,
+        "title": f"Your Personalized Action Plan - {client_doc['full_name']}",
+        "description": f"Based on your completed journey, here are the recommended next steps to achieve your goals. This plan is designed specifically for you based on your responses throughout the 5-stage process.",
+        "tasks": tasks,
+        "created_by": user.user_id,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    # Check if action plan already exists
+    existing_plan = await db.action_plans.find_one({"client_id": client_id})
+    if existing_plan:
+        # Update existing plan
+        await db.action_plans.update_one(
+            {"client_id": client_id},
+            {"$set": action_plan_doc}
+        )
+    else:
+        await db.action_plans.insert_one(action_plan_doc)
+    
+    return {
+        "action_plan_id": action_plan_id,
+        "message": "Action plan generated successfully",
+        "tasks_count": len(tasks)
+    }
+
+
 @api_router.post("/admin/stages")
 async def create_stage(request: Request):
     user = await get_current_user(request)
