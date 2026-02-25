@@ -84,7 +84,7 @@ class Question(BaseModel):
     order: int
     created_at: datetime
 
-class Response(BaseModel):
+class QuestionnaireResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     response_id: str
     client_id: str
