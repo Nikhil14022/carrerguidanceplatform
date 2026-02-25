@@ -177,6 +177,8 @@ async def create_session(request: Request, response: Response):
     body = await request.json()
     session_id = body.get("session_id")
     
+    logger.info(f"Session exchange requested with session_id: {session_id[:20]}...")
+    
     if not session_id:
         raise HTTPException(status_code=400, detail="session_id required")
     
@@ -188,7 +190,9 @@ async def create_session(request: Request, response: Response):
         )
         resp.raise_for_status()
         data = resp.json()
+        logger.info(f"Session verified for email: {data.get('email')}")
     except Exception as e:
+        logger.error(f"Failed to verify session: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Failed to verify session: {str(e)}")
     
     user_id = f"user_{uuid.uuid4().hex[:12]}"
