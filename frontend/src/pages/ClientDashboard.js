@@ -167,7 +167,7 @@ export default function ClientDashboard() {
                         data-testid={`start-stage-${stageNumber}-btn`}
                         className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 font-medium mt-4"
                       >
-                        {stage.requires_meeting ? 'View Details' : 'Start Questionnaire'}
+                        Start Questionnaire
                       </Button>
                     )}
                     
