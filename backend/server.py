@@ -215,6 +215,25 @@ async def create_session(request: Request, response: Response):
             "created_at": datetime.now(timezone.utc)
         }
         await db.users.insert_one(user_doc)
+        
+        # Auto-create client profile for new users with client role
+        client_exists = await db.clients.find_one({"user_id": user_id})
+        if not client_exists:
+            client_id = f"client_{uuid.uuid4().hex[:12]}"
+            client_doc = {
+                "client_id": client_id,
+                "user_id": user_id,
+                "full_name": name,
+                "email": email,
+                "phone": None,
+                "current_stage": 1,
+                "progress_percentage": 0.0,
+                "assigned_team_member": None,
+                "status": "active",
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+            await db.clients.insert_one(client_doc)
     
     await db.user_sessions.delete_many({"user_id": user_id})
     
