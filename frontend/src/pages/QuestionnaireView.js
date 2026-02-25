@@ -85,7 +85,25 @@ export default function QuestionnaireView() {
         });
       }
 
-      toast.success("Responses saved successfully!");
+      // Calculate total stages to determine progress
+      const totalStages = 5; // We have 5 stages
+      const currentStage = client.current_stage;
+      
+      // Advance to next stage and update progress
+      const nextStage = currentStage + 1;
+      const progressPercentage = Math.round((currentStage / totalStages) * 100);
+      
+      await fetch(`${API}/clients/${client.client_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          current_stage: nextStage <= totalStages ? nextStage : currentStage,
+          progress_percentage: progressPercentage
+        })
+      });
+
+      toast.success("Stage completed! Moving to next stage...");
       navigate('/dashboard');
     } catch (error) {
       console.error('Error submitting responses:', error);
