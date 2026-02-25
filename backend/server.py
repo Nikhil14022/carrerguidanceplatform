@@ -502,13 +502,16 @@ async def get_client_reports(client_id: str, request: Request):
 async def generate_report(client_id: str, request: Request):
     user = await get_current_user(request)
     
-    if user.role not in ["admin", "team"]:
-        raise HTTPException(status_code=403, detail="Access denied")
-    
     # Get client data
     client_doc = await db.clients.find_one({"client_id": client_id}, {"_id": 0})
     if not client_doc:
         raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Allow clients to generate their own reports
+    if user.role == "client" and client_doc["user_id"] != user.user_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    elif user.role not in ["admin", "team", "client"]:
+        raise HTTPException(status_code=403, detail="Access denied")
     
     # Get responses with question details
     responses = await db.responses.find({"client_id": client_id}, {"_id": 0}).to_list(1000)
