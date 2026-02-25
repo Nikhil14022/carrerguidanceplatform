@@ -33,16 +33,26 @@ export default function AuthCallback() {
           body: JSON.stringify({ session_id: sessionId })
         });
 
-        const data = await response.json();
+        // Clone response to allow reading body multiple times if needed
+        const responseClone = response.clone();
         
-        if (!response.ok) {
-          console.error('Session exchange failed:', response.status, data);
-          throw new Error(data.detail || `Session exchange failed: ${response.status}`);
-        }
+        try {
+          const data = await response.json();
+          
+          if (!response.ok) {
+            console.error('Session exchange failed:', response.status, data);
+            throw new Error(data.detail || `Authentication failed`);
+          }
 
-        console.log('Session exchange successful, user:', data.user);
-        toast.success(`Welcome back, ${data.user.name}!`);
-        navigate('/dashboard', { replace: true, state: { user: data.user } });
+          console.log('Session exchange successful, user:', data.user);
+          toast.success(`Welcome back, ${data.user.name}!`);
+          navigate('/dashboard', { replace: true, state: { user: data.user } });
+        } catch (jsonError) {
+          // If JSON parsing fails, try reading as text
+          const errorText = await responseClone.text();
+          console.error('Response parsing error:', jsonError, 'Response:', errorText);
+          throw new Error('Failed to process authentication response');
+        }
       } catch (error) {
         console.error('Auth error:', error);
         toast.error(`Authentication failed: ${error.message}`);
