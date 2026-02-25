@@ -173,11 +173,11 @@ async def get_current_user(request: Request) -> User:
     return User(**user_doc)
 
 @api_router.post("/auth/session")
-async def create_session(request: Request, response: Response):
+async def create_session(request: Request, http_response: Response):
     body = await request.json()
     session_id = body.get("session_id")
     
-    logger.info(f"Session exchange requested with session_id: {session_id[:20]}...")
+    logger.info(f"Session exchange requested with session_id: {session_id[:20] if session_id else 'None'}...")
     
     if not session_id:
         raise HTTPException(status_code=400, detail="session_id required")
