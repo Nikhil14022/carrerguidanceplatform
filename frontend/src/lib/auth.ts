@@ -7,6 +7,7 @@ import { headers } from 'next/headers'
 
 const { handlers, auth: nextAuth, signIn, signOut } = NextAuth({
   trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: 'credentials',
