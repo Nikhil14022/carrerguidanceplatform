@@ -1,0 +1,671 @@
+[
+  {
+    "id": "pf16_1",
+    "type": "statement",
+    "text": "I have a lot of energy"
+  },
+  {
+    "id": "pf16_2",
+    "type": "statement",
+    "text": "I have a vivid imagination"
+  },
+  {
+    "id": "pf16_3",
+    "type": "statement",
+    "text": "I prefer to follow a schedule"
+  },
+  {
+    "id": "pf16_4",
+    "type": "statement",
+    "text": "I enjoy trying to understand complicated ideas"
+  },
+  {
+    "id": "pf16_5",
+    "type": "statement",
+    "text": "I think about the needs of others"
+  },
+  {
+    "id": "pf16_6",
+    "type": "statement",
+    "text": "I enjoy being the center of attention"
+  },
+  {
+    "id": "pf16_7",
+    "type": "statement",
+    "text": "I make sure my work is finished on time"
+  },
+  {
+    "id": "pf16_8",
+    "type": "statement",
+    "text": "I sympathize with the homeless"
+  },
+  {
+    "id": "pf16_9",
+    "type": "statement",
+    "text": "I think about why people do the things they do"
+  },
+  {
+    "id": "pf16_10",
+    "type": "statement",
+    "text": "I enjoy chatting with new acquaintances"
+  },
+  {
+    "id": "pf16_11",
+    "type": "statement",
+    "text": "I keep my belongings in their proper place"
+  },
+  {
+    "id": "pf16_12",
+    "type": "statement",
+    "text": "I enjoy being there for people when they are feeling sad"
+  },
+  {
+    "id": "pf16_13",
+    "type": "statement",
+    "text": "I would rather go with the flow than have a set schedule"
+  },
+  {
+    "id": "pf16_14",
+    "type": "statement",
+    "text": "I enjoy philosophical discussions"
+  },
+  {
+    "id": "pf16_15",
+    "type": "statement",
+    "text": "I would enjoy attending a large party in my honor"
+  },
+  {
+    "id": "pf16_16",
+    "type": "statement",
+    "text": "I am very attentive to deadlines"
+  },
+  {
+    "id": "pf16_17",
+    "type": "statement",
+    "text": "I am helpful to the people around me"
+  },
+  {
+    "id": "pf16_18",
+    "type": "statement",
+    "text": "It is important to me to understand the bigger picture"
+  },
+  {
+    "id": "pf16_19",
+    "type": "statement",
+    "text": "It is easy for me to talk to strangers"
+  },
+  {
+    "id": "pf16_20",
+    "type": "statement",
+    "text": "I believe in the importance of art"
+  },
+  {
+    "id": "pf16_21",
+    "type": "statement",
+    "text": "I work hard to please others"
+  },
+  {
+    "id": "pf16_22",
+    "type": "statement",
+    "text": "I like to help others with their personal problems"
+  },
+  {
+    "id": "pf16_23",
+    "type": "statement",
+    "text": "I like thinking about the mysteries of the universe"
+  },
+  {
+    "id": "pf16_24",
+    "type": "statement",
+    "text": "I make plans and stick to them"
+  },
+  {
+    "id": "pf16_25",
+    "type": "statement",
+    "text": "I spend time trying to understand myself"
+  },
+  {
+    "id": "pf16_26",
+    "type": "statement",
+    "text": "I get a thrill out of meeting new people"
+  },
+  {
+    "id": "pf16_27",
+    "type": "statement",
+    "text": "I am sensitive to the feelings of others"
+  },
+  {
+    "id": "pf16_28",
+    "type": "statement",
+    "text": "I enjoy learning about scientific theories"
+  },
+  {
+    "id": "pf16_29",
+    "type": "statement",
+    "text": "I start tasks in advance, so that I have plenty of time to finish"
+  },
+  {
+    "id": "pf16_30",
+    "type": "statement",
+    "text": "I love to make new friends"
+  },
+  {
+    "id": "pf16_31",
+    "type": "statement",
+    "text": "I like to have a detailed plan before starting a task"
+  },
+  {
+    "id": "pf16_32",
+    "type": "statement",
+    "text": "People tell me I am too quiet"
+  },
+  {
+    "id": "pf16_33",
+    "type": "statement",
+    "text": "I am concerned about others"
+  },
+  {
+    "id": "pf16_34",
+    "type": "statement",
+    "text": "I would prefer to come up with an original solution to a problem"
+  },
+  {
+    "id": "pf16_35",
+    "type": "statement",
+    "text": "Being around lots of people energizes me"
+  },
+  {
+    "id": "pf16_36",
+    "type": "statement",
+    "text": "I have trouble sticking to a routine"
+  },
+  {
+    "id": "pf16_37",
+    "type": "statement",
+    "text": "It is important to me to be of service to others"
+  },
+  {
+    "id": "pf16_38",
+    "type": "statement",
+    "text": "I enjoy examining myself and my life"
+  },
+  {
+    "id": "pf16_39",
+    "type": "statement",
+    "text": "I find it challenging to make new friends"
+  },
+  {
+    "id": "pf16_40",
+    "type": "statement",
+    "text": "I am a private person"
+  },
+  {
+    "id": "pf16_41",
+    "type": "statement",
+    "text": "I let others know that I care about their feelings"
+  },
+  {
+    "id": "pf16_42",
+    "type": "statement",
+    "text": "I am full of new ideas"
+  },
+  {
+    "id": "pf16_43",
+    "type": "statement",
+    "text": "I like to finish all my chores before I do something fun"
+  },
+  {
+    "id": "pf16_44",
+    "type": "statement",
+    "text": "I question why things are the way they are"
+  },
+  {
+    "id": "pf16_45",
+    "type": "statement",
+    "text": "I carry out my plans"
+  },
+  {
+    "id": "pf16_46",
+    "type": "statement",
+    "text": "It is important to me to make decisions without being swayed by emotions"
+  },
+  {
+    "id": "pf16_47",
+    "type": "statement",
+    "text": "I lose my belongings"
+  },
+  {
+    "id": "pf16_48",
+    "type": "statement",
+    "text": "It is important to me to follow traditions"
+  },
+  {
+    "id": "pf16_49",
+    "type": "statement",
+    "text": "I let other people know what I think"
+  },
+  {
+    "id": "pf16_50",
+    "type": "statement",
+    "text": "I try to avoid conflict"
+  },
+  {
+    "id": "pf16_51",
+    "type": "statement",
+    "text": "I have trouble controlling my impulses"
+  },
+  {
+    "id": "pf16_52",
+    "type": "statement",
+    "text": "I love life"
+  },
+  {
+    "id": "pf16_53",
+    "type": "statement",
+    "text": "I am ambitious"
+  },
+  {
+    "id": "pf16_54",
+    "type": "statement",
+    "text": "I would like to play a musical instrument"
+  },
+  {
+    "id": "pf16_55",
+    "type": "statement",
+    "text": "I like to be needed by other people"
+  },
+  {
+    "id": "pf16_56",
+    "type": "statement",
+    "text": "I avoid being alone"
+  },
+  {
+    "id": "pf16_57",
+    "type": "statement",
+    "text": "I forgive easily"
+  },
+  {
+    "id": "pf16_58",
+    "type": "statement",
+    "text": "I like trying out new hobbies"
+  },
+  {
+    "id": "pf16_59",
+    "type": "statement",
+    "text": "I like to stay active"
+  },
+  {
+    "id": "pf16_60",
+    "type": "statement",
+    "text": "It is best to be totally objective when making a decision"
+  },
+  {
+    "id": "pf16_61",
+    "type": "statement",
+    "text": "I have a rich fantasy life"
+  },
+  {
+    "id": "pf16_62",
+    "type": "statement",
+    "text": "I have little to say"
+  },
+  {
+    "id": "pf16_63",
+    "type": "statement",
+    "text": "I like to do things as they were done in the past"
+  },
+  {
+    "id": "pf16_64",
+    "type": "statement",
+    "text": "I avoid arguing, even when I disagree"
+  },
+  {
+    "id": "pf16_65",
+    "type": "statement",
+    "text": "I have a lot of fun"
+  },
+  {
+    "id": "pf16_66",
+    "type": "statement",
+    "text": "I resist temptations"
+  },
+  {
+    "id": "pf16_67",
+    "type": "statement",
+    "text": "I am determined to achieve success in life"
+  },
+  {
+    "id": "pf16_68",
+    "type": "statement",
+    "text": "I like to spend my free time alone"
+  },
+  {
+    "id": "pf16_69",
+    "type": "statement",
+    "text": "I believe people should be punished for their mistakes"
+  },
+  {
+    "id": "pf16_70",
+    "type": "statement",
+    "text": "I spend time seeking out new experiences"
+  },
+  {
+    "id": "pf16_71",
+    "type": "statement",
+    "text": "I am on the go"
+  },
+  {
+    "id": "pf16_72",
+    "type": "statement",
+    "text": "I wish other people would be more logical"
+  },
+  {
+    "id": "pf16_73",
+    "type": "statement",
+    "text": "I like to tidy up"
+  },
+  {
+    "id": "pf16_74",
+    "type": "statement",
+    "text": "I enjoy imagining the future"
+  },
+  {
+    "id": "pf16_75",
+    "type": "statement",
+    "text": "I find it difficult to express my opinions"
+  },
+  {
+    "id": "pf16_76",
+    "type": "statement",
+    "text": "I try not to draw attention to myself"
+  },
+  {
+    "id": "pf16_77",
+    "type": "statement",
+    "text": "I dislike being in competition with others"
+  },
+  {
+    "id": "pf16_78",
+    "type": "statement",
+    "text": "I question the wisdom of my elders"
+  },
+  {
+    "id": "pf16_79",
+    "type": "statement",
+    "text": "I finish assignments before they are due"
+  },
+  {
+    "id": "pf16_80",
+    "type": "statement",
+    "text": "I am concerned for the welfare of elderly people"
+  },
+  {
+    "id": "pf16_81",
+    "type": "statement",
+    "text": "I follow my impulses"
+  },
+  {
+    "id": "pf16_82",
+    "type": "statement",
+    "text": "I feel very happy"
+  },
+  {
+    "id": "pf16_83",
+    "type": "statement",
+    "text": "I need support from other people"
+  },
+  {
+    "id": "pf16_84",
+    "type": "statement",
+    "text": "I enjoy going to museums"
+  },
+  {
+    "id": "pf16_85",
+    "type": "statement",
+    "text": "I avoid noisy crowds"
+  },
+  {
+    "id": "pf16_86",
+    "type": "statement",
+    "text": "I forgive others' mistakes, even when they harm me personally"
+  },
+  {
+    "id": "pf16_87",
+    "type": "statement",
+    "text": "I like to do things differently, even if I am not sure it will work"
+  },
+  {
+    "id": "pf16_88",
+    "type": "statement",
+    "text": "I am not bothered by disorder"
+  },
+  {
+    "id": "pf16_89",
+    "type": "statement",
+    "text": "I do not like to sit still for long"
+  },
+  {
+    "id": "pf16_90",
+    "type": "statement",
+    "text": "I make important decisions based on my gut feelings"
+  },
+  {
+    "id": "pf16_91",
+    "type": "statement",
+    "text": "I enjoy having a daily routine"
+  },
+  {
+    "id": "pf16_92",
+    "type": "statement",
+    "text": "I hold back my opinions"
+  },
+  {
+    "id": "pf16_93",
+    "type": "statement",
+    "text": "I feel uncomfortable when I disagree with someone"
+  },
+  {
+    "id": "pf16_94",
+    "type": "statement",
+    "text": "I make an effort to be popular"
+  },
+  {
+    "id": "pf16_95",
+    "type": "statement",
+    "text": "I am easily distracted"
+  },
+  {
+    "id": "pf16_96",
+    "type": "statement",
+    "text": "I have a zest for life"
+  },
+  {
+    "id": "pf16_97",
+    "type": "statement",
+    "text": "I give to people who are less fortunate than I"
+  },
+  {
+    "id": "pf16_98",
+    "type": "statement",
+    "text": "I wonder why I am the way I am"
+  },
+  {
+    "id": "pf16_99",
+    "type": "statement",
+    "text": "It's important to me that other people like me"
+  },
+  {
+    "id": "pf16_100",
+    "type": "statement",
+    "text": "I appreciate the beauty of nature"
+  },
+  {
+    "id": "pf16_101",
+    "type": "statement",
+    "text": "I prefer quiet surroundings"
+  },
+  {
+    "id": "pf16_102",
+    "type": "statement",
+    "text": "I find it difficult to get down to work"
+  },
+  {
+    "id": "pf16_103",
+    "type": "statement",
+    "text": "I can't stand when someone doesn't like me"
+  },
+  {
+    "id": "pf16_104",
+    "type": "statement",
+    "text": "I like poetry"
+  },
+  {
+    "id": "pf16_105",
+    "type": "statement",
+    "text": "Emotional people make me uncomfortable"
+  },
+  {
+    "id": "pf16_106",
+    "type": "pair",
+    "left": "I spend my time pursuing my goals",
+    "right": "I spend my time enjoying life"
+  },
+  {
+    "id": "pf16_107",
+    "type": "pair",
+    "left": "I focus on real life",
+    "right": "I use my imagination"
+  },
+  {
+    "id": "pf16_108",
+    "type": "pair",
+    "left": "I trust traditional values",
+    "right": "I question traditional values"
+  },
+  {
+    "id": "pf16_109",
+    "type": "pair",
+    "left": "I enjoy activities that are familiar",
+    "right": "I enjoy experiencing new things"
+  },
+  {
+    "id": "pf16_110",
+    "type": "pair",
+    "left": "I am more interested in what is possible",
+    "right": "I am more interested in what is real"
+  },
+  {
+    "id": "pf16_111",
+    "type": "pair",
+    "left": "I like to cooperate",
+    "right": "I like to compete"
+  },
+  {
+    "id": "pf16_112",
+    "type": "pair",
+    "left": "I prefer to follow a clear procedure",
+    "right": "I prefer to improvise"
+  },
+  {
+    "id": "pf16_113",
+    "type": "pair",
+    "left": "I prefer to work in an active, bustling office",
+    "right": "I prefer to work in a calm, quiet office"
+  },
+  {
+    "id": "pf16_114",
+    "type": "pair",
+    "left": "I do things step-by-step",
+    "right": "I jump in and figure things out as I go"
+  },
+  {
+    "id": "pf16_115",
+    "type": "pair",
+    "left": "I am often disorganized",
+    "right": "I keep myself organized"
+  },
+  {
+    "id": "pf16_116",
+    "type": "pair",
+    "left": "I make decisions with my head",
+    "right": "I make decisions with my heart"
+  },
+  {
+    "id": "pf16_117",
+    "type": "pair",
+    "left": "I like to try to innovate",
+    "right": "I like to use trusted methods"
+  },
+  {
+    "id": "pf16_118",
+    "type": "pair",
+    "left": "I keep my thoughts to myself",
+    "right": "I speak up"
+  },
+  {
+    "id": "pf16_119",
+    "type": "pair",
+    "left": "I seek attention from others",
+    "right": "I avoid attention from others"
+  },
+  {
+    "id": "pf16_120",
+    "type": "pair",
+    "left": "I look for ways to help others",
+    "right": "I look for ways to achieve my own goals"
+  },
+  {
+    "id": "pf16_121",
+    "type": "pair",
+    "left": "I start conversations",
+    "right": "I let others start conversations"
+  },
+  {
+    "id": "pf16_122",
+    "type": "pair",
+    "left": "I like ideas that are easy to understand",
+    "right": "I like ideas that are complex"
+  },
+  {
+    "id": "pf16_123",
+    "type": "pair",
+    "left": "I feel the pain of other people",
+    "right": "I am not easily affected by sad stories"
+  },
+  {
+    "id": "pf16_124",
+    "type": "pair",
+    "left": "I value my social status",
+    "right": "I value my privacy"
+  },
+  {
+    "id": "pf16_125",
+    "type": "pair",
+    "left": "I put my needs first",
+    "right": "I put others' needs ahead of my own"
+  },
+  {
+    "id": "pf16_126",
+    "type": "pair",
+    "left": "I follow a plan",
+    "right": "I act on impulse"
+  },
+  {
+    "id": "pf16_127",
+    "type": "pair",
+    "left": "I am always prepared",
+    "right": "I am often unprepared"
+  },
+  {
+    "id": "pf16_128",
+    "type": "pair",
+    "left": "I make sure everyone is taken care of",
+    "right": "I look out for myself"
+  },
+  {
+    "id": "pf16_129",
+    "type": "pair",
+    "left": "I work first, play later",
+    "right": "I play first, work later"
+  }
+]

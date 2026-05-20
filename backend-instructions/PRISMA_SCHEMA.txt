@@ -1,0 +1,127 @@
+// Prisma Schema Blueprint for Career Guidance Platform
+// Database: MongoDB
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  PARENT
+  ADMIN
+  EXPERT
+}
+
+enum ModuleStatus {
+  LOCKED
+  UNLOCKED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+}
+
+enum ReportStatus {
+  AI_GENERATED
+  HUMAN_REVIVING
+  FINALIZED
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  password      String
+  name          String?
+  role          Role      @default(CLIENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  clientProfile ClientProfile?
+}
+
+model ClientProfile {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  
+  parentId      String?   @db.ObjectId // Link to another User with role PARENT
+  
+  currentStage  Int       @default(1)
+  journeyStatus String    @default("Started")
+
+  modules       ClientModule[]
+  reports       Report[]
+}
+
+model Module {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String?
+  schema        Json      // Dynamic question structure
+  defaultOrder  Int
+}
+
+model ClientModule {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String     @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  moduleId      String       @db.ObjectId
+  status        ModuleStatus @default(LOCKED)
+  order         Int
+  filledBy      String       @default("CLIENT") // CLIENT, ADMIN, or MIXED
+  
+  response      ModuleResponse?
+}
+
+model ModuleResponse {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientModuleId String   @unique @db.ObjectId
+  clientModule   ClientModule @relation(fields: [clientModuleId], references: [id])
+  
+  data          Json      // The answer payload
+  submittedAt   DateTime?
+  approvedAt    DateTime?
+  reviewerId    String?   @db.ObjectId
+}
+
+model Report {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String     @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  status        ReportStatus @default(AI_GENERATED)
+  content       String?      // Rich text or JSON
+  
+  careerOptions CareerOption[]
+  active        Boolean      @default(true)
+}
+
+model CareerOption {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  reportId  String   @db.ObjectId
+  report    Report   @relation(fields: [reportId], references: [id])
+  
+  title     String
+  reasoning String?
+  match     Int      // Percentage
+  
+  research  ResearchEntry?
+}
+
+model ResearchEntry {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  careerOptionId String       @unique @db.ObjectId
+  careerOption   CareerOption @relation(fields: [careerOptionId], references: [id])
+  
+  pathway        String?
+  skills         String[]
+  indiaVsAbroad  String?
+  lifestyle      String?
+  gaps           String?
+}

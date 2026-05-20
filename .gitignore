@@ -1,0 +1,68 @@
+# Mobile App - excluded
+CareerPathMobile/
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Environment variables
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated
+frontend/src/generated/
+
+# IDE
+.vscode/
+.idea/
+
+# Agent/AI tool folders
+.agent/
+.claude/
+.gemini/
+
+# Misc temp files
+*.pem
+
+# Vercel
+.vercel
+
+# Lock files (optional - uncomment if you don't want them)
+# package-lock.json
+
+# Large binary docs (optional)
+*.docx
+
+# Temp/scratch files
+frontend/temp_script.txt
+frontend/temp_truity.html
+frontend/ts_error.txt
+frontend/extract.js
+frontend/extracted.json
+frontend/public/uploads/

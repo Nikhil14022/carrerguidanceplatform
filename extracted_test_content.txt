@@ -1,0 +1,1403 @@
+=== PARAGRAPHS ===
+
+P0 [normal]: Name:
+P4 [normal]: DEMOGRAPHICS
+P6 [normal]: 1. Additional Exams (completed/giving/planning to give)
+P9 [normal]: 2. Any extracurricular activities you have participated in? (highlight those which they have enjoyed)
+P12 [normal]: Share with us your marksheets:
+P13 [normal]: - If in 10th grade – ask for 7th, 8th, 9th and latest year marksheets
+P14 [normal]: - If in 12th grade – ask for 9th, 10th, 11th and latest year marksheets
+P15 [normal]: - If in degree – ask for 10th, 12th, and the latest year marksheets
+P16 [normal]: - If in post-graduation – ask for 10th, 12th graduation, and latest year marksheets
+P19 [normal]: Academic Overview:
+P26 [normal]: 3. Thoughts on education & academics:
+P34 [normal]: 4. Apart from academics, what other areas interest you or what are you most curious about? OR What are the things you like to do in your free time? (Hobbies)
+P37 [normal]: 5. What is your routine every day? (If they go random, try going into specifics and in random time what they do, take their time and activity as close as possible)
+P40 [normal]: AIM AND VISION
+P42 [normal]: 1. What are you aiming at with these sessions? Any expectations from the sessions? Your intention for yourself through these sessions?
+P45 [normal]: 2. Areas You Would like to work on/Goals:
+P47 [normal]: Career/Academics/Course (school, curriculum, marks, system, subjects) -
+P49 [normal]: Self (personality, skills, qualities, looks, body) -
+P51 [normal]: Family (communication, bond, relationship) -
+P53 [normal]: Friends/ Relationship –
+P56 [normal]: 3A. Name the 5 Most Important things/people in your life right now?
+P57 [normal]: (First ask what they have to say, later ask in depth on the answers given & then Mark top 5)
+P58 [normal]: For example:
+P61 [normal]: 3B. Name 5 areas in which you spend yeh maximum amount of your time
+P62 [normal]: (First ask what they have to say, later ask in depth on the answers given & then Mark top 5)
+P66 [normal]: 4. What is the out of the box career that fascinates you the most?
+P67 [normal]: Either something that already exists or something you would want it to exist. Can be individual fields or a combo of two different fields
+P71 [normal]: 5. Imagine a life where you have all the money and resources, how would you want to use/spend them?
+P72 [normal]: (First ask what they have to say then give options)
+P75 [normal]: For example:
+P92 [normal]: 6. Name 10 things that you would like to have in your life within the span of 10 years. This can include anything & everything. So be creative!
+P93 [normal]: (First ask what they have to say then give options)
+P94 [normal]: For example:
+P103 [normal]: CAREER PERSPECTIVE (Degree Only)
+P104 [normal]: 1. Which of the following do you relate the most with?
+P125 [normal]: 2. While choosing a career, following things matter to me: (Select 3 and rank them) (Select 3 and prioritise)
+P135 [normal]: 3. Work criterias which are important to me: (Select 3 and rank them)
+P136 [normal]: a. People related:
+P152 [normal]: b. Environment/Culture:
+P161 [normal]: Risk Taking
+P163 [normal]: 1. How much risk are you willing to take in your career?
+P164 [normal]: Minimal risk (I prefer safe, stable roles)
+P165 [normal]: Moderate risk (I'm open to some risks for potential rewards)
+P166 [normal]: High risk (I embrace significant risks for greater opportunities)
+P168 [normal]: 2. How important is creative expression in your career?
+P169 [normal]: Not important (I focus more on practical aspects)
+P170 [normal]: Somewhat important (I value a balance between expression and practicality)
+P171 [normal]: Very important (Creative expression is a top priority for me)
+P173 [normal]: 3. What is your priority when it comes to financial stability?
+P174 [normal]: High priority (Financial stability is my main concern)
+P175 [normal]: Medium priority (I value financial stability but also consider other factors)
+P176 [normal]: Low priority (I am willing to sacrifice financial stability for other opportunities)
+P178 [normal]: 4. Which best describes your approach to stability and exploration?
+P179 [normal]: First, I want stability, then I want to explore.
+P180 [normal]: First, I want to explore; stability is not a concern in the short run.
+P181 [normal]: I want to explore but safely.
+P182 [normal]: Stability matters, and exploring does not.
+P184 [normal]: 5. How important is working in a field you are passionate about?
+P185 [normal]: Very important (I want to work in a field I am passionate about)
+P186 [normal]: Somewhat important (I prefer to work in a field I like, but it's not a deal-breaker)
+P187 [normal]: Not important (I focus more on other aspects like salary or stability)
+P197 [normal]: MOVIES AND VISUAL WORLD
+P199 [normal]: Genres:
+P203 [normal]: 2. If you could have a superpower, what would it be and why?
+P206 [normal]: 3. Do you like reading books?
+P208 [normal]: 4. Different genre of books you like reading or would like to read?
+P219 [normal]: 5. Characters you love/relate the most with (books/movies/series)? Any character you would want to be like?
+P221 [normal]: 1→
+P224 [normal]: 2→
+P227 [normal]: 3→
+P229 [normal]: •Real Known person →
+P232 [normal]: 6. Favourite games you are currently playing or have ever played? Why?
+P237 [normal]: Favourite game genre
+P239 [normal]: 10. Favourite music genres?
+P241 [normal]: 11. Do you use Youtube and/or Instagram?
+P243 [normal]: 12. Any favourite Genres/Bloggers/YouTubers/Channels you follow?
+P244 [normal]: (Ask for the name of YouTubers they follow/spend maximum time on)
+P245 [normal]: (Ask them to send their subscription/following list)
+P249 [normal]: 14. Share with us the following for the last 15 days (the reason being – this is where your mind is naturally going in a free space hence it is very important for us to know that; you can delete certain things if you are not comfortable sharing with us but as you know this is a non-judgmental space)
+P250 [normal]: - YouTube Subscription List (Laptop/Tablet + Phone)
+P251 [normal]: - YouTube Watch History (Laptop/Tablet + Phone)
+P252 [normal]: - YouTube Search History (Laptop/Tablet + Phone)
+P253 [normal]: - Google/Chrome/Firefox Search History (Laptop/Tablet + Phone)
+P254 [normal]: - Screen Time for different apps (Laptop/Tablet + Phone)
+P255 [normal]: = Instagram
+P256 [normal]: = Snapchat
+P257 [normal]: = WhatsApp
+P258 [normal]: = Music
+P259 [normal]: = YouTube
+P260 [normal]: = Google/Chrome/Firefox
+P261 [normal]: = Games
+P262 [normal]: = Facebook
+P263 [normal]: = Netflix/Prime/Zee/Hotstar/Voot etc.l
+P264 [normal]: Check Screen Time on Iphone directly; If it is android, install Screen Time app or check digital wellbeing pre-installed app on the phone; Mark top 3 apps
+P281 [normal]: FRIENDS & RELATIONSHIPS
+P283 [normal]: 1. What is friendship for you? (definition/understanding)
+P285 [normal]: Describe in 5 lines your friendship/school journey?
+P287 [normal]: 2. Top 3 craziest things you have done with your friends
+P288 [normal]: (Stupid, funny, hilarious, embarrassing, the most memorable)
+P290 [normal]: 1 -
+P293 [normal]: 2 -
+P296 [normal]: 3 -
+P300 [normal]: 3. What kind of people do you think you can easily form a friendship with & why?
+P301 [normal]: (First ask what they have to say then give options)
+P307 [normal]: 4. You and Friends: Who are you here?
+P309 [normal]: 5. Did you ever have difficulties making friends or socialising?
+P310 [normal]: 6. What were the difficulties? Does it still impact how you socialise? If you already dealt successfully with it, how did you do it?
+P313 [normal]: 7. Have some of your closest friends tried to push you to do something that you did not want to do?
+P314 [normal]: (First ask what they have to say then give options)
+P315 [normal]: For example:
+P320 [normal]: How did you/will you face such a situation?
+P321 [normal]: (First ask what they have to say, then give options)
+P323 [normal]: 7. Imagine 2 of your friends are fighting, what role would you play in such a situation?
+P325 [normal]: 8. What do you do when you disagree with your friends on certain things?
+P326 [normal]: 9. Do you like meeting new people and making friends?
+P328 [normal]: 10. How happy you are with your existing group of friends? Different ratings for different groups if any
+P330 [normal]: Rate - 1    2    3    4    5    6    7    8    9    10
+P343 [normal]: FAMILY
+P344 [normal]: 1. What does Family mean to you? If you must randomly give out words when you hear ‘Family’, what all would you say?
+P346 [normal]: 2. Describe your relationship with your parents/siblings in one word.
+P348 [normal]: 3. How would you describe your family space for now:
+P350 [normal]: 4. What are the general thoughts of your family towards/for you? Describe
+P352 [normal]: 5. Does your family influence your career/work decisions? In what ways?
+P368 [normal]: 6. Thoughts about career in family:(Select 3 and rank them)
+P370 [normal]: 7. If you could change anything about your family as a whole or any particular family member, what would it be and why?
+P373 [normal]: LIFESTYLE EXPECTANCIES
+P375 [normal]: 1. What do you understand about the term ‘lifestyle’?
+P379 [normal]: 2. I want a lifestyle where I… (future visualisation)
+P387 [normal]: 4. Which of the following would you choose? Individually or a combo of both with more inclination towards which side
+P391 [normal]: 5. Thoughts about Me-Time:
+P393 [normal]: 6. Me-Time for me is…
+P395 [normal]: 7. What would your legacy be? How do you want the world to know/remember you? (E.g., Personality, Deeds, Work, Skills, Qualities)
+P404 [normal]: 8. NEEDS v/s WANTS
+P406 [normal]: 9. If you could live anyone’s life for a week, who would it be & why? – Someone whose way of living/lifestyle inspires you.
+P409 [normal]: 10. Your thoughts on India vs Abroad? What are your parents say in this? (Ask are they comfortable or willing to go or not?)
+P411 [normal]: 12. What are a few good habits that you want to incorporate in yourself & some of the bad habits that you wish to eradicate from your day-to-day life?
+P412 [normal]: 13. Which areas would you like to know more about & be aware of the latest trends?
+P413 [normal]: (Current Affairs, Gadgets, Brands, Fashion, Technology, Science, Series, Celebrities, Business)
+P423 [normal]: BODY IMAGE/SELF IMAGE
+P424 [normal]: 1. How happy are you with your personality?
+P426 [normal]: 2. How happy are you with your body image?
+P428 [normal]: 3. How important are looks and presentation for you? Rate them from 1-10.
+P430 [normal]: 4.  When it comes to work, what is your imagination with respect to looks and presentation? (How they imagine themselves, how would they present themselves)
+P432 [normal]: 5. Do you want to change anything about your body or have you done anything extreme to change your body?
+P447 [normal]: STRENGTHS AND WEAKNESSES
+P448 [normal]: (Add the rating in the empty boxes under Strength and Weakness Respectively ; 1-not at all, 10 – extremely high)
+P454 [normal]: FEARS
+P455 [normal]: (Not necessarily a fear/phobia, it can be discomfort as well)
+P456 [normal]: Rate on scale of 1-10; 1 - not at all; 10 – extremely high
+P457 [normal]: Claustrophobia
+P458 [normal]: Fear of Being Left Out (feel excluded with/without people around)
+P459 [normal]: Fear of Public Speaking/Performance
+P460 [normal]: Fear of Too Many People (being in a crowd)
+P461 [normal]: Fear of Commitment (work, people, situations, relationship of any kind)
+P462 [normal]: Fear of the Unknown (do not know what can/will happen)
+P463 [normal]: Fear of Change (people around, within people, surrounding, place of living)
+P464 [normal]: Fear of Missing Out (people, information, situation)
+P465 [normal]: Fear of the Future
+P466 [normal]: Fear of Making Mistakes
+P467 [normal]: Fear of Failure
+P468 [normal]: Fear of Having Too Much Power (misuse or hurt someone)
+P469 [normal]: Fear of Success (How it might impact you - ego, goes into head, change you; not able to maintain it)
+P470 [normal]: Fear of letting go
+P471 [normal]: Fear of Gaining weight
+P472 [normal]: Fear of Losing Freedom (choices, financial, speech/expression, travelling etc)
+P473 [normal]: Fear of Rejection (people, work, relationship of any kind)
+P475 [normal]: Fear of Disappointment - me to others (both - we are disappointing someone and others disappointing us)
+P476 [normal]: Fear of Disappointment - others to me (both - we are disappointing someone and others disappointing us)
+P477 [normal]: Fear of Losing a Loved One
+P478 [normal]: Fear of Intimacy (physically, emotionally, mentally – purpose – building social skills)
+P479 [normal]: Fear of Society (unable to try certain things, unable to break certain rules, feeling restricted, legal restrictions culturally/societally)
+P480 [normal]: Fear of Being Judged
+P481 [normal]: Fear of Social-Media (cat fishing, hacking, watching others post, posting, FOMO, anxiety, unable to use it/not knowing how to use it etc.)
+P482 [normal]: Fear of Work (any specific task/extra or too much work/less work or no work)
+P483 [normal]: Fear of Not Being Able to Remember Things
+P484 [normal]: Fear of Living a Mediocre Life
+P485 [normal]: Fear of Being Late
+P508 [normal]: TESTS
+P509 [normal]: 16 PERSONALITY FACTORS
+P510 [normal]: RESULTS:
+P526 [normal]: MOST IMPORTANT VALUES
+P527 [normal]: Instructions:
+P528 [normal]: 16. Select 20 values overall, five from each genre.
+P529 [normal]: 17. Now, rank top 10 values from those 20 values selected
+P530 [normal]: 18. Categorise the top 10 into Ideal value, Standard value, Wants & Preferences
+P532 [normal]: Ideal value – It seems like a perfect concept in your mind rather than a reality, it is the ultimate aim and not how you live currently
+P534 [normal]: Standard Value – A standard is a judgement or a conclusion that something should be different than it actually is Shoulds and Musts; How it should be!
+P536 [normal]: Want & Preference Value – Some “values” may simply be wants and preferences instead of important values, this may simply be something that you think would be nice to have rather than something you are committed to
+P549 [normal]: Personal Values: Values That Guide My Personal Conduct
+P565 [normal]: Social Values: Values That Guide My Choice of People and Culture
+P583 [normal]: Achievement Values: Values That Motivate Me to Reach My Goals
+P594 [normal]: Physical Values: Values That Guide Your Choice of Physical Things
+P600 [normal]: .
+P603 [normal]: INTEREST TEST (Optional for Degree)
+P604 [normal]: Instructions:
+P605 [normal]: 19. Go vertically with each column
+P606 [normal]: 20. I AM – most of the times, I am this person
+P607 [normal]: 21. I CAN – irrespective of whether I like it or not, whether I know it or not, if somebody guides me, teaches me, or supports me, I can do this
+P608 [normal]: 22. I LIKE TO – irrespective of whether I can do it or not, if I like it, choose it
+P609 [normal]: 23. There is no limitation to the number of things you choose
+P613 [normal]: REALISTIC (R)
+P614 [normal]: R TOTAL = _____
+P617 [normal]: INVESTIGATE (I)
+P618 [normal]: I TOTAL = _____
+P630 [normal]: ARTISTIC (A)
+P631 [normal]: A TOTAL = _____
+P641 [normal]: SOCIAL (S)
+P642 [normal]: S TOTAL = _____
+P654 [normal]: ENTERPRISING (E)
+P655 [normal]: E Total = _____
+P669 [normal]: CONVENTIONAL (C)
+P671 [normal]: C Total = _____
+P675 [normal]: Scoring Instructions:
+P676 [normal]: Add all the selected ones in the entire section and you will get a total score for that particular letter
+P677 [normal]: For e.g. – add all the selected ones in the Realistic box and you will get the R total, similarly, do it for all the other letters
+P678 [normal]: Mark the 3 highest scoring letters
+P679 [normal]: Refer to the interpretation document for interpreting what the letters suggest
+P682 [normal]: COLOR TEST
+P684 [normal]: Instructions:
+P685 [normal]: 31. Choose one from either of the columns for each row – the one which you tend to be/do most of the times in most of situations with most of the people
+P686 [normal]: SECTION – I
+P687 [normal]: At least 51 percent of the times I tend to…
+P692 [normal]: SECTION – II
+P693 [normal]: At least 51 percent of the times I tend to…
+P702 [normal]: SECTION – III
+P703 [normal]: At least 51 percent of the times I tend to…
+P712 [normal]: SECTION – IV
+P713 [normal]: At least 51 percent of the times I tend to…
+P714 [normal]: Scoring Instructions:
+P715 [normal]: For each section, add the number of selected ones for each column
+P716 [normal]: For e.g. – section 1 – add all the ticks in column A so you will get the total for column A, similarly for column B and other sections
+P717 [normal]: Each column has a color associated with it; we choose the column with highest total and its associated color
+P718 [normal]: In the end, you will get a two-color combination along with the category -Introvert or Extrovert – For e.g. – Green/Gold Introverts
+P719 [normal]: Refer to the interpretation document for interpreting the code
+P723 [normal]: SUBJECT MATTER INTEREST (HYPOTHETICAL SCENARIOS)
+P724 [normal]: Instructions:
+P725 [normal]: Visualize you are a part of the below scenarios
+P726 [normal]: Put a tick mark on the left for those activities which you would naturally be inclined to do in that particular scenario – select 5 out 8 options
+P727 [normal]: Rank those 5 options according to your preferences on the right
+P728 [normal]: In the end, ask which 3 scenarios they would choose if they got to live those in the real life
+P730 [normal]: Scenario 1
+P731 [normal]: Imagine being stranded on a small island for 2 years with a few others. What activities would you be naturally inclined to do to help the group survive and get along?
+P736 [normal]: Scenario 2
+P737 [normal]: If you were a performer or part of a team of people putting on a concert, what activities would you look forward to doing every day?
+P753 [normal]: Scenario 3
+P754 [normal]: You're on a three-month sailing trip. As part of a small crew, how would you likely spend your time?
+P767 [normal]: Scenario 4
+P768 [normal]: As part of a group of people making a movie about a global warming disaster, which activities would interest you?
+P783 [normal]: Scenario 5
+P784 [normal]: You and a group of friends have a business plan of running a restaurant in summer on a beach side. What roles would you play in this endeavor?
+P801 [normal]: Scenario 6
+P802 [normal]: If you were a part of the Rashtrapati Bhawan in the administration department, what would you do the best?
+P816 [normal]: Scenario 7
+P817 [normal]: The President of India encourages people to invent a totally new kind of automobile in the next decade. How would you see yourself participating in this effort?
+P823 [normal]: Scenario 8
+P824 [normal]: You’ve been assigned to be a professor for one year at a University. What cluster of courses would you enjoy teaching?
+P836 [normal]: Scoring Instructions:
+P837 [normal]: Add the numbers under each column from all the scenarios
+P838 [normal]: For e.g. – add the number under all the A columns from each scenario (A+A+A+A+A+A+A+A = total score of A)
+P860 [normal]: Parents Meeting:
+P861 [normal]: Q1. Describe your child
+P862 [normal]: (Give what words come to your mind when you think about your child? Explain why)
+P864 [normal]: Q2. What kind of relationship do you share with your child?
+P865 [normal]: (Let them answer, if they can't think give options, if they can then from your understanding tick below)
+P867 [normal]: Q3. Your child's school journey
+P868 [normal]: What was their favourite subject -
+P869 [normal]: What subject did they hate -
+P870 [normal]: What kind of learner was your child (slow, average, fast) -
+P871 [normal]: Are they readers, listeners, learn practically, rote learn, understand and then in their own words) -
+P872 [normal]: How was their relationship with teachers -
+P873 [normal]: How was their relationship with friends and peers -
+P874 [normal]: How was their relationship with the opposite gender -
+P875 [normal]: Was your child ever bullied or harassed? -
+P876 [normal]: When it comes to marks, how do they score? -
+P877 [normal]: Have they ever won something or have been appreciated for? -
+P878 [normal]: Did they take part in extracurriculars like sports and arts or others? -
+P880 [normal]: Q4. Describe their routine
+P881 [normal]: Waking up and sleeping -
+P882 [normal]: Dinner/lunch (are they picky, do they take it on their own, do y'all eat together, where do they eat and what do they do while eating) -
+P883 [normal]: Studying - on their own, need to be reminded? -
+P884 [normal]: Deadlines - before Time, on time, last minute, after the deadline -
+P885 [normal]: Traveling - (on their own, what mode of transport) -
+P886 [normal]: Rate the following
+P887 [normal]: Attention and focus
+P888 [normal]: Emotional Regulation (how well they manage emotions)
+P889 [normal]: Decision making skills
+P890 [normal]: Social interaction
+P891 [normal]: Time management
+P892 [normal]: Q5. How much do the following matter to your child
+P893 [normal]: (rate out of 10 and explain what it means to them)
+P894 [normal]: Money -
+P895 [normal]: Creative expression -
+P896 [normal]: Following their passion -
+P897 [normal]: Satisfaction and happiness -
+P898 [normal]: Giving back to the society -
+P900 [normal]: Q6. What does your child do in their free time?
+P907 [normal]: Q7. How is your child in different social spaces -
+P909 [normal]: Q8. Describe your child's free time
+P910 [normal]: (Do they use their phones, sleep, eat, read books, talk to friends on call or meet, play sports, any other hobbies they engage in - painting, dance, cooking, etc)
+P912 [normal]: Q9. How much are they influenced by (rate 1-10)
+P913 [normal]: Media -
+P914 [normal]: What kind of content do they watch -
+P915 [normal]: Friends -
+P916 [normal]: Parents/family -
+P917 [normal]: Anything else -
+P919 [normal]: Q9. Any incidents/events (shifting, friend leaving or betraying, failing, winning) which impacted them/changed them as a person
+P921 [normal]: Q10. Thoughts on career
+P922 [normal]: What fields are you not comfortable with and why (understand their reason, is it protection, finance, unpredictable nature, marriage and related issues, money, stability, not respectable enough)
+P924 [normal]: Q11. Stance on where to study
+P925 [normal]: 11-12th -
+P926 [normal]: Graduation -
+P927 [normal]: Masters -
+P928 [normal]: Settle -
+P929 [normal]: (Child is not responsible, safety, financially, opportunity, others)
+P931 [normal]: Q12. Their expectations related to
+P932 [normal]: Marriage
+P933 [normal]: Time till when they should become independent
+P934 [normal]: Till what age would they financial support them
+P936 [normal]: Q13. Parents risk taking behaviour and pathway they want to choose -
+P937 [normal]: First finish degree then explore
+P938 [normal]: Safe options only
+P939 [normal]: Money is not a factor, we are okay if they earn less and are happy
+P940 [normal]: Join family business
+P941 [normal]: Do something which they can manage their home with
+P943 [normal]: Q14. Non conventional questions
+P944 [normal]: Any hidden talents your child has
+P945 [normal]: If money and marks was not a concern what would they want to become/ what would you want them to become
+P946 [normal]: What qualities do you think they got from you
+P947 [normal]: Mom -
+P948 [normal]: Dad -
+P950 [normal]: Q15. Anything else we should know?
+
+
+=== TABLES ===
+
+
+--- TABLE 0 ---
+  Row 0: Sr. No. | Topic | Done / Not Done | Date | Online/offline
+  Row 1: Topics | Topics | Topics | Topics | Topics
+  Row 2: 1 | Demographics, Aim and Vision |  |  | 
+  Row 3:  | Career Perspective (Degree pg) |  |  | 
+  Row 4:  | Risk Taking Ability |  |  | 
+  Row 5: 2 | Movies and Visual World |  |  | 
+  Row 6: 3 | Friends |  |  | 
+  Row 7: 4 | Family |  |  | 
+  Row 8: 5 | Lifestyle Expectancies |  |  | 
+  Row 9: 6 | Strengths and weaknesses |  |  | 
+  Row 10: 7 | Fears |  |  | 
+  Row 11: Tests | Tests | Tests | Tests | Tests
+  Row 12: 1 | 16 PF |  |  | 
+  Row 13: 2 | Values |  |  | 
+  Row 14: 3 | RIASEC |  |  | 
+  Row 15: 4 | Color test |  |  | 
+  Row 16: 5 | Subject Matter Interest (Degree Pg) |  |  | 
+  Row 17: Others | Others | Others | Others | Others
+  Row 18: 1 | Media Data Screenshots |  |  | 
+  Row 19: 2 | Self Discovery Questionnaire |  |  | 
+  Row 20: 3 | Marksheets |  |  | 
+
+--- TABLE 1 ---
+  Row 0: Name: 
+Age:  years 
+Date of Birth: 
+School name: 
+Current year: 
+Residence: 
+Lives with: 
+Mother: 
+Father: 
+Subjects (current):
+
+--- TABLE 2 ---
+  Row 0: SUBJECTS | Like & Score Well | Do not Like but Score Well | Like & Do not Score Well | Do not Like & Do not Score
+  Row 1:  |  |  |  | 
+  Row 2:  |  |  |  | 
+  Row 3:  |  |  |  | 
+  Row 4:  |  |  |  | 
+  Row 5:  |  |  |  | 
+  Row 6:  |  |  |  | 
+  Row 7:  |  |  |  | 
+  Row 8:  |  |  |  | 
+  Row 9:  |  |  |  | 
+
+--- TABLE 3 ---
+  Row 0: 1 | I am academically driven person & I enjoy it | 
+  Row 1: 2 | I am academically driven person because it’s important | 
+  Row 2: 3 | I am academically driven person because it’s a direct/indirect compulsion | 
+  Row 3: 4 | I am a combination of education & being outside (education being on higher side) | 
+  Row 4: 5 | I am a combination of education & being outside (Balanced) | 
+  Row 5: 6 | I am a combination of education & being outside (More of outgoing person) | 
+  Row 6: 7 | Academics is difficult for me, but I am willing to try hard | 
+  Row 7: 8 | Academics is difficult for me & have realised it’s going to be challenging in spite of hard work | 
+  Row 8: 9 | Academics is difficult for me & it’s just matter of clearing now | 
+  Row 9: 10 | I am not academic driven person, and I don’t want to carry on further | 
+
+--- TABLE 4 ---
+  Row 0: Time | Activity
+  Row 1:  | 
+  Row 2:  | 
+  Row 3:  | 
+  Row 4:  | 
+  Row 5:  | 
+  Row 6:  | 
+  Row 7:  | 
+  Row 8:  | 
+  Row 9:  | 
+
+--- TABLE 5 ---
+  Row 0: Gadgets
+Games
+Friends
+Certain daily habits
+General knowledge
+Current affairs
+Meditation/Yoga
+Certain food items
+Self | Family
+Relationships
+Sports
+Career
+Academics
+Shopping
+Reading books
+Hobbies | Movies
+Fitness
+Lifestyle
+Social media
+Travelling
+Music
+Going out/Partying
+Tv shows
+
+--- TABLE 6 ---
+  Row 0: Travel
+Buy a house/ bungalow
+Buy cars/bike/yacht
+Buy all the brands
+Donate/ charity | Invest
+Savings
+Adventure
+Create a start-up
+Games | Experience
+Gadgets
+Society
+Lifestyle
+Parents/ relatives
+
+--- TABLE 7 ---
+  Row 0: Skills
+Qualities
+Things you want to do/buy/experience
+Personality type
+Relationship | Job/Salary
+Travel
+Social Status
+Own a House/Car
+Lifestyle change
+
+--- TABLE 8 ---
+  Row 0: 1 |  | 6 | 
+  Row 1: 2 |  | 7 | 
+  Row 2: 3 |  | 8 | 
+  Row 3: 4 |  | 9 | 
+  Row 4: 5 |  | 10 | 
+
+--- TABLE 9 ---
+  Row 0: 1 | I want to design my future career to the point where I know exactly what I will do | 
+  Row 1: 2 | I don’t know how long it will take or how difficult it will be, but that’s the result I want | 
+  Row 2: 3 | I want to move toward designing my future career, but I am not ready to go all the way | 
+  Row 3: 4 | I want to decide on some parts of the design and leave others open for now | 
+  Row 4: 5 | I am not ready to design my career now | 
+  Row 5: 6 | I want to use this process to learn more about myself & begin to explore career issues | 
+  Row 6: 7 | I am doing this because I am supposed to, expected to, or have to | 
+
+--- TABLE 10 ---
+  Row 0: 1 | A field which has reputation and status in the society | 
+  Row 1: 2 | Something I enjoy the most – happy & satisfied at the end of the day | 
+  Row 2: 3 | Where I feel most connected with my work - Where I can learn something new every day | 
+  Row 3: 4 | Where I can experiment frequently - don’t want it to get monotonous | 
+  Row 4: 5 | Where I don’t have to move around at all – would prefer a desk job | 
+  Row 5: 6 | Where I don’t have to move around much – somewhat is okay but not a lot of it | 
+  Row 6: 7 | Where I get to travel a lot, explore and experiment | 
+  Row 7: 8 | In sync with my natural talents & skills - I am okay building extra skills which I might not be naturally good at | 
+  Row 8: 9 | I don’t want to put a lot of efforts – want easy-going | 
+  Row 9: 10 | Where I can earn amazingly well (approx. how much?) | 
+  Row 10: 11 | I would like to experiment with unconventional options | 
+  Row 11: 12 | I would prefer to stick to safe, conventional options | 
+  Row 12: 13 | Where the work is meaningful to me | 
+  Row 13: 14 | Where it will provide me my own space of expression | 
+
+--- TABLE 11 ---
+  Row 0: 1 | I get to work by myself | 
+  Row 1: 2 | I would prefer working in a group/team | 
+  Row 2: 3 | I want to have a balance between working with others and by myself | 
+  Row 3: 4 | I want more of working by self and less of group of work | 
+  Row 4: 5 | I want more of working with group and less by myself | 
+  Row 5: 6 | I would prefer working with people who are more structured & deadline oriented | 
+  Row 6: 7 | I would prefer working with people who are flexible by nature, not too rigid/stubborn | 
+  Row 7: 8 | I would prefer working with people who likes to be unstructured, no guidelines, creating their own path | 
+  Row 8: 9 | I would prefer working with people who help each other grow rather than pulling others down to get ahead | 
+
+--- TABLE 12 ---
+  Row 0: 1 | Where efficiency & quality of work is given importance than the amount of work | 
+  Row 1: 2 | Where the overall culture is result-oriented, working towards collective goal | 
+  Row 2: 3 | Where even individual goals are given importance | 
+  Row 3: 4 | Where the functioning is more of process-driven, having systems-thinking | 
+  Row 4: 5 | Where the functioning is more inclined towards out of the box thinking & creativity | 
+  Row 5: 6 | Where there is a good combination between systems thinking & creativity | 
+  Row 6: 7 | Where there is a healthy competition and not unnecessary pressure or proving each other | 
+  Row 7: 8 | Where the employees are valued for their own skills/talents, no comparisons | 
+  Row 8: 9 | Where there is little to no politics involved | 
+  Row 9: 10 | Where the culture is very supportive of individual growth | 
+  Row 10: 11 | Where they have various opportunities for growth, no stagnancy | 
+  Row 11: 12 | Where there is recognition for the work everyone does | 
+
+--- TABLE 13 ---
+  Row 0: Favourite movies | Favourite TV serials/series
+  Row 1: 1. | 1.
+  Row 2: 2. | 2.
+  Row 3: 3. | 3.
+  Row 4: 4. | 4.
+  Row 5: 5. | 5.
+
+--- TABLE 14 ---
+  Row 0: Action
+Adventure
+Comedy
+Dramas
+Horror
+Crime
+Mystery
+Sci-fi
+Parody
+Thrillers
+Romance | Documentaries
+Sports
+Historical
+Musical
+Superhero
+Psychological
+Legal drama
+Anime
+Tollywood
+Animation | Fantasy
+Rom-Com
+Classical
+Family
+Film noir
+War
+Biography
+Western
+Short
+
+--- TABLE 15 ---
+  Row 0: YES | NO
+
+--- TABLE 16 ---
+  Row 0: Fiction
+Non-fiction
+Science fiction
+Romance
+Thriller | Crime
+Suspense
+Self-help
+History
+Mystery | Fantasy
+Biopics
+Philosophical
+Mythological
+Fairy Tales
+
+--- TABLE 17 ---
+  Row 0: Favourite Games | Favourite Game Genres
+  Row 1:  | 
+  Row 2:  | 
+  Row 3:  | 
+  Row 4:  | 
+  Row 5:  | 
+
+--- TABLE 18 ---
+  Row 0: - Shooter Games (COD, PubG, Fortnite)
+- Action/Fighting
+- Building/Creating games
+- Racing Games
+- Brain games
+- Puzzles, Logic Games (Tetris)
+- Platform Games (Super Mario) | - Strategy/Board Games (Ludo, chess, WWE, cricket cards, Pokémon)
+- Interactive 3D Movie Games
+- Candy Crush
+- Interactive Game’s (Jenga)
+- Crime/ Investigation
+- Superhero
+- Horror
+- Sports
+
+--- TABLE 19 ---
+  Row 0: Top Channels/ Pages | Top Channels/ Pages
+  Row 1: Youtube | Instagram
+  Row 2:  | 
+  Row 3:  | 
+  Row 4:  | 
+  Row 5:  | 
+  Row 6:  | 
+
+--- TABLE 20 ---
+  Row 0: Fashion
+Vloggers
+Beauty
+Travel
+Conspiracy
+Games
+Infotainment
+Stand-up
+Stunts
+Yoga | Cars
+Technology
+Documentaries
+Facts
+History
+DIY
+Challenges
+Science
+Sports
+Pranks/challenges | News
+Food/Cooking
+Lifestyle
+Current Affairs/GK
+Music
+Educational/Learning
+Design/Art
+Fitness/Health/Workout
+
+--- TABLE 21 ---
+  Row 0: Trustworthy
+Honest
+Reliable
+Knowledgeable
+Playful
+Active
+Sporty
+Talkative
+Silent
+Popular
+Intellectual
+Emotional | Unpopular
+Gossiper
+Adventurous
+Cautious
+Supportive
+Fun loving
+Well mannered
+Funny
+Fashionable
+Helpful
+Humorous
+Social class | Authoritative
+Persuasive
+Nurturer
+Practical
+Spontaneous
+Strong Headed
+Shy
+Foodie
+Caring
+Realistic
+Visionaries
+Outgoing | Like to get influenced by
+Family background
+Same culture/religion
+Gender preference
+Down to earth
+Understanding
+Quiet/less talkative
+Traditional/Conservative
+Whom you can influence
+Liberal/Broadminded
+
+--- TABLE 22 ---
+  Row 0: 1 | I have a lot of friends & honestly, they mean a lot to me. I really enjoy being with them | 
+  Row 1: 2 | I have a lot of friends & have a mixed combination of good / difficult time with them | 
+  Row 2: 3 | I have a lot of friends but most times it’s too much for me to handle within | 
+  Row 3: 4 | I have a lot of friends & keep hopping within them | 
+  Row 4: 5 | I have few friends & we are very connected & I am really content with them | 
+  Row 5: 6 | I have few friends & yeah, it’s just fine for now. I don’t want to go through the process of making new friends | 
+  Row 6: 7 | I have few friends & honestly really want new friends | 
+  Row 7: 8 | I really don’t have good close friends. I find it difficult but for now I don’t want to go through the process of making one as its too tasking for me | 
+  Row 8: 9 | I really don’t have good close friends. I think I need few in my life & I am ready to open up myself to experiment and I have an idea of how to go ahead with it | 
+  Row 9: 10 | I really don’t have good close friends. I think I need few in my life & I am ready to open up myself to experiment, but I don’t know how to do it | 
+  Row 10: 11 | I think I am good alone. I don’t trust people & it’s better to be alone than broken trust | 
+
+--- TABLE 23 ---
+  Row 0: Yes | No
+
+--- TABLE 24 ---
+  Row 0: YES | NO
+
+--- TABLE 25 ---
+  Row 0: Drinking
+Smoking
+Pranks
+Lying to parents/others
+Eating non-veg
+Physical fight | Proposing/Dating
+Shoplifting
+Perform a dare
+Talk to a stranger
+Cheating/Breakup
+Breaking in/out of house
+
+--- TABLE 26 ---
+  Row 0: 1 | Avoid the friend completely because he/she did not respect me | 
+  Row 1: 2 | Deny firmly because I do not like to do things that go against my principles, or I do not want to do | 
+  Row 2: 3 | Give in and do it so that I can save my friendship | 
+  Row 3: 4 | Reason/argue with them to make my point and then walk away | 
+  Row 4: 5 | Maybe not break the friendship but not talk with them for a while | 
+  Row 5: 6 | Simply walk away from the situation | 
+  Row 6: 7 | Find another way to come out of the situation – making sure I don’t hurt anyway, or it doesn’t affect the friendship | 
+  Row 7: 8 | Give it a chance to see what will happen if I do so | 
+  Row 8: 9 | Give it a chance but only if it is not something that will harm others | 
+  Row 9: 10 | Make them understand my reasons for not doing it and ask them also to not get into any trouble | 
+
+--- TABLE 27 ---
+  Row 0: 1 | Try to mediate between both of them and make sure things do not escalate | 
+  Row 1: 2 | Fuel the fire for fun, but only if the situation is not too serious | 
+  Row 2: 3 | Support the one whom I am closest to, even if it means I am on the wrong side | 
+  Row 3: 4 | Support the one who is correct, even if it meant going against my closest friend | 
+  Row 4: 5 | Avoid the fight and walk away, not interested in any drama | 
+  Row 5: 6 | Play on both the sides, do not want to take one side, and let it affect the friendship | 
+  Row 6: 7 | Simply standing and watching the fight, don’t want to meddle in others business | 
+  Row 7: 8 | Backstabbing during the fight | 
+  Row 8: 9 | Do nothing during the fight but later can be a shoulder to cry on | 
+
+--- TABLE 28 ---
+  Row 0: 1 | Strongly disagree & take a stand for what I believe in or want to do | 
+  Row 1: 2 | Avoid and let it go because I don’t like to get into any disagreements | 
+  Row 2: 3 | Agree with others as I don’t want to end up being alone | 
+  Row 3: 4 | Okay with other people having different opinions | 
+  Row 4: 5 | Using their words against them | 
+  Row 5: 6 | Change the topic for a safe side | 
+  Row 6: 7 | Convincing the majority to take my side so that it becomes much easier to get what I want | 
+  Row 7: 8 | Taking someone’s help | 
+
+--- TABLE 29 ---
+  Row 0: 1 | Yes of course, I love meeting new people | 
+  Row 1: 2 | No, I would rather be with my own set of people | 
+  Row 2: 3 | Yes, I like meeting new people | 
+  Row 3: 4 | Depends on my mood | 
+  Row 4: 5 | Yes, but not too many people | 
+  Row 5: 6 | Only sometimes, not very frequently | 
+  Row 6: 7 | No, I would rather prefer my own company (myself) | 
+  Row 7: 8 | Meeting people is fine, but I am not very sure of making new friends | 
+  Row 8: 9 | Have not tried it much yet, but would like to experiment with the same | 
+  Row 9: 10 | Only, if I have someone mutual with me while meeting new people | 
+
+--- TABLE 30 ---
+  Row 0: 1 | We all are very connected to each other & share everything. There’s open space for sharing anything & everything & it’s a beautiful support system within. We do give individual space to each other too. | 
+  Row 1: 2 | We all are very connected to each other & share almost everything apart from few topics which we have disputes on (but only few & disagreement doesn’t go extreme. We come back pretty quickly) | 
+  Row 2: 3 | We all are connected in a way but there’s no real sharing about all diverse topics. Maybe few topics but don’t really interfere too much. Everybody operates pretty individualistic | 
+  Row 3: 4 | I am more connected to one person (mom/dad/grandparent/sibling) & share/express very openly about almost every topic without thinking & having a fear of being judged | 
+  Row 4: 5 | I am more connected to one person but share limited stuff to them due to response & reactions I receive or may receive | 
+  Row 5: 6 | I am more connected to one person but don’t really talk or share personal stuff that much | 
+  Row 6: 7 | Most times we only talk about limited stuff (Food, Health, Studies & Career) that’s it | 
+  Row 7: 8 | We have difference in thinking and that leads to a lot of clashes within. The atmosphere is always on edge & there’s lack of understanding & communication within | 
+  Row 8: 9 | Its suffocating most of the times but I have no choice. Once I am independent, I would want to go away from here | 
+  Row 9: 10 | Its suffocating most of the times but I have no choice. Once I am independent, I would like to work around & bring on certain changes (ask what) | 
+  Row 10: 11 | I live most times in my room & space, talk only when it’s a need or compulsion | 
+
+--- TABLE 31 ---
+  Row 0: YES | NO | SOMETIMES
+
+--- TABLE 32 ---
+  Row 0: 1 | They are very open for me to explore anything I would love to do including out of the box options. They want me to express myself even if it's any offbeat space. Earning isn’t really first priority & they are ok even if my journey is random to start with. They don’t have any specific timeline | 
+  Row 1: 2 | They are open for me to explore anything I would love to do including out of the box career options but want me to be clearer about what I want now/work. They need me to work towards it now & find my pathway | 
+  Row 2: 3 | They say they are ok with offbeat spaces but honestly, I see them scared. They may still allow me to do what I want but internally they will always be skeptical | 
+  Row 3: 4 | They want to choose safe options, get done with degree & then whatever I want to do later | 
+  Row 4: 5 | They have specific things in their mind which they keep expressing directly or indirectly & somehow, I am stuck there. Their opinion has become my opinion now | 
+  Row 5: 6 | They are clear of what they want me to do & I don’t have a lot of say & thought here for now. I am scared of putting my thoughts as they have counter questions for which I have no answers | 
+  Row 6: 7 | They want me to be safe & secured in a way they understand/fields they know which I don’t agree & thus there’s always a battle | 
+  Row 7: 8 | They want me to do good with academics, get into good college & then its upto me | 
+  Row 8: 9 | Everyone in family is into something & they are looking for me to get into the same thing | 
+  Row 9: 10 | They say but I do what I want to do & that’s how it goes. | 
+
+--- TABLE 33 ---
+  Row 0: 1 | Am satisfied with my work/career | 
+  Row 1: 2 | Have a luxurious life (brands, status symbols, gadgets, big house) | 
+  Row 2: 3 | Am able to make a lot of money (Expectations of monthly income?) | 
+  Row 3: 4 | Have sufficient amount of money to sustain and enjoy life | 
+  Row 4: 5 | Am able to explore, travel around the world & do everything that I have always wanted to do – adventurous experiences/experiences otherwise | 
+  Row 5: 6 | Will be able to spend time with friends (chill, party, hang out) | 
+  Row 6: 7 | Will have a lot of freedom (choices, being independent, going out, doing things I want to, travel etc.) | 
+  Row 7: 8 | Am living comfortably if not luxuriously (definition?) | 
+  Row 8: 9 | Will be able to follow my passion (any interest/hobby) | 
+  Row 9: 10 | Have a good cultural/social life | 
+  Row 10: 11 | Am living a slow-paced life – on my own pace | 
+  Row 11: 12 | Have loads of gadgets – technology assisted lifestyle | 
+  Row 12: 13 | Have a nature based surrounding and peace | 
+  Row 13: 14 | Feel more relaxed and at ease on everyday basis | 
+  Row 14: 15 | Am more inclined towards work-oriented life and less of social life | 
+  Row 15: 16 | Am able to have a balanced life between work, family, friends, and me-time | 
+
+--- TABLE 34 ---
+  Row 0: Cultural/Social Lifestyle | A slow-paced Lifestyle
+  Row 1: Gadget/Technology Person | A Nature Person
+  Row 2: Relaxed Lifestyle | Work Oriented Lifestyle
+
+--- TABLE 35 ---
+  Row 0: 1 | I am okay if I do not get me-time | 
+  Row 1: 2 | I mandatorily need me-time every single day even if it is for some time | 
+  Row 2: 3 | I want a fixed me-time at a stretch every day (how many hours?) | 
+  Row 3: 4 | I am okay to have me-time scattered throughout the day | 
+  Row 4: 5 | I would like to have some time for myself but no compulsion as such | 
+
+--- TABLE 36 ---
+  Row 0: 1 | Spending time all by myself doing whatever I feel in that moment | 
+  Row 1: 2 | Spending time with my friends | 
+  Row 2: 3 | Listening to music | 
+  Row 3: 4 | Engaging in my favorite hobbies | 
+  Row 4: 5 | Just sleep & do nothing more | 
+  Row 5: 6 | Journal, reflect and try to improve on myself | 
+  Row 6: 7 | Do courses or watch videos to build on my skills | 
+  Row 7: 8 | Watch TV, movies/series, YouTube videos etc. | 
+  Row 8: 9 | Workout, gym, yoga etc. | 
+  Row 9: 10 | Play sports or any other physical activity | 
+  Row 10: 11 | Online gaming | 
+  Row 11: 12 | Randomly scrolling online | 
+
+--- TABLE 37 ---
+  Row 0: Things You Need | Things You Want/Desire
+  Row 1:  | 
+  Row 2:  | 
+  Row 3:  | 
+  Row 4:  | 
+  Row 5:  | 
+
+--- TABLE 38 ---
+  Row 0: India / Current Country | Abroad – Study / Job / Settle
+
+--- TABLE 39 ---
+  Row 0: Habits to Improve / Incorporate | Habits to Eliminate
+  Row 1:  | 
+  Row 2:  | 
+  Row 3:  | 
+  Row 4:  | 
+  Row 5:  | 
+
+--- TABLE 40 ---
+  Row 0: Career Priorities for next 5 Years (Degree Only) | Career Priorities for next 5 Years (Degree Only)
+  Row 1: Academics - | Human Nature/Personality -
+  Row 2: Finance - | Beliefs/Values -
+  Row 3: Family - | Creative Expression/Expressing yourself -
+  Row 4: Skills - | Knowledge -
+  Row 5: Lifestyle - | Relationship  -
+
+--- TABLE 41 ---
+  Row 0: Strength | Weakness
+  Row 1: Communication | Communication
+  Row 2: I am able to convey my thoughts and ideas effectively | I sometimes struggle to convey my thoughts and ideas effectively
+  Row 3:  | 
+  Row 4: Organisational Skills | Organisational Skills
+  Row 5: Organized | Disorganized
+  Row 6:  | 
+  Row 7: Organising thoughts and flow in mind | Organising thoughts and flow in mind
+  Row 8: Can organise my thoughts well in my mind | Scattered thoughts
+  Row 9:  | 
+  Row 10: Responsibility | Responsibility
+  Row 11: Responsible | Irresponsible
+  Row 12:  | 
+  Row 13: Problem Solving | Problem Solving
+  Row 14: I approach problems with a clear strategy and find effective solutions | Avoiding the problem
+  Row 15:  | 
+  Row 16: Adaptability | Adaptability
+  Row 17: I adapt well to new situations | I find it challenging to adapt to new situations
+  Row 18:  | 
+  Row 19: Prioritising | Prioritising
+  Row 20: I can identify what is most important | I struggle to prioritise tasks
+  Row 21:  | 
+  Row 22: Patience | Patience
+  Row 23: I am patient while working through challenging situations | Impatient
+  Row 24:  | 
+  Row 25: Curiosity | Curiosity
+  Row 26: I am always eager to learn new things | I sometimes lack curiosity and motivation to learn new things
+  Row 27:  | 
+  Row 28: Perseverance | Perseverance
+  Row 29: I persist through difficulties to achieve my goals | Give up easily
+  Row 30:  | 
+  Row 31: Thoughtfulness & reflection | Thoughtfulness & reflection
+  Row 32: I take time to reflect and think things through carefully | I often act without taking time to think or reflect
+  Row 33:  | 
+  Row 34: Sticking to deadlines | Sticking to deadlines
+  Row 35: I tend to stick to deadlines | I struggle to stick to deadlines
+  Row 36:  | 
+  Row 37: Generating ideas | Generating ideas
+  Row 38: I contribute creative ideas in various situations | I find it challenging to come up with creative ideas
+  Row 39:  | 
+  Row 40: Multi-tasking | Multi-tasking
+  Row 41: I can multitask | I struggle to multitask
+  Row 42:  | 
+  Row 43: Time management | Time management
+  Row 44: I manage my time effectively to maximise productivity | I often have trouble managing my time effectively
+  Row 45:  | 
+  Row 46: Independence | Independence
+  Row 47: I work well independently and take initiative | I rely too much on others and lack independence
+  Row 48:  | 
+  Row 49: Seeking help | Seeking help
+  Row 50: I know when to ask for help | I hesitate to ask for help when needed
+  Row 51:  | 
+  Row 52: Goal Setting and Execution | Goal Setting and Execution
+  Row 53: I set clear goals and work hard to achieve them | I hmave difficulty setting and executing personal goals
+  Row 54:  | 
+  Row 55: Stress Management | Stress Management
+  Row 56: I can work under stressful situations | I can not work under stressful situations
+  Row 57:  | 
+  Row 58: Team Work | Team Work
+  Row 59: I work well in groups | I don’t work well in groups
+  Row 60:  | 
+  Row 61: Growth Mindset | Growth Mindset
+  Row 62: I embrace challenges and opportunities for growth | My abilities and knowledge are innate traits and cannot be improved.
+  Row 63:  | 
+  Row 64: Criticism | Criticism
+  Row 65: Can take criticism | Cannot take criticism
+  Row 66:  | 
+  Row 67: Feedback | Feedback
+  Row 68: Giving constructive feedback | Giving unconstructive feedback
+  Row 69:  | 
+  Row 70: Listening | Listening
+  Row 71: I am a good listener and i pay attention to others | I am not always paying attention to what others are saying
+  Row 72:  | 
+  Row 73: Empathy/ Sensitivity | Empathy/ Sensitivity
+  Row 74: I am sensitive and empathetic towards others | I struggle to be empathetic towards others
+  Row 75:  | 
+  Row 76: Procrastination | Procrastination
+  Row 77: I don’t procrastinate | I procrastinate alot before doing/starting anything
+  Row 78:  | 
+  Row 79: Working Individually or with one person | Working Individually or with one person
+  Row 80: You can work well when you are working with one person | You cannot work effectively only with one person
+  Row 81:  | 
+  Row 82: social interaction | social interaction
+  Row 83: You like social interaction, you can interact with people in a social setting | Avoiding social interaction
+  Row 84:  | 
+  Row 85: Expressiveness | Expressiveness
+  Row 86: Able to express needs, wants, emotions, thoughts, ideas, opinions easily & verbally | unable to express needs, wants, emotions, thoughts, ideas, opinions easily & verbally
+  Row 87:  | 
+  Row 88: Accountability | Accountability
+  Row 89: Accepting mistakes & owning up to them | Not accepting mistakes & owning up to them
+  Row 90:  | 
+  Row 91: Spontaneity | Spontaneity
+  Row 92: Can do things impulsively without planning | Cannot do things impulsively without planning
+  Row 93:  | 
+  Row 94: Rules and Routines | Rules and Routines
+  Row 95: Following rules and routines | Not following rules and routines
+  Row 96:  | 
+  Row 97: Accepting change | Accepting change
+  Row 98: I am open to and can accept change | I cannot accept change and i find it difficult
+  Row 99:  | 
+  Row 100: Finding direction | Finding direction
+  Row 101: I am good at finding my direction and path | I struggle to find my own direction
+  Row 102:  | 
+  Row 103: Conversing with a group | Conversing with a group
+  Row 104: Talking to many people | Not being able to talk to many people
+  Row 105:  | 
+  Row 106: Initiating conversations | Initiating conversations
+  Row 107: I can start conversations without a challenge | I cannot start conversations
+  Row 108:  | 
+  Row 109: Taking a stand for oneself | Taking a stand for oneself
+  Row 110: Taking a stand for oneself | Not being able to take a stand for oneself
+  Row 111:  | 
+  Row 112: Self-control | Self-control
+  Row 113: Controlling your own actions and learning to ignore immediate pulses | Cannot control own impulses and actions
+  Row 114:  | 
+
+--- TABLE 42 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 43 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 44 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 45 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 46 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 47 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 48 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 49 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 50 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 51 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 52 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 53 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 54 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 55 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 56 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 57 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 58 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 59 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 60 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 61 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 62 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 63 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 64 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 65 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 66 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 67 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 68 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 69 ---
+  Row 0: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  Row 1:  |  |  |  |  |  |  |  |  | 
+
+--- TABLE 70 ---
+  Row 0: MIND | ENERGY | NATURE | TACTICS | IDENTITY
+  Row 1: Extraverted | Intuitive | Thinking | Judging | Assertive
+  Row 2: Introverted | Observant | Feeling | Prospecting | Turbulent
+
+--- TABLE 71 ---
+  Row 0: Accepting | Deliberate/
+Intentional | Level-Headed/Balanced | See the big picture
+  Row 1: Adventurousness | Do the right thing | Look Good/Appearance | Seek Truth
+  Row 2: Aliveness | Do what you should do | Loyalty/Dutiful | Self-Development
+  Row 3: Autonomy | Empathy | Mastery/Learning | Self-Discipline
+  Row 4: Be extraordinary | Excellence | Objectivity/
+Logical | Self-Awareness
+  Row 5: Be light | Factual/Literal | Open-Mindedness | Subjectivity
+  Row 6: Careful/Cautious | Feel Good | Play by the rules | Tactful
+  Row 7: Caring/
+Understanding | Frankness | Play it safe | Tradition
+  Row 8: Change Agent/Catalyst | Friendship | Playfulness | Truthfulness
+  Row 9: Cleverness | Fulfilment/Joy/
+fun | Practical | Use my natural talents
+  Row 10: Compassion | Honesty/
+Integrity/Trust | Respect | Wisdom/Wit
+  Row 11: Creativity/
+Innovation | Independent/Solo | Responsibility | Work first, play later
+  Row 12: Critical Thinking | Justice/Rules/
+Order | Say it like it is | Work is play
+  Row 13: Curiosity | Leadership | Security/
+Stability | 
+
+--- TABLE 72 ---
+  Row 0: Alternative | Forgiveness | Meritocracy | Seek Cooperation
+  Row 1: Be in control | Freedom | Moderate/Fairly sensible | Seek Partnership
+  Row 2: Be who you are | Getting Ahead | My way or the highway | Sexually Expressive
+  Row 3: Belong to the group | Global Minded | No kids by choice | Social Responsibility
+  Row 4: Bend in, be accepted | Have less/Have more | Obey higher authority | Social Status
+  Row 5: Benefit from | Independent | Obey inner authority | Supremacy
+  Row 6: Challenge the status quo | Intellectual | Passion | Systems Thinking
+  Row 7: Companionship | Interdependence | Patriotism | Take care of others
+  Row 8: Conservative/
+Traditional | Intuitive/Think outside the box | Practical Minded | Take care of your own
+  Row 9: Democracy | Keep things the same | Progressive Morals | Team Spirit/Tribal
+  Row 10: Diversity | Keep up with the joneses | Punishment | The strong deserves the more
+  Row 11: Empowerment | Liberal/
+Free-thinking | Rational/Logical | Tolerance of differences
+  Row 12: Equality | Local Minded | Seek Authority | Traditional Morals
+  Row 13: Family/Marriage/
+Children | Meaningful | Seek Competition | 
+
+--- TABLE 73 ---
+  Row 0: Analysis | Enlightenment | Make a difference | Reliability
+  Row 1: Be Happy | Entrepreneurship | Make a history | Serve mankind
+  Row 2: Be Masterful | Fame | Make lots of money | Shift a paradigm
+  Row 3: Be the best | Finish what you start | Make others look good | Simplify
+  Row 4: Be world class | Happiness is a way of life | Make the world better | Solving problems
+  Row 5: Big changes start small | Happiness is earned | New possibilities | Spiritual Development
+  Row 6: Change the world | Have the most | Obey, get rewarded | Start a revolution
+  Row 7: Daring | Humour | One step at a time | Stick to things
+  Row 8: Depend on others | Improve/Enhance | Overcome the odds | Making things work together as one
+  Row 9: Disobey | Interdependence | Peace | Take a stand
+  Row 10: Do more with less | Invent/Create | Perseverance | Usefulness
+  Row 11: Do something important | Leave a legacy | Personal comfort | Work Hard
+  Row 12: Do what it takes | Live to the fullest | Philanthropy | Work Smart
+  Row 13: Efficiency | Make a contribution | Quality | 
+
+--- TABLE 74 ---
+  Row 0: Adventure | Elegance | More is better | Seek quality
+  Row 1: Aesthetics | Entitled/Get my share | Natural | Seek quantity
+  Row 2: Artful | Fairness | Nature | Simple living
+  Row 3: Beauty | Fashionable | Noisy/Busy | Small is beautiful
+  Row 4: Bigger is better | Financial security | Organic | Solitude/Privacy
+  Row 5: Bright/Sunny | Fix broken things | Plain/Simple | Stylish
+  Row 6: Casual | Functional | Pleasure/
+Sensuality | Success symbols
+  Row 7: Classical Methods | Get what I deserve | Rural | Survive
+  Row 8: Close to home | Holistic | Safety | Sustainability
+  Row 9: Comfort | I will show them | Saving/
+Investment | Unique
+  Row 10: Conserve | Interesting experiences | See new places | Urban
+  Row 11: Die with the most things | Luxury | Seeks conservation | Utilitarian (beneficial)
+  Row 12: Dominate | Maximise wealth | Seek development | Wealth
+  Row 13: Ecological | Modern |  | 
+
+--- TABLE 75 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Practical | Fix, build, or repair things | Tinker with mechanisms
+  Row 2: Athletic | Solve mechanical problems | Be outdoors
+  Row 3: Straightforward | Play a sport | Be physically active
+  Row 4: Mechanically inclined | Read blueprints or diagrams | Use my hands
+  Row 5: Reliable | Operate tools, machinery, or equipment | Build new things
+  Row 6: Persistent | Use physical strength to accomplish things | Work with objects
+  Row 7: Thrifty |  | Care for animals
+  Row 8: Genuine |  | Tend plants
+
+--- TABLE 76 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Inquisitive | Analyze Data | Explore ideas
+  Row 2: Analytical | Understand scientific theories | Use Computers
+  Row 3: Introverted | Do complex calculations | Work independently
+  Row 4: Scientific | Conduct research | Solve puzzles
+  Row 5: Independent | Evaluate information | Perform laboratory experiments
+  Row 6: Observant | Chart Data on graphs | Read scientific or technical publications
+  Row 7: Precise |  | Study or solve problems
+  Row 8: Intellectual |  | 
+  Row 9: Reserved |  | 
+
+--- TABLE 77 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Creative | Draw, sculpt, or paint | Attend concerts, movies, theatre, or art exhibitions
+  Row 2: Intuitive | Play a musical instrument, sing, or compose music | Read fiction, plays, or poetry
+  Row 3: Introspective | Write stories, poems, music, plays, or scripts | Work on crafts
+  Row 4: Innovative | Design fashions, objects, graphics, or interiors | Collect artwork
+  Row 5: Original | Express myself creatively | Read about art, literature, or music
+  Row 6: Idealistic | Perform in front of an audience | Take photographs
+  Row 7: Expressive |  | Work in unstructured situations
+  Row 8: Nonconforming |  | Take an art course
+
+--- TABLE 78 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Helpful | Teach or train others | Work in groups
+  Row 2: Insightful | Express myself clearly | Help people with problems
+  Row 3: Outgoing | Lead a group discussion | Participate in meetings
+  Row 4: Understanding | Counsel others | Volunteer
+  Row 5: Trustworthy | Mediate disputes | Work with young people
+  Row 6: Generous | Plan and supervise an activity | Entertain others
+  Row 7: Nurturing | Cooperate well with others | Play team sports
+  Row 8:  |  | Read about psychology, sociology, human relations
+
+--- TABLE 79 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Self-confident | Persuade people | Make decisions affecting others
+  Row 2: Assertive | Start projects | Participate in politics
+  Row 3: Adventuresome | Sell things or promote ideas | Excel in leaderships or sales
+  Row 4: Persuasive | Give a speech | Meet important people
+  Row 5: Enthusiastic | Organize activities | Plan activities or meetings
+  Row 6: Ambitious | Run my own service or business | Read business publications
+  Row 7: Talkative | Lead a group | Belong to groups or clubs
+  Row 8: Extroverted | Supervise others | 
+
+--- TABLE 80 ---
+  Row 0: I AM | I CAN | I LIKE TO
+  Row 1: Methodical | Work well within a system | Work with numbers
+  Row 2: Accurate | Follow instructions | Check paperwork or products for errors
+  Row 3: Careful | Set up a record keeping system | Work with data
+  Row 4: Conscientious | Use a computer and/or office machines | Follow clearly defined office protocols
+  Row 5: Efficient | Write effective business documents | Be responsible for details
+  Row 6: Detail-oriented | Organize office products | Collect and categorize things
+  Row 7: Patient | Follow a set plan | Keep accurate records
+  Row 8: Perseverant |  | Work in an office
+
+--- TABLE 81 ---
+  Row 0: Column A |  | Column B
+  Row 1: Value accuracy more | or | Value insights more
+  Row 2: Be interested in concrete issues | or | Be interested in abstract ideas
+  Row 3: Prefer people who speak plainly | or | Prefer unusual ways of expression
+  Row 4: Remember many details | or | Be vague about details
+  Row 5: Be down to earth | or | Be complex
+  Row 6: Focus on the present | or | Focus on future possibilities
+  Row 7: Be valued for my common sense | or | Be valued for seeing new trends
+  Row 8: Be realistic and pragmatic | or | Be theoretical and imaginative
+  Row 9: Be trusting of the facts | or | Be trusting of my intuition
+
+--- TABLE 82 ---
+  Row 0: Column A |  | Column B
+  Row 1: Frank and direct | or | Tactful and diplomatic
+  Row 2: Skeptical at first | or | Accepting at first
+  Row 3: Unemotional | or | Emotional
+  Row 4: Analytical | or | Empathetic
+  Row 5: Apt to meet conflict head on | or | Apt to avoid conflict where possible
+  Row 6: Principled | or | Sympathetic
+  Row 7: Objective when criticized | or | Apt to take things personally
+  Row 8: Impartial | or | Compassionate
+  Row 9: Competitive | or | Supportive
+
+--- TABLE 83 ---
+  Row 0: Column @ |  | Column #
+  Row 1: Meet deadlines early | or | Meet deadlines at the last minute
+  Row 2: Make detailed plans before I start | or | Handle problems as they arise
+  Row 3: Be punctual and sometimes early | or | Be leisurely, sometimes late
+  Row 4: Like to be scheduled | or | Prefer to be spontaneous
+  Row 5: Like clear guidelines | or | Like flexibility
+  Row 6: Feel settled | or | Often feel restless
+  Row 7: Have a tidy workplace | or | Have a workplace with many piles/papers
+  Row 8: Be deliberate | or | Be carefree
+  Row 9: Like to make plans | or | Like to wait and see
+
+--- TABLE 84 ---
+  Row 0: Column (e) |  | Column (i)
+  Row 1: Like to talk | or | Prefer to listen
+  Row 2: Become bored when alone too much | or | Need time alone to recharge batteries
+  Row 3: Prefer to work with a group | or | Prefer to work alone or with one another
+  Row 4: Speak first-then reflect | or | Reflect first-then speak
+  Row 5: Be more interactive & energetic | or | Be more reflective and thoughtful
+  Row 6: Know a little about many topics | or | Know a few topics in depth
+  Row 7: Initiate conversations at social gatherings | or | Wait to be approached at social gatherings
+
+--- TABLE 85 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Building a fishing net & a spear for hunting |  |  |  |  |  |  |  | 
+  Row 2: 2 | Be the wise person and draft a constitution for the island/enforce fairness & follow laws |  |  |  |  |  |  |  | 
+  Row 3: 3 | Perform a stand-up comedy act, try to make people laugh |  |  |  |  |  |  |  | 
+  Row 4: 4 | Monitor the food supply, needs of people |  |  |  |  |  |  |  | 
+  Row 5: 5 | Hunt, fish, chop wood, gather berries, carry water |  |  |  |  |  |  |  | 
+  Row 6: 6 | Fashion coconuts into bowls for eating/drinking, make clothes/create utensils |  |  |  |  |  |  |  | 
+  Row 7: 7 | Construct huts to live in and build a raft |  |  |  |  |  |  |  | 
+  Row 8: 8 | Nurse sick people back to health |  |  |  |  |  |  |  | 
+
+--- TABLE 86 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | I'd invent unique electronic consoles for instruments/create effects |  |  |  |  |  |  |  | 
+  Row 2: 2 | I’d write poetic and philosophical lyrics |  |  |  |  |  |  |  | 
+  Row 3: 3 | I’d be the drummer or lead guitarist |  |  |  |  |  |  |  | 
+  Row 4: 4 | I'd be the band manager |  |  |  |  |  |  |  | 
+  Row 5: 5 | I'd be the roadie, drive the truck, and collect the equipment/logistics |  |  |  |  |  |  |  | 
+  Row 6: 6 | I’d operate the visual light and laser show |  |  |  |  |  |  |  | 
+  Row 7: 7 | I'd set up and troubleshoot the amplifiers and sound system |  |  |  |  |  |  |  | 
+  Row 8: 8 | I’d be in charge of the fan club and social engagements |  |  |  |  |  |  |  | 
+
+--- TABLE 87 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Do marine biology research |  |  |  |  |  |  |  | 
+  Row 2: 2 | Spend long hours reading and pondering the meaning of life |  |  |  |  |  |  |  | 
+  Row 3: 3 | Write a journal, document the trip or the crew's life stories |  |  |  |  |  |  |  | 
+  Row 4: 4 | Be the captain of the ship and coordinate the shipmates' tasks |  |  |  |  |  |  |  | 
+  Row 5: 5 | Do the athletic work of hands-on sailing and getting a good tan |  |  |  |  |  |  |  | 
+  Row 6: 6 | Cook and coordinate meals |  |  |  |  |  |  |  | 
+  Row 7: 7 | Be in charge of navigating and reading ocean maps |  |  |  |  |  |  |  | 
+  Row 8: 8 | Plan events and trips to nearby islands and go shopping |  |  |  |  |  |  |  | 
+
+--- TABLE 88 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Advise on the atmospheric and geological theories for the film/plot of film |  |  |  |  |  |  |  | 
+  Row 2: 2 | Write a screenplay about the social implications of a global disaster |  |  |  |  |  |  |  | 
+  Row 3: 3 | Direct the film, coach the actors, and shape the overall plot line |  |  |  |  |  |  |  | 
+  Row 4: 4 | Be the film producer in charge of funding and promoting the project |  |  |  |  |  |  |  | 
+  Row 5: 5 | Be a stuntman or stuntwoman |  |  |  |  |  |  |  | 
+  Row 6: 6 | Do the cinematography |  |  |  |  |  |  |  | 
+  Row 7: 7 | Build the film sets |  |  |  |  |  |  |  | 
+  Row 8: 8 | Gossip with the actors, organize lunch, schedule the day's activities |  |  |  |  |  |  |  | 
+
+--- TABLE 89 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Be in charge of expanding the business and networking |  |  |  |  |  |  |  | 
+  Row 2: 2 | Find a quiet spot at the bar and observe people |  |  |  |  |  |  |  | 
+  Row 3: 3 | Play guitar and perform for people |  |  |  |  |  |  |  | 
+  Row 4: 4 | Operate the bar, track inventory to make sure there's enough food & drinks |  |  |  |  |  |  |  | 
+  Row 5: 5 | Play volleyball on the beach, dance, take part in events |  |  |  |  |  |  |  | 
+  Row 6: 6 | Be the bartender |  |  |  |  |  |  |  | 
+  Row 7: 7 | Be the utility person and fix anything that breaks |  |  |  |  |  |  |  | 
+  Row 8: 8 | Be the host/hostess and make sure people have a good time |  |  |  |  |  |  |  | 
+
+--- TABLE 90 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Science adviser on renewable energy |  |  |  |  |  |  |  | 
+  Row 2: 2 | A Political speechwriter for the President |  |  |  |  |  |  |  | 
+  Row 3: 3 | Press Secretary for the Rashtrapati Bhawan |  |  |  |  |  |  |  | 
+  Row 4: 4 | Be the President & call all the shots |  |  |  |  |  |  |  | 
+  Row 5: 5 | Be a fitness trainer to the staff or a Secret Service agent |  |  |  |  |  |  |  | 
+  Row 6: 6 | Design handmade decorations for all holiday events and dinners |  |  |  |  |  |  |  | 
+  Row 7: 7 | IT network specialist for a secure communications system |  |  |  |  |  |  |  | 
+  Row 8: 8 | Secretary of education, interested in improving children's education |  |  |  |  |  |  |  | 
+
+--- TABLE 91 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Get a PhD in physics to understand complex 3D systems |  |  |  |  |  |  |  | 
+  Row 2: 2 | Study sociology to learn the impacts of new technology on society |  |  |  |  |  |  |  | 
+  Row 3: 3 | Write content for a Website to promote the program |  |  |  |  |  |  |  | 
+  Row 4: 4 | Study finance and economics to balance the national budget |  |  |  |  |  |  |  | 
+  Row 5: 5 | Run in a marathon to raise money for the mission |  |  |  |  |  |  |  | 
+  Row 6: 6 | Take photographs of today's traffic jams for an art exhibition - history photography |  |  |  |  |  |  |  | 
+  Row 7: 7 | Become an engineer or mechanic in the automotive field |  |  |  |  |  |  |  | 
+  Row 8: 8 | Be a grade-school teacher to prepare students for the future |  |  |  |  |  |  |  | 
+
+--- TABLE 92 ---
+  Row 0:  |  | A | B | C | D | E | F | G | H
+  Row 1: 1 | Astrophysics, molecular biology, paleontology |  |  |  |  |  |  |  | 
+  Row 2: 2 | World history, political science, human behavior |  |  |  |  |  |  |  | 
+  Row 3: 3 | Journalism, public relations, screenwriting |  |  |  |  |  |  |  | 
+  Row 4: 4 | Accounting, finance, business management |  |  |  |  |  |  |  | 
+  Row 5: 5 | Anatomy, nutrition, physical fitness |  |  |  |  |  |  |  | 
+  Row 6: 6 | Furniture making, cooking, interior design |  |  |  |  |  |  |  | 
+  Row 7: 7 | Mechanical engineering, information technology, masonry (stone/glass/ceramics) |  |  |  |  |  |  |  | 
+  Row 8: 8 | Child development, nursing, special education |  |  |  |  |  |  |  | 
+
+--- TABLE 93 ---
+  Row 0: Total the points in each column |  |  |  |  |  |  |  | 
+  Row 1: Highlight the top two highest scores | A | B | C | D | E | F | G | H
+
+--- TABLE 94 ---
+  Row 0: Mother: | 
+  Row 1: Father | 
+
+--- TABLE 95 ---
+  Row 0: Sr. No. | What kind of bond do you share with your child? | Dad | Mom
+  Row 1: 1 | Very Connected (We share everything, talk openly and closely) |  | 
+  Row 2: 2 | Friendly Bond (We talk freely, like friends, with comfort) |  | 
+  Row 3: 3 | Neutral (Our relationship is fine, but not very deep) |  | 
+  Row 4: 4 | Formal Relationship (We mostly speak about studies or responsibilities, not personal things) |  | 
+  Row 5: 5 | Emotionally Strained (There is some tension or difficulty when we try to talk or connect) |  | 
+
+--- TABLE 96 ---
+  Row 0: 
+
+--- TABLE 97 ---
+  Row 0:  |  |  |  |  |  | Close family | Friends | Authority | Strangers
+  Row 1: Comfort Level 
+(How relaxed or at ease is the child around these people?) | Comfort Level 
+(How relaxed or at ease is the child around these people?) | Comfort Level 
+(How relaxed or at ease is the child around these people?) | Comfort Level 
+(How relaxed or at ease is the child around these people?) | Comfort Level 
+(How relaxed or at ease is the child around these people?) | Comfort Level 
+(How relaxed or at ease is the child around these people?) |  |  |  | 
+  Row 2: Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) | Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) | Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) | Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) | Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) | Communication Style (Does the child talk freely, stay quiet, use gestures, or avoid eye contact?) |  |  |  | 
+  Row 3: Initiation of Interaction (Does the child start conversations or wait to be spoken to?) | Initiation of Interaction (Does the child start conversations or wait to be spoken to?) | Initiation of Interaction (Does the child start conversations or wait to be spoken to?) | Initiation of Interaction (Does the child start conversations or wait to be spoken to?) | Initiation of Interaction (Does the child start conversations or wait to be spoken to?) | Initiation of Interaction (Does the child start conversations or wait to be spoken to?) |  |  |  | 
+  Row 4: Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) | Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) | Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) | Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) | Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) | Emotional Expression (Does the child express joy, affection, frustration, or remain neutral?) |  |  |  | 
+
+--- TABLE 98 ---
+  Row 0:  | Home city | Anywhere in India | Abroad
+  Row 1: Yes/no |  |  | 
+  Row 2: Why? |  |  | 

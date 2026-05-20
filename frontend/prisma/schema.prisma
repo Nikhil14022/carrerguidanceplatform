@@ -1,0 +1,574 @@
+// Prisma Schema Blueprint for Career Guidance Platform (Production Ready)
+// Database: MongoDB
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  CLIENT
+  PARENT
+  ADMIN           // Legacy — use SUPER_ADMIN for new accounts
+  EXPERT          // Legacy — use MENTOR_PERMANENT/MENTOR_TEMPORARY
+  SUPER_ADMIN
+  MENTOR_PERMANENT
+  MENTOR_TEMPORARY
+}
+
+enum ModuleStatus {
+  LOCKED
+  UNLOCKED
+  IN_PROGRESS
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+}
+
+enum WorkflowStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  UNDER_REVIEW
+  APPROVED
+  REVISION_REQUIRED
+  COMPLETED
+}
+
+enum ReportStatus {
+  AI_GENERATED
+  HUMAN_REVIVING
+  FINALIZED
+}
+
+enum FlagType {
+  INCONSISTENCY
+  QUERY
+}
+
+enum FlagStatus {
+  OPEN
+  RESOLVED
+}
+
+enum AppointmentType {
+  ONLINE
+  OFFLINE
+}
+
+enum BookingStatus {
+  REQUESTED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum QueryStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum QueryPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ExposureStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum NotificationType {
+  SYSTEM
+  MODULE_UPDATE
+  REPORT_READY
+  APPOINTMENT
+  CHAT
+}
+
+enum MentorType {
+  PERMANENT
+  TEMPORARY
+}
+
+enum MentorStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+// ============================================
+// CORE ENTITIES
+// ============================================
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  password      String
+  name          String?
+  role          Role      @default(CLIENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  clientProfile  ClientProfile?
+  mentorProfile  MentorProfile?
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+}
+
+// ============================================
+// MENTOR SYSTEM
+// ============================================
+
+model MentorProfile {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @unique @db.ObjectId
+  user            User          @relation(fields: [userId], references: [id])
+
+  type            MentorType    @default(PERMANENT)
+  status          MentorStatus  @default(ACTIVE)
+  specializations String[]
+  bio             String?
+  whatsappNumber  String?
+  googleCalendarUrl String?
+
+  accessStart     DateTime      @default(now())
+  accessEnd       DateTime?     // null = permanent, set = temporary auto-expire
+
+  assignments     MentorAssignment[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model MentorAssignment {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  mentorProfileId String        @db.ObjectId
+  mentorProfile   MentorProfile @relation(fields: [mentorProfileId], references: [id])
+  clientProfileId String        @db.ObjectId
+
+  permissions     String[]      // ["VIEW_MODULES","REVIEW_MODULES","VIEW_REPORTS","EDIT_REPORTS","CHAT"]
+  assignedBy      String        @db.ObjectId
+
+  isActive        Boolean       @default(true)
+  assignedAt      DateTime      @default(now())
+  expiresAt       DateTime?
+}
+
+model ClientProfile {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String    @unique @db.ObjectId
+  user          User      @relation(fields: [userId], references: [id])
+  parentId      String?   @db.ObjectId
+  
+  // High-level Tracking
+  currentStage  Int       @default(1)
+  journeyStatus String    @default("Started")
+
+  // Relationships
+  workflowState   ClientWorkflowState?
+  modules         ClientModule[]
+  reports         Report[]
+  appointments    AppointmentBooking[]
+  queries         ClientQuery[]
+  exposures       ClientExposureProgress[]
+  skillGaps       SkillGap[]
+  dataFlags       DataFlag[]
+  parentData      ParentData[]
+  workshopEnrollments WorkshopEnrollment[]
+}
+
+// ============================================
+// WORKFLOW ENGINE
+// ============================================
+
+model WorkflowConfiguration {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  defaultSequence String[]  // Array of Module IDs
+  rules           Json      // Conditional branching logic
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model ClientWorkflowState {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String       @unique @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  currentStage    String
+  status          WorkflowStatus @default(NOT_STARTED)
+  moduleOrdering  String[]     // Override for specific clients
+  history         Json         // transition log
+}
+
+// ============================================
+// MODULE SYSTEM
+// ============================================
+
+model Module {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String    @unique
+  description   String?
+  schema        Json
+  defaultOrder  Int
+  clientModules ClientModule[]
+}
+
+model ClientModule {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String       @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  moduleId        String       @db.ObjectId
+  module          Module       @relation(fields: [moduleId], references: [id])
+  status          ModuleStatus @default(LOCKED)
+  order           Int
+  filledBy        String       @default("CLIENT")
+  mentorNotes     String?
+  
+  response        ModuleResponse?
+  comments        ModuleComment[]
+}
+
+model ModuleResponse {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientModuleId String    @unique @db.ObjectId
+  clientModule   ClientModule @relation(fields: [clientModuleId], references: [id])
+  
+  data          Json
+  submittedAt   DateTime?
+  approvedAt    DateTime?
+  reviewerId    String?   @db.ObjectId
+}
+
+model ModuleComment {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientModuleId  String    @db.ObjectId
+  clientModule    ClientModule @relation(fields: [clientModuleId], references: [id])
+  questionId      String
+  userId          String    @db.ObjectId
+  content         String
+  createdAt       DateTime  @default(now())
+  resolved        Boolean   @default(false)
+  parentId        String?   @db.ObjectId // Threaded comments
+}
+
+model DataFlag {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String    @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  type            FlagType  // INCONSISTENCY, QUERY
+  fieldRef        String    // e.g. "module_1.question_3"
+  description     String
+  status          FlagStatus @default(OPEN)
+  createdAt       DateTime  @default(now())
+}
+
+// ============================================
+// APPOINTMENTS
+// ============================================
+
+model AppointmentSlot {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  expertId    String   @db.ObjectId
+  startTime   DateTime
+  endTime     DateTime
+  isBooked    Boolean  @default(false)
+}
+
+model AppointmentBooking {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  slotId          String    @unique @db.ObjectId // If slot is a relation, it would be here
+  clientProfileId String    @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  type            AppointmentType
+  meetingLink     String?
+  status          BookingStatus @default(REQUESTED)
+  notes           String?   // Internal notes
+  sessionSummary  String?   // Output for client
+  createdAt       DateTime  @default(now())
+}
+
+// ============================================
+// AUDIT & VERSION CONTROL
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  userRole    Role
+  action      String
+  entity      String
+  entityId    String   @db.ObjectId
+  oldValue    Json?
+  newValue    Json?
+  timestamp   DateTime @default(now())
+}
+
+model ModuleResponseVersion {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  moduleId        String    @db.ObjectId
+  clientProfileId String    @db.ObjectId
+  data            Json
+  version         Int
+  savedAt         DateTime  @default(now())
+  savedBy         String    @db.ObjectId
+}
+
+model ReportVersion {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  reportId    String    @db.ObjectId
+  content     String
+  version     Int
+  status      ReportStatus
+  createdAt   DateTime  @default(now())
+  createdBy   String    @db.ObjectId
+}
+
+// ============================================
+// QUERIES SYSTEM
+// ============================================
+
+model ClientQuery {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String    @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  category        String
+  subject         String
+  description     String
+  status          QueryStatus @default(OPEN)
+  priority        QueryPriority @default(MEDIUM)
+  expertId        String?   @db.ObjectId
+  createdAt       DateTime  @default(now())
+  
+  responses       QueryResponse[]
+}
+
+model QueryResponse {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  queryId     String    @db.ObjectId
+  query       ClientQuery @relation(fields: [queryId], references: [id])
+  userId      String    @db.ObjectId
+  message     String
+  createdAt   DateTime  @default(now())
+}
+
+// ============================================
+// EXPOSURE SYSTEM
+// ============================================
+
+model ExposureProgram {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  careerTags  String[]
+  description String
+}
+
+model ClientExposureProgress {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String    @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  programId       String    @db.ObjectId // could relate to ExposureProgram
+  status          ExposureStatus @default(NOT_STARTED)
+  feedbacks       ExposureFeedback[]
+}
+
+model ExposureFeedback {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  progressId  String    @db.ObjectId
+  progress    ClientExposureProgress @relation(fields: [progressId], references: [id])
+  reflection  String
+  expertEvaluation String?
+  createdAt   DateTime  @default(now())
+}
+
+// ============================================
+// REPORTS & CAREER LOGIC
+// ============================================
+
+model Report {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String       @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  status          ReportStatus @default(AI_GENERATED)
+  content         String?      // Replaced by specific sections practically
+  active          Boolean      @default(true)
+  mentorApproved  Boolean      @default(false)
+  
+  careerOptions   CareerOption[]
+  finalPlan       FinalPlan?
+}
+
+model CareerOption {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  reportId      String   @db.ObjectId
+  report        Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  title         String
+  reasoning     String?
+  match         Int
+  isShortlisted Boolean @default(false)
+  
+  research      ResearchEntry?
+  skillGaps     SkillGap[]
+}
+
+model FinalPlan {
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  reportId        String       @unique @db.ObjectId
+  report          Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  comparisonData  Json
+  finalRoadmap    String?
+  createdAt       DateTime     @default(now())
+}
+
+model ResearchEntry {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  careerOptionId String       @unique @db.ObjectId
+  careerOption   CareerOption @relation(fields: [careerOptionId], references: [id], onDelete: Cascade)
+  
+  pathway        String?
+  skills         String[]
+  indiaVsAbroad  String?
+  lifestyle      String?
+  gaps           String?
+}
+
+model SkillGap {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  careerOptionId  String    @db.ObjectId
+  careerOption    CareerOption @relation(fields: [careerOptionId], references: [id], onDelete: Cascade)
+  clientProfileId String    @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  
+  requiredSkill   String
+  clientLevel     Int
+  requiredLevel   Int
+  gapScore        Int
+  improvementPlan String
+  deadline        DateTime?
+  progress        Int       @default(0)
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String           @db.ObjectId
+  user            User             @relation(fields: [userId], references: [id])
+  
+  title           String
+  message         String
+  type            NotificationType
+  link            String?          // URL to navigate to when clicked
+  
+  isRead          Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+}
+
+// ============================================
+// DISCUSSION FORUM
+// ============================================
+
+model Discussion {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  userName    String
+  userRole    String   @default("CLIENT")
+
+  title       String
+  content     String
+  category    String   @default("General")
+  
+  likes       Int      @default(0)
+  views       Int      @default(0)
+
+  comments    DiscussionComment[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model DiscussionComment {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  discussionId  String   @db.ObjectId
+  discussion    Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+  userId        String   @db.ObjectId
+  userName      String
+  userRole      String   @default("CLIENT")
+
+  content       String
+  
+  createdAt     DateTime @default(now())
+}
+
+// ============================================
+// PARENT DATA
+// ============================================
+
+model ParentData {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String   @db.ObjectId
+  type            String   // "REPORT_CARD" | "PROJECT" | "ACHIEVEMENT"
+  title           String
+  description     String?
+  fileUrl         String?  // uploaded image/document
+  uploadedBy      String   @db.ObjectId
+  createdAt       DateTime @default(now())
+
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+}
+
+model ParentQuestionnaire {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  clientProfileId String   @db.ObjectId
+  parentId        String   @db.ObjectId
+  responses       Json     // parent's answers
+  submittedAt     DateTime @default(now())
+}
+
+// ============================================
+// WORKSHOP SYSTEM
+// ============================================
+
+model Workshop {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  date        DateTime
+  location    String?
+  createdBy   String   @db.ObjectId  // admin or mentor
+  createdAt   DateTime @default(now())
+  enrollments WorkshopEnrollment[]
+}
+
+model WorkshopEnrollment {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  workshopId     String   @db.ObjectId
+  workshop       Workshop @relation(fields: [workshopId], references: [id])
+  clientProfileId String  @db.ObjectId
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id], onDelete: Cascade)
+  parentApproved Boolean  @default(false)
+  status         String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  respondedAt    DateTime?
+}

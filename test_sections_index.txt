@@ -1,0 +1,21 @@
+L179: P508 [normal]: TESTS
+L180: P509 [normal]: 16 PERSONALITY FACTORS
+L182: P526 [normal]: MOST IMPORTANT VALUES
+L184: P528 [normal]: 16. Select 20 values overall, five from each genre.
+L185: P529 [normal]: 17. Now, rank top 10 values from those 20 values selected
+L189: P536 [normal]: Want & Preference Value – Some “values” may simply be wants and preferences instead of important values, this may simply be something that you think would be nice to have rather than something you are committed to
+L190: P549 [normal]: Personal Values: Values That Guide My Personal Conduct
+L191: P565 [normal]: Social Values: Values That Guide My Choice of People and Culture
+L192: P583 [normal]: Achievement Values: Values That Motivate Me to Reach My Goals
+L193: P594 [normal]: Physical Values: Values That Guide Your Choice of Physical Things
+L219: P682 [normal]: COLOR TEST
+L233: P717 [normal]: Each column has a color associated with it; we choose the column with highest total and its associated color
+L234: P718 [normal]: In the end, you will get a two-color combination along with the category -Introvert or Extrovert – For e.g. – Green/Gold Introverts
+L236: P723 [normal]: SUBJECT MATTER INTEREST (HYPOTHETICAL SCENARIOS)
+L350:   Row 11: Tests | Tests | Tests | Tests | Tests
+L351:   Row 12: 1 | 16 PF |  |  |
+L352:   Row 13: 2 | Values |  |  |
+L353:   Row 14: 3 | RIASEC |  |  |
+L354:   Row 15: 4 | Color test |  |  |
+L355:   Row 16: 5 | Subject Matter Interest (Degree Pg) |  |  |
+L850:   Row 2: Finance - | Beliefs/Values -
