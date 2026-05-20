@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import { headers } from 'next/headers'
 
 const { handlers, auth: nextAuth, signIn, signOut } = NextAuth({
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: 'credentials',
