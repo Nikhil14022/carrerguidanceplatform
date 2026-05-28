@@ -67,6 +67,7 @@ export class TestScoringService extends BaseService {
         scores = this.scoreSMI(rawData);
         break;
       case 'PARENTS_MEETING':
+      case 'SELF_DISCOVERY':
         scores = null; // No scoring, mentor reviews raw data
         break;
     }

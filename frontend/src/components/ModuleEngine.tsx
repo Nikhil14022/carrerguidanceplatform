@@ -9,6 +9,7 @@ const RIASECTest = lazy(() => import('./test-modules/RIASECTest'));
 const ColorTest = lazy(() => import('./test-modules/ColorTest'));
 const SubjectMatterTest = lazy(() => import('./test-modules/SubjectMatterTest'));
 const ParentsMeetingForm = lazy(() => import('./test-modules/ParentsMeetingForm'));
+const SelfDiscoveryTest = lazy(() => import('./test-modules/SelfDiscoveryTest'));
 
 const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     '16PF': PersonalityFactorsTest,
@@ -17,6 +18,7 @@ const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     'COLOR': ColorTest,
     'SMI': SubjectMatterTest,
     'PARENTS_MEETING': ParentsMeetingForm,
+    'SELF_DISCOVERY': SelfDiscoveryTest,
 };
 
 export default function ModuleEngine({ moduleId }: { moduleId: string }) {

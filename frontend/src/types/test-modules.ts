@@ -118,7 +118,7 @@ export interface ParentsMeetingResponse {
 // ══════════════════════════════════════════════════════════════
 // Unified test result
 // ══════════════════════════════════════════════════════════════
-export type TestType = '16PF' | 'VALUES' | 'RIASEC' | 'COLOR' | 'SMI' | 'PARENTS_MEETING';
+export type TestType = '16PF' | 'VALUES' | 'RIASEC' | 'COLOR' | 'SMI' | 'PARENTS_MEETING' | 'SELF_DISCOVERY';
 
 export interface TestModuleResult {
   testType: TestType;

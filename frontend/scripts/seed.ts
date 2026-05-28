@@ -1372,6 +1372,19 @@ async function main() {
         questions: []
       },
       defaultOrder: 17
+    },
+
+    // ─────────────────────────────────────────────────────────────
+    // MODULE 18 — SELF DISCOVERY QUESTIONNAIRE (Specialized Test Component)
+    // ─────────────────────────────────────────────────────────────
+    {
+      title: 'Module 18: Self Discovery Questionnaire',
+      description: 'Reflect deeply on your interests, creative skills, emotional clues, values, and career directions.',
+      schema: {
+        testType: 'SELF_DISCOVERY',
+        questions: []
+      },
+      defaultOrder: 18
     }
 
   ]
@@ -1387,7 +1400,7 @@ async function main() {
     })
   }
 
-  console.log('Seeded successfully: 11 topic modules + 6 test modules = 17 modules total')
+  console.log('Seeded successfully: 11 topic modules + 7 test modules = 18 modules total')
 }
 
 main()
