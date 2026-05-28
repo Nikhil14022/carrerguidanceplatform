@@ -391,7 +391,16 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                         Back to Clients
                     </button>
                     <h1 className="text-3xl font-bold tracking-tight">{client.user.name || 'Unnamed Client'}</h1>
-                    <p className="text-slate-500 mt-1">{client.user.email} · Joined {new Date(client.user.createdAt).toLocaleDateString()}</p>
+                    <p className="text-slate-500 mt-1 mb-4">{client.user.email} · Joined {new Date(client.user.createdAt).toLocaleDateString()}</p>
+                    <button
+                        onClick={() => router.push(`/admin/clients/${clientId}/combined-answers`)}
+                        className="px-4 py-2.5 bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-colors inline-flex items-center gap-2 border border-orange-500/20 shadow-lg shadow-orange-600/10 mb-4"
+                    >
+                        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        View Combined Answers Feed
+                    </button>
                 </div>
                 <div className="flex gap-3">
                     {pendingReview.length > 0 && (
