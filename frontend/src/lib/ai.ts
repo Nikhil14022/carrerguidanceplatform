@@ -37,7 +37,7 @@ async function cleanupExistingReports(clientProfileId: string) {
   }
 }
 
-export async function generateCareerReport(clientProfileId: string) {
+export async function generateCareerReport(clientProfileId: string, customInstructions?: string) {
   const clientProfile = await prisma.clientProfile.findUnique({
     where: { id: clientProfileId },
     include: {
@@ -64,6 +64,11 @@ export async function generateCareerReport(clientProfileId: string) {
 Student Assessment Data:
 ${JSON.stringify(responses, null, 2)}
 
+${customInstructions ? `Additional Custom Instructions / Guidance for Report Generation:
+${customInstructions}
+
+Please strictly incorporate the above custom instructions in your analysis, strengths, personality insights, and career suggestions.
+` : ''}
 Return a JSON object with exactly these keys:
 - "personality_insights": a 2-3 paragraph professional profile describing the student's personality, strengths, work style, and professional potential. Make it detailed and insightful.
 - "career_suggestions": an array of exactly 3 objects, each with:
@@ -273,4 +278,50 @@ Return a JSON object with exactly these keys:
     console.error('General research error:', error);
     throw error;
   }
+}
+
+export async function chatWithClientData(
+  clientProfileId: string,
+  messages: { role: 'user' | 'assistant' | 'system'; content: string }[]
+) {
+  const clientProfile = await prisma.clientProfile.findUnique({
+    where: { id: clientProfileId },
+    include: {
+      user: { select: { name: true, email: true } },
+      modules: {
+        where: {
+          status: { in: ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'] }
+        },
+        include: { response: true, module: true }
+      }
+    }
+  })
+
+  if (!clientProfile) {
+    throw new Error('Client profile not found')
+  }
+
+  const responses = clientProfile.modules.map((m: any) => ({
+    moduleTitle: m.module.title,
+    responses: m.response?.data
+  }))
+
+  const systemMessage = {
+    role: 'system',
+    content: `You are an expert AI Career Guidance Counselor. You are assisting a mentor or admin in analyzing the career survey responses of the student named ${clientProfile.user.name || 'Unnamed Student'} (${clientProfile.user.email}).
+
+Here is the student's complete assessment data from all modules:
+${JSON.stringify(responses, null, 2)}
+
+Your task is to answer specific questions about their responses, provide insights, suggest career paths, or help write/refine career report sections. 
+Keep your responses detailed, professional, encouraging, and directly rooted in the student's actual responses. Use markdown formatting to make your answers easy to read.`
+  };
+
+  const result = await groq.chat.completions.create({
+    messages: [systemMessage, ...messages] as any,
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.7,
+  });
+
+  return result.choices[0]?.message?.content || "";
 }

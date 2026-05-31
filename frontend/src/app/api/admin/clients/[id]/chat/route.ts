@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { generateCareerReport } from '@/lib/ai'
+import { chatWithClientData } from '@/lib/ai'
 
 export async function POST(
   request: Request,
@@ -18,14 +18,15 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const body = await request.json().catch(() => ({}));
-    const prompt = body?.prompt || undefined;
+    const { messages } = await request.json()
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json({ error: 'Invalid messages array' }, { status: 400 })
+    }
 
-    const report = await generateCareerReport(id, prompt)
-
-    return NextResponse.json({ success: true, report })
+    const responseText = await chatWithClientData(id, messages)
+    return NextResponse.json({ success: true, response: responseText })
   } catch (error: any) {
-    console.error('Generate report error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to generate report' }, { status: 500 })
+    console.error('Chat error:', error)
+    return NextResponse.json({ error: error.message || 'Failed to get chat response' }, { status: 500 })
   }
 }
