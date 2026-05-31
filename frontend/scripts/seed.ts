@@ -95,7 +95,7 @@ async function main() {
           {
             id: 'demo_exams',
             type: 'table',
-            question: '1. Additional Exams (completed / giving / planning to give)',
+            question: 'Additional Exams (completed / giving / planning to give)',
             minRows: 3,
             col1Label: 'Exam Name (e.g., JEE, NEET, SAT)',
             col2Label: 'Status',
@@ -104,7 +104,7 @@ async function main() {
           {
             id: 'demo_extracurricular',
             type: 'table',
-            question: '2. Any extracurricular activities you have participated in? (highlight those which you have enjoyed)',
+            question: 'Any extracurricular activities you have participated in? (highlight those which you have enjoyed)',
             minRows: 3,
             col1Label: 'Activity',
             col2Label: 'Frequency',
@@ -129,7 +129,7 @@ async function main() {
           {
             id: 'demo_thoughts_academics',
             type: 'multiselect_with_rank',
-            question: '3. Thoughts on education & academics — which of the following best describes you? (Select all that apply, then rank)',
+            question: 'Thoughts on education & academics — which of the following best describes you? (Select all that apply, then rank)',
             options: [
               { id: '1', text: 'I am academically driven person & I enjoy it' },
               { id: '2', text: "I am academically driven person because it's important" },
@@ -146,7 +146,7 @@ async function main() {
           {
             id: 'demo_hobbies',
             type: 'table',
-            question: '4. Apart from academics, what other areas interest you or what are you most curious about? OR What are the things you like to do in your free time? (Hobbies)',
+            question: 'Apart from academics, what other areas interest you or what are you most curious about? OR What are the things you like to do in your free time? (Hobbies)',
             minRows: 3,
             col1Label: 'Hobby/Interest',
             col2Label: 'Description',
@@ -155,7 +155,7 @@ async function main() {
           {
             id: 'demo_routine',
             type: 'schedule',
-            question: '5. What is your routine every day? (Time → Activity)',
+            question: 'What is your routine every day? (Time → Activity)',
             description: 'Share your typical daily schedule as closely as possible (e.g., 7am Wake up, 8am School, 3pm Sports, 10pm Sleep)'
           }
         ]
@@ -174,13 +174,13 @@ async function main() {
           {
             id: 'aim_1',
             type: 'text',
-            question: '1. What are you aiming at with these sessions? Any expectations from the sessions? Your intention for yourself through these sessions?',
+            question: 'What are you aiming at with these sessions? Any expectations from the sessions? Your intention for yourself through these sessions?',
             placeholder: 'Share your goals and expectations from this career counselling process...'
           },
           {
             id: 'aim_2_career',
             type: 'text',
-            question: '2. Areas You Would like to work on / Goals: Career/Academics/Course',
+            question: 'Areas You Would like to work on / Goals: Career/Academics/Course',
             description: 'Focus on: **school, curriculum, marks, system, subjects**',
             placeholder: 'Your goals here...'
           },
@@ -207,7 +207,7 @@ async function main() {
           {
             id: 'aim_3a',
             type: 'table',
-            question: '3A. Name the 5 Most Important things/people in your life right now?',
+            question: 'Name the 5 Most Important things/people in your life right now?',
             description: 'First share what comes to mind, then explore in depth. \n\n**Examples:** *Gadgets, Games, Friends, Daily habits, General knowledge, Current affairs, Meditation/Yoga, Food items, Self, Family, Relationships, Sports, Career, Academics, Shopping, Reading books, Hobbies, Movies, Fitness, Lifestyle, Social media, Travelling, Music, Going out/Partying, TV shows*',
             minRows: 5,
             col1Label: 'Important Thing/Person',
@@ -216,7 +216,7 @@ async function main() {
           {
             id: 'aim_3b',
             type: 'table',
-            question: '3B. Name 5 areas in which you spend the maximum amount of your time',
+            question: 'Name 5 areas in which you spend the maximum amount of your time',
             minRows: 5,
             col1Label: 'Area / Activity',
             col2Label: 'Estimated time spent'
@@ -224,21 +224,21 @@ async function main() {
           {
             id: 'aim_4',
             type: 'text',
-            question: '4. What is the out of the box career that fascinates you the most?',
+            question: 'What is the out of the box career that fascinates you the most?',
             description: 'Either something that already exists or something you would want to exist. Can be individual fields or a combo of two different fields.',
             placeholder: 'Describe the career that excites you most...'
           },
           {
             id: 'aim_5',
             type: 'text',
-            question: '5. Imagine a life where you have all the money and resources — how would you want to use/spend them?',
+            question: 'Imagine a life where you have all the money and resources — how would you want to use/spend them?',
             description: '**Examples:** *Travel, Buy a house/bungalow, Buy cars/bike/yacht, Buy all the brands, Donate/charity, Invest, Savings, Adventure, Create a start-up, Games, Experience, Gadgets, Society, Lifestyle, Parents/relatives*',
             placeholder: 'Describe how you would spend unlimited resources...'
           },
           {
             id: 'aim_6',
             type: 'table',
-            question: '6. Name 10 things that you would like to have in your life within the span of 10 years. This can include anything & everything — be creative!',
+            question: 'Name 10 things that you would like to have in your life within the span of 10 years. This can include anything & everything — be creative!',
             description: '**Examples:** *Skills, Qualities, Things you want to do/buy/experience, Personality type, Relationship, Job/Salary, Travel, Social Status, Own a House/Car, Lifestyle change*',
             minRows: 10,
             col1Label: 'Thing to have/achieve',
@@ -260,7 +260,7 @@ async function main() {
           {
             id: 'career_1',
             type: 'choice',
-            question: '1. Which of the following do you relate the most with?',
+            question: 'Which of the following do you relate the most with?',
             options: [
               { id: '1', text: 'I want to design my future career to the point where I know exactly what I will do' },
               { id: '2', text: "I don't know how long it will take or how difficult it will be, but that's the result I want" },
@@ -274,7 +274,7 @@ async function main() {
           {
             id: 'career_2',
             type: 'rank',
-            question: '2. While choosing a career, the following things matter to me (Select 3 and rank them in order of priority)',
+            question: 'While choosing a career, the following things matter to me (Select 3 and rank them in order of priority)',
             options: [
               { id: '1', text: 'A field which has reputation and status in the society' },
               { id: '2', text: 'Something I enjoy the most – happy & satisfied at the end of the day' },
@@ -295,7 +295,7 @@ async function main() {
           {
             id: 'career_3a',
             type: 'rank',
-            question: '3a. Work criteria — People related (Select 3 and rank them)',
+            question: 'Work criteria — People related (Select 3 and rank them)',
             options: [
               { id: '1', text: 'I get to work by myself' },
               { id: '2', text: 'I would prefer working in a group/team' },
@@ -311,7 +311,7 @@ async function main() {
           {
             id: 'career_3b',
             type: 'rank',
-            question: '3b. Work criteria — Environment/Culture (Select 3 and rank them)',
+            question: 'Work criteria — Environment/Culture (Select 3 and rank them)',
             options: [
               { id: '1', text: 'Where efficiency & quality of work is given importance over the amount of work' },
               { id: '2', text: 'Where the overall culture is result-oriented, working towards collective goal' },
@@ -343,7 +343,7 @@ async function main() {
           {
             id: 'risk_1',
             type: 'choice',
-            question: '1. How much risk are you willing to take in your career?',
+            question: 'How much risk are you willing to take in your career?',
             options: [
               { id: 'minimal', text: 'Minimal risk (I prefer safe, stable roles)' },
               { id: 'moderate', text: "Moderate risk (I'm open to some risks for potential rewards)" },
@@ -353,7 +353,7 @@ async function main() {
           {
             id: 'risk_2',
             type: 'choice',
-            question: '2. How important is creative expression in your career?',
+            question: 'How important is creative expression in your career?',
             options: [
               { id: 'not_important', text: 'Not important (I focus more on practical aspects)' },
               { id: 'somewhat', text: 'Somewhat important (I value a balance between expression and practicality)' },
@@ -363,7 +363,7 @@ async function main() {
           {
             id: 'risk_3',
             type: 'choice',
-            question: '3. What is your priority when it comes to financial stability?',
+            question: 'What is your priority when it comes to financial stability?',
             options: [
               { id: 'high', text: 'High priority (Financial stability is my main concern)' },
               { id: 'medium', text: 'Medium priority (I value financial stability but also consider other factors)' },
@@ -373,7 +373,7 @@ async function main() {
           {
             id: 'risk_4',
             type: 'choice',
-            question: '4. Which best describes your approach to stability and exploration?',
+            question: 'Which best describes your approach to stability and exploration?',
             options: [
               { id: 'stability_first', text: 'First, I want stability, then I want to explore.' },
               { id: 'explore_first', text: 'First, I want to explore; stability is not a concern in the short run.' },
@@ -384,7 +384,7 @@ async function main() {
           {
             id: 'risk_5',
             type: 'choice',
-            question: '5. How important is working in a field you are passionate about?',
+            question: 'How important is working in a field you are passionate about?',
             options: [
               { id: 'very', text: 'Very important (I want to work in a field I am passionate about)' },
               { id: 'somewhat', text: "Somewhat important (I prefer to work in a field I like, but it's not a deal-breaker)" },
@@ -459,13 +459,13 @@ async function main() {
           {
             id: 'visual_superpower',
             type: 'text',
-            question: '2. If you could have a superpower, what would it be and why?',
+            question: 'If you could have a superpower, what would it be and why?',
             placeholder: 'Describe your superpower and the reason behind your choice...'
           },
           {
             id: 'visual_books',
             type: 'choice',
-            question: '3. Do you like reading books?',
+            question: 'Do you like reading books?',
             options: [
               { id: 'yes', text: 'YES' },
               { id: 'no', text: 'NO' }
@@ -475,7 +475,7 @@ async function main() {
             id: 'visual_book_genres',
             type: 'multiselect',
             dependsOn: { questionId: 'visual_books', value: 'yes' },
-            question: '4. Different genre of books you like reading or would like to read? (Select all that apply)',
+            question: 'Different genre of books you like reading or would like to read? (Select all that apply)',
             options: [
               { id: 'fiction', text: 'Fiction' },
               { id: 'nonfiction', text: 'Non-fiction' },
@@ -497,7 +497,7 @@ async function main() {
           {
             id: 'visual_characters',
             type: 'table',
-            question: '5. Characters you love/relate the most with (books/movies/series)? Any character you would want to be like?',
+            question: 'Characters you love/relate the most with (books/movies/series)? Any character you would want to be like?',
             description: 'Also mention a real known person whose life/qualities inspire you.',
             minRows: 3,
             col1Label: 'Character / Person',
@@ -506,7 +506,7 @@ async function main() {
           {
             id: 'visual_games',
             type: 'table',
-            question: '6. Favourite games you are currently playing or have ever played? Why?',
+            question: 'Favourite games you are currently playing or have ever played? Why?',
             description: 'Game genres: Shooter Games (COD, PubG, Fortnite) | Action/Fighting | Building/Creating games | Racing Games | Brain games | Puzzles, Logic Games (Tetris) | Platform Games (Super Mario) | Strategy/Board Games (Ludo, chess, WWE, cricket cards, Pokémon) | Interactive 3D Movie Games | Candy Crush | Interactive Games (Jenga) | Crime/Investigation | Superhero | Horror | Sports',
             prefilledRows: [
               'Favourite games',
@@ -519,13 +519,13 @@ async function main() {
           {
             id: 'visual_music',
             type: 'text',
-            question: '10. Favourite music genres?',
+            question: 'Favourite music genres?',
             placeholder: 'e.g., Pop, Hip-hop, Classical, Rock, EDM, Folk, Jazz...'
           },
           {
             id: 'visual_youtube_insta',
             type: 'table',
-            question: '11. Do you use YouTube and/or Instagram? List your Top Channels/Pages on each.',
+            question: 'Do you use YouTube and/or Instagram? List your Top Channels/Pages on each.',
             prefilledRows: [
               'YouTube Top Channels',
               'Instagram Top Pages'
@@ -538,12 +538,12 @@ async function main() {
             type: 'table',
             minRows: 3,
             col1Label: 'Content Genre',
-            question: '12a. Content genres you follow online (List them)'
+            question: 'Content genres you follow online (List them)'
           },
           {
             id: 'visual_content_creators',
             type: 'text',
-            question: '12b. Any specific Bloggers/YouTubers/Channels you follow? (Share your subscription/following list)',
+            question: 'Any specific Bloggers/YouTubers/Channels you follow? (Share your subscription/following list)',
             placeholder: 'Specific channels/creators you love: ...'
           },
         ]
@@ -562,7 +562,7 @@ async function main() {
           {
             id: 'friends_1',
             type: 'text',
-            question: '1. What is friendship for you? (definition/understanding)',
+            question: 'What is friendship for you? (definition/understanding)',
             placeholder: 'Define friendship in your own words...'
           },
           {
@@ -574,7 +574,7 @@ async function main() {
           {
             id: 'friends_2',
             type: 'table',
-            question: '2. Top 3 craziest things you have done with your friends (stupid, funny, hilarious, embarrassing, most memorable)',
+            question: 'Top 3 craziest things you have done with your friends (stupid, funny, hilarious, embarrassing, most memorable)',
             minRows: 3,
             col1Label: 'Craziest Thing',
             col2Label: 'When/Why'
@@ -582,14 +582,14 @@ async function main() {
           {
             id: 'friends_3',
             type: 'text',
-            question: '3. What kind of people do you think you can easily form a friendship with & why?',
+            question: 'What kind of people do you think you can easily form a friendship with & why?',
             description: 'Examples: Trustworthy | Honest | Reliable | Knowledgeable | Playful | Active | Sporty | Talkative | Silent | Popular | Intellectual | Emotional | Unpopular | Gossiper | Adventurous | Cautious | Supportive | Fun loving | Well mannered | Funny | Fashionable | Helpful | Humorous | Authoritative | Persuasive | Nurturer | Practical | Spontaneous | Strong Headed | Shy | Foodie | Caring | Realistic | Visionaries | Outgoing | Down to earth | Understanding | Liberal/Broadminded | Traditional/Conservative | Quiet/less talkative',
             placeholder: 'Describe the qualities of people you connect with and why...'
           },
           {
             id: 'friends_4',
             type: 'choice',
-            question: '4. You and Friends: Who are you here?',
+            question: 'You and Friends: Who are you here?',
             options: [
               { id: '1', text: 'I have a lot of friends & honestly, they mean a lot to me. I really enjoy being with them' },
               { id: '2', text: 'I have a lot of friends & have a mixed combination of good / difficult time with them' },
@@ -607,7 +607,7 @@ async function main() {
           {
             id: 'friends_5',
             type: 'choice',
-            question: '5. Did you ever have difficulties making friends or socialising?',
+            question: 'Did you ever have difficulties making friends or socialising?',
             options: [
               { id: 'yes', text: 'Yes' },
               { id: 'no', text: 'No' }
@@ -617,13 +617,13 @@ async function main() {
             id: 'friends_6',
             type: 'text',
             dependsOn: { questionId: 'friends_5', value: 'yes' },
-            question: '6. What were the difficulties? Does it still impact how you socialise? If you already dealt successfully with it, how did you do it?',
+            question: 'What were the difficulties? Does it still impact how you socialise? If you already dealt successfully with it, how did you do it?',
             placeholder: 'Describe the difficulties and how you handled or are handling them...'
           },
           {
             id: 'friends_7a',
             type: 'choice',
-            question: '7. Have some of your closest friends tried to push you to do something that you did not want to do?',
+            question: 'Have some of your closest friends tried to push you to do something that you did not want to do?',
             description: 'Examples: Drinking, Smoking, Pranks, Lying to parents/others, Eating non-veg, Physical fight, Proposing/Dating, Shoplifting, Perform a dare, Talk to a stranger, Cheating/Breakup, Breaking in/out of house',
             options: [
               { id: 'yes', text: 'YES' },
@@ -634,7 +634,7 @@ async function main() {
             id: 'friends_7b',
             type: 'choice',
             dependsOn: { questionId: 'friends_7a', value: 'yes' },
-            question: '7. How did you / will you face such a situation?',
+            question: 'How did you / will you face such a situation?',
             options: [
               { id: '1', text: 'Avoid the friend completely because he/she did not respect me' },
               { id: '2', text: 'Deny firmly because I do not like to do things that go against my principles, or I do not want to do' },
@@ -651,7 +651,7 @@ async function main() {
           {
             id: 'friends_7c',
             type: 'choice',
-            question: '7. Imagine 2 of your friends are fighting — what role would you play in such a situation?',
+            question: 'Imagine 2 of your friends are fighting — what role would you play in such a situation?',
             options: [
               { id: '1', text: 'Try to mediate between both of them and make sure things do not escalate' },
               { id: '2', text: 'Fuel the fire for fun, but only if the situation is not too serious' },
@@ -667,7 +667,7 @@ async function main() {
           {
             id: 'friends_8',
             type: 'choice',
-            question: '8. What do you do when you disagree with your friends on certain things?',
+            question: 'What do you do when you disagree with your friends on certain things?',
             options: [
               { id: '1', text: 'Strongly disagree & take a stand for what I believe in or want to do' },
               { id: '2', text: "Avoid and let it go because I don't like to get into any disagreements" },
@@ -682,7 +682,7 @@ async function main() {
           {
             id: 'friends_9',
             type: 'choice',
-            question: '9. Do you like meeting new people and making friends?',
+            question: 'Do you like meeting new people and making friends?',
             options: [
               { id: '1', text: 'Yes of course, I love meeting new people' },
               { id: '2', text: 'No, I would rather be with my own set of people' },
@@ -701,7 +701,7 @@ async function main() {
             type: 'scale',
             min: 1,
             max: 10,
-            question: '10. How happy are you with your existing group of friends? (Rate 1–10)',
+            question: 'How happy are you with your existing group of friends? (Rate 1–10)',
             description: '1 = Not happy at all, 10 = Extremely happy'
           }
         ]
@@ -720,19 +720,19 @@ async function main() {
           {
             id: 'family_1',
             type: 'text',
-            question: "1. What does Family mean to you? If you must randomly give out words when you hear 'Family', what all would you say?",
+            question: "What does Family mean to you? If you must randomly give out words when you hear 'Family', what all would you say?",
             placeholder: 'Share words or thoughts that come to mind when you think of family...'
           },
           {
             id: 'family_2',
             type: 'text',
-            question: '2. Describe your relationship with your parents/siblings in one word.',
+            question: 'Describe your relationship with your parents/siblings in one word.',
             placeholder: 'e.g., Mother: Warm | Father: Strict | Sibling: Fun'
           },
           {
             id: 'family_3',
             type: 'choice',
-            question: '3. How would you describe your family space for now?',
+            question: 'How would you describe your family space for now?',
             options: [
               { id: '1', text: "We all are very connected to each other & share everything. There's open space for sharing anything & everything & it's a beautiful support system within. We do give individual space to each other too." },
               { id: '2', text: "We all are very connected to each other & share almost everything apart from few topics which we have disputes on (but only few & disagreement doesn't go extreme. We come back pretty quickly)" },
@@ -750,13 +750,13 @@ async function main() {
           {
             id: 'family_4',
             type: 'text',
-            question: '4. What are the general thoughts of your family towards/for you? Describe.',
+            question: 'What are the general thoughts of your family towards/for you? Describe.',
             placeholder: "Describe how your family sees you, their expectations, and their feelings towards you..."
           },
           {
             id: 'family_5',
             type: 'choice',
-            question: '5. Does your family influence your career/work decisions?',
+            question: 'Does your family influence your career/work decisions?',
             options: [
               { id: 'yes', text: 'YES' },
               { id: 'no', text: 'NO' },
@@ -766,13 +766,13 @@ async function main() {
           {
             id: 'family_5_detail',
             type: 'text',
-            question: '5. In what ways does your family influence your career/work decisions?',
+            question: 'In what ways does your family influence your career/work decisions?',
             placeholder: 'Describe the ways your family influences (or does not influence) your career choices...'
           },
           {
             id: 'family_6',
             type: 'choice',
-            question: '6. Thoughts about career in family (Select the one that best applies)',
+            question: 'Thoughts about career in family (Select the one that best applies)',
             options: [
               { id: '1', text: "They are very open for me to explore anything I would love to do including out of the box options. They want me to express myself even if it's any offbeat space. Earning isn't really first priority & they are ok even if my journey is random to start with. They don't have any specific timeline" },
               { id: '2', text: 'They are open for me to explore anything I would love to do including out of the box career options but want me to be clearer about what I want now/work. They need me to work towards it now & find my pathway' },
@@ -789,7 +789,7 @@ async function main() {
           {
             id: 'family_7',
             type: 'text',
-            question: '7. If you could change anything about your family as a whole or any particular family member, what would it be and why?',
+            question: 'If you could change anything about your family as a whole or any particular family member, what would it be and why?',
             placeholder: 'Describe the changes you would make and your reasons...'
           }
         ]
@@ -808,13 +808,13 @@ async function main() {
           {
             id: 'lifestyle_1',
             type: 'text',
-            question: "1. What do you understand about the term 'lifestyle'?",
+            question: "What do you understand about the term 'lifestyle'?",
             placeholder: 'Define what lifestyle means to you...'
           },
           {
             id: 'lifestyle_2',
             type: 'multiselect',
-            question: '2. I want a lifestyle where I… (Select all that apply)',
+            question: 'I want a lifestyle where I… (Select all that apply)',
             options: [
               { id: '1', text: 'Am satisfied with my work/career' },
               { id: '2', text: 'Have a luxurious life (brands, status symbols, gadgets, big house)' },
@@ -837,7 +837,7 @@ async function main() {
           {
             id: 'lifestyle_4',
             type: 'dropdown_multi',
-            question: '4. Which of the following would you choose? (Select one or more — indicate your inclination)',
+            question: 'Which of the following would you choose? (Select one or more — indicate your inclination)',
             options: [
               { id: 'cultural_social', text: 'Cultural/Social Lifestyle' },
               { id: 'slow_paced', text: 'A slow-paced Lifestyle' },
@@ -850,7 +850,7 @@ async function main() {
           {
             id: 'lifestyle_5',
             type: 'choice',
-            question: '5. Thoughts about Me-Time:',
+            question: 'Thoughts about Me-Time:',
             options: [
               { id: '1', text: 'I am okay if I do not get me-time' },
               { id: '2', text: 'I mandatorily need me-time every single day even if it is for some time' },
@@ -862,7 +862,7 @@ async function main() {
           {
             id: 'lifestyle_6',
             type: 'multiselect',
-            question: '6. Me-Time for me is… (Select all that apply)',
+            question: 'Me-Time for me is… (Select all that apply)',
             options: [
               { id: '1', text: 'Spending time all by myself doing whatever I feel in that moment' },
               { id: '2', text: 'Spending time with my friends' },
@@ -881,13 +881,13 @@ async function main() {
           {
             id: 'lifestyle_7',
             type: 'text',
-            question: '7. What would your legacy be? How do you want the world to know/remember you? (E.g., Personality, Deeds, Work, Skills, Qualities)',
+            question: 'What would your legacy be? How do you want the world to know/remember you? (E.g., Personality, Deeds, Work, Skills, Qualities)',
             placeholder: 'Describe how you want to be remembered and what mark you want to leave...'
           },
           {
             id: 'lifestyle_8',
             type: 'table',
-            question: '8. NEEDS vs WANTS — List the Things You Need vs Things You Want/Desire',
+            question: 'NEEDS vs WANTS — List the Things You Need vs Things You Want/Desire',
             minRows: 3,
             col1Label: 'Things I Need',
             col2Label: 'Things I Want/Desire'
@@ -895,13 +895,13 @@ async function main() {
           {
             id: 'lifestyle_9',
             type: 'text',
-            question: "9. If you could live anyone's life for a week, who would it be & why? — Someone whose way of living/lifestyle inspires you.",
+            question: "If you could live anyone's life for a week, who would it be & why? — Someone whose way of living/lifestyle inspires you.",
             placeholder: 'Name the person and explain what about their lifestyle inspires you...'
           },
           {
             id: 'lifestyle_10',
             type: 'choice',
-            question: '10. Your thoughts on India vs Abroad? What do your parents say in this?',
+            question: 'Your thoughts on India vs Abroad? What do your parents say in this?',
             options: [
               { id: 'india', text: 'India / Current Country — prefer to stay here' },
               { id: 'abroad_study', text: 'Abroad – for Study only' },
@@ -912,7 +912,7 @@ async function main() {
           {
             id: 'lifestyle_12',
             type: 'table',
-            question: '12. What are a few good habits that you want to incorporate in yourself & some of the bad habits that you wish to eradicate from your day-to-day life?',
+            question: 'What are a few good habits that you want to incorporate in yourself & some of the bad habits that you wish to eradicate from your day-to-day life?',
             minRows: 3,
             col1Label: 'Habits to Improve/Incorporate',
             col2Label: 'Habits to Eliminate'
@@ -920,7 +920,7 @@ async function main() {
           {
             id: 'lifestyle_13',
             type: 'text',
-            question: '13. Which areas would you like to know more about & be aware of the latest trends?',
+            question: 'Which areas would you like to know more about & be aware of the latest trends?',
             description: 'Examples: Current Affairs, Gadgets, Brands, Fashion, Technology, Science, Series, Celebrities, Business',
             placeholder: 'List areas you want to stay informed about...'
           },
@@ -961,7 +961,7 @@ async function main() {
             type: 'scale',
             min: 1,
             max: 10,
-            question: '1. How happy are you with your personality?',
+            question: 'How happy are you with your personality?',
             description: '1 = Not happy at all, 10 = Extremely happy'
           },
           {
@@ -969,7 +969,7 @@ async function main() {
             type: 'scale',
             min: 1,
             max: 10,
-            question: '2. How happy are you with your body image?',
+            question: 'How happy are you with your body image?',
             description: '1 = Not happy at all, 10 = Extremely happy'
           },
           {
@@ -977,19 +977,19 @@ async function main() {
             type: 'scale',
             min: 1,
             max: 10,
-            question: '3. How important are looks and presentation for you?',
+            question: 'How important are looks and presentation for you?',
             description: '1 = Not important at all, 10 = Extremely important'
           },
           {
             id: 'body_4',
             type: 'text',
-            question: '4. When it comes to work, what is your imagination with respect to looks and presentation? (How do you imagine yourself presenting professionally?)',
+            question: 'When it comes to work, what is your imagination with respect to looks and presentation? (How do you imagine yourself presenting professionally?)',
             placeholder: 'Describe how you see yourself in a professional setting...'
           },
           {
             id: 'body_5',
             type: 'text',
-            question: '5. Do you want to change anything about your body or have you done anything extreme to change your body?',
+            question: 'Do you want to change anything about your body or have you done anything extreme to change your body?',
             placeholder: 'Your thoughts and experiences around body changes...'
           }
         ]
