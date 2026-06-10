@@ -187,7 +187,40 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                 m.module.schema.questions.forEach((q: any) => {
                     const val = hasAns[q.id];
                     if (val !== undefined && val !== null) {
-                        summaryText += `Q: ${q.question}\nA: ${JSON.stringify(val)}\n\n`;
+                        let displayVal = "";
+                        if (Array.isArray(val)) {
+                            displayVal = val.map((valItem: any) => {
+                                if (valItem && typeof valItem === 'object') {
+                                    const values = Object.values(valItem)
+                                        .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
+                                        .filter(v => v !== '');
+                                    return values.length > 0 ? values.join(' - ') : JSON.stringify(valItem);
+                                }
+                                if (q.options) {
+                                    const opt = q.options.find((o: any) => o.id === valItem);
+                                    if (opt) return opt.text;
+                                }
+                                return String(valItem);
+                            }).filter(Boolean).join(', ');
+                        } else if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
+                            displayVal = (val as any).ranked.map((valItem: any, idx: number) => {
+                                if (q.options) {
+                                    const opt = q.options.find((o: any) => o.id === valItem);
+                                    if (opt) return `${idx + 1}. ${opt.text}`;
+                                }
+                                return `${idx + 1}. ${valItem}`;
+                            }).join(', ');
+                        } else if (val && typeof val === 'object') {
+                            displayVal = JSON.stringify(val);
+                        } else {
+                            if (q.options) {
+                                const opt = q.options.find((o: any) => o.id === val);
+                                displayVal = opt ? opt.text : String(val);
+                            } else {
+                                displayVal = String(val);
+                            }
+                        }
+                        summaryText += `Q: ${q.question}\nA: ${displayVal}\n\n`;
                     }
                 });
             }
@@ -559,11 +592,44 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                             <div className="text-slate-400 text-sm leading-relaxed pl-4 border-l border-slate-800 mt-1 whitespace-pre-wrap">
                                                                 {Array.isArray(value) ? (
                                                                     <div className="flex flex-wrap gap-1.5 mt-1">
-                                                                        {value.map((valItem: any, idx) => (
-                                                                            <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
-                                                                                {typeof valItem === 'object' ? JSON.stringify(valItem) : String(valItem)}
-                                                                            </span>
-                                                                        ))}
+                                                                        {value
+                                                                            .map((valItem: any) => {
+                                                                                if (valItem && typeof valItem === 'object') {
+                                                                                    const values = Object.values(valItem)
+                                                                                        .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
+                                                                                        .filter(v => v !== '');
+                                                                                    return values.length > 0 ? values.join(' - ') : '';
+                                                                                }
+                                                                                if (q.options) {
+                                                                                    const opt = q.options.find(o => o.id === valItem);
+                                                                                    if (opt) return opt.text;
+                                                                                }
+                                                                                return String(valItem);
+                                                                            })
+                                                                            .filter(valStr => valStr !== '')
+                                                                            .map((valStr: string, idx: number) => (
+                                                                                <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                    {valStr}
+                                                                                </span>
+                                                                            ))
+                                                                        }
+                                                                    </div>
+                                                                ) : value && typeof value === 'object' && Array.isArray((value as any).ranked) ? (
+                                                                    <div className="flex flex-wrap gap-1.5 mt-1">
+                                                                        {(value as any).ranked
+                                                                            .map((valItem: any) => {
+                                                                                if (q.options) {
+                                                                                    const opt = q.options.find(o => o.id === valItem);
+                                                                                    if (opt) return opt.text;
+                                                                                }
+                                                                                return String(valItem);
+                                                                            })
+                                                                            .map((valStr: string, idx: number) => (
+                                                                                <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                    {idx + 1}. {valStr}
+                                                                                </span>
+                                                                            ))
+                                                                        }
                                                                     </div>
                                                                 ) : typeof value === 'object' ? (
                                                                     <pre className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
@@ -572,7 +638,13 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                         📄 View Document File
                                                                     </a>
                                                                 ) : (
-                                                                    String(value) || <span className="italic text-slate-600">Not answered</span>
+                                                                    (() => {
+                                                                        if (q.options) {
+                                                                            const opt = q.options.find(o => o.id === value);
+                                                                            if (opt) return opt.text;
+                                                                        }
+                                                                        return String(value);
+                                                                    })() || <span className="italic text-slate-600">Not answered</span>
                                                                 )}
                                                             </div>
                                                         )}
