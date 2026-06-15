@@ -21,6 +21,14 @@ export async function GET(
                     include: {
                         research: true
                     }
+                },
+                clientProfile: {
+                    include: {
+                        user: { select: { name: true, email: true } },
+                        modules: {
+                            include: { response: true, module: true }
+                        }
+                    }
                 }
             }
         })

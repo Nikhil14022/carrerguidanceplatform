@@ -23,11 +23,18 @@ const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
 
 export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [currentStep, setCurrentStep] = useState(0);
-    const [answers, setAnswers] = useState<Record<string, any>>({});
+    const [answers, originalSetAnswers] = useState<Record<string, any>>({});
     const [module, setModule] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+
+    const isReadOnly = module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false;
+
+    const setAnswers = (val: any) => {
+        if (isReadOnly) return;
+        originalSetAnswers(val);
+    };
 
     // Comments Panel State
     const [isCommentsOpen, setIsCommentsOpen] = useState(false);
@@ -49,6 +56,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
 
     const router = useRouter();
     const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isSavingRef = useRef(false);
 
     useEffect(() => {
         fetchModule();
@@ -60,7 +68,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
             if (!res.ok) throw new Error('Failed to load module');
             const data = await res.json();
             if (data.module) setModule(data.module);
-            if (data.response?.data) setAnswers(data.response.data);
+            if (data.response?.data) originalSetAnswers(data.response.data);
 
             // Inject Mentor Notes as a comment if they exist
             if (data.module?.mentorNotes) {
@@ -79,7 +87,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
 
     // Auto-save logic Debounce
     useEffect(() => {
-        if (loading || !module) return;
+        if (loading || !module || isReadOnly) return;
 
         if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
 
@@ -90,9 +98,16 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         return () => {
             if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
         };
-    }, [answers, currentStep]);
+    }, [answers, currentStep, isReadOnly]);
 
     const handleSave = async (isFinal = false) => {
+        if (isReadOnly || isSavingRef.current) {
+            if (isReadOnly && isFinal) {
+                router.push('/dashboard');
+            }
+            return;
+        }
+        isSavingRef.current = true;
         setIsSaving(true);
         try {
             const endpoint = isFinal ? `/api/client/modules/${moduleId}/submit` : `/api/client/modules/${moduleId}/save`;
@@ -106,6 +121,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         } catch (err: any) {
             console.error('Save error:', err);
         } finally {
+            isSavingRef.current = false;
             setIsSaving(false);
         }
     };
@@ -145,6 +161,10 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         if (next < (module?.schema?.questions?.length || 0)) {
             setCurrentStep(next);
         } else {
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+                autoSaveTimerRef.current = null;
+            }
             handleSave(true);
         }
     };
@@ -175,7 +195,9 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
             <div className="relative">
                 {/* Autosave Indicator */}
                 <div className="absolute top-0 right-10 flex items-center gap-2 text-xs font-bold text-slate-400">
-                    {isSaving ? (
+                    {isReadOnly ? (
+                        <span className="text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">Read-Only</span>
+                    ) : isSaving ? (
                         <>
                             <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin" />
                             Saving...
@@ -191,6 +213,18 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                 </div>
 
                 <div className="max-w-4xl mx-auto py-10">
+                    {isReadOnly && (
+                        <div className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-6 py-4 rounded-xl flex items-center gap-3 mb-6">
+                            <svg className="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <div>
+                                <p className="font-bold text-sm">Read-Only Mode</p>
+                                <p className="text-xs text-indigo-400/80 mt-0.5">This module has already been submitted and is locked for editing.</p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="mb-6">
                         <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-1">Assessment Test</div>
                         <h1 className="text-2xl font-bold">{module.title}</h1>
@@ -205,7 +239,14 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                         <TestComponent
                             answers={answers}
                             setAnswers={setAnswers}
-                            onSubmit={() => handleSave(true)}
+                            onSubmit={() => {
+                                if (autoSaveTimerRef.current) {
+                                    clearTimeout(autoSaveTimerRef.current);
+                                    autoSaveTimerRef.current = null;
+                                }
+                                handleSave(true);
+                            }}
+                            readOnly={isReadOnly}
                         />
                     </Suspense>
                 </div>
@@ -219,7 +260,9 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         <div className="relative">
             {/* Autosave Indicator */}
             <div className="absolute top-0 right-10 flex items-center gap-2 text-xs font-bold text-slate-400">
-                {isSaving ? (
+                {isReadOnly ? (
+                    <span className="text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded">Read-Only</span>
+                ) : isSaving ? (
                     <>
                         <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin" />
                         Saving...
@@ -235,6 +278,17 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
             </div>
 
             <div className="max-w-3xl mx-auto space-y-8 py-10">
+                {isReadOnly && (
+                    <div className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-6 py-4 rounded-xl flex items-center gap-3">
+                        <svg className="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <div>
+                            <p className="font-bold text-sm">Read-Only Mode</p>
+                            <p className="text-xs text-indigo-400/80 mt-0.5">This module has already been submitted and is locked for editing.</p>
+                        </div>
+                    </div>
+                )}
                 {/* Progress Section */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-end">
@@ -269,6 +323,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                     placeholder={q?.placeholder || "Enter your answer..."}
                                     value={answers[q.id] || ''}
                                     rows={4}
+                                    disabled={isReadOnly}
                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
                                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                                 />
@@ -278,6 +333,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                     type={q.type}
                                     placeholder={q?.placeholder || "Enter your answer..."}
                                     value={answers[q.id] || ''}
+                                    disabled={isReadOnly}
                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg [color-scheme:dark]"
                                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                                 />
@@ -293,6 +349,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         min={q.min}
                                         max={q.max}
                                         value={answers[q.id] || (q.min + q.max) / 2}
+                                        disabled={isReadOnly}
                                         className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                                         onChange={(e) => setAnswers({ ...answers, [q.id]: parseInt(e.target.value) })}
                                     />
@@ -303,6 +360,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         placeholder="Why did you give this rating?"
                                         value={answers[`${q.id}_reason`] || ''}
                                         rows={2}
+                                        disabled={isReadOnly}
                                         className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 mt-4 text-sm"
                                         onChange={(e) => setAnswers({ ...answers, [`${q.id}_reason`]: e.target.value })}
                                     />
@@ -318,11 +376,12 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         return (
                                         <button
                                             key={opt.id}
+                                            disabled={isReadOnly}
                                             onClick={() => {
                                                 setAnswers({ ...answers, [q.id]: [opt.id] });
                                             }}
                                             className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                                                ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                         >
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                                                 ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -346,6 +405,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         return (
                                             <button
                                                 key={opt.id}
+                                                disabled={isReadOnly}
                                                 onClick={() => {
                                                     const current: string[] = answers[q.id] || [];
                                                     const updated = isSelected
@@ -354,7 +414,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     setAnswers({ ...answers, [q.id]: updated });
                                                 }}
                                                 className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                             >
                                                 <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0
                                                     ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -381,6 +441,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             return (
                                                 <button
                                                     key={opt.id}
+                                                    disabled={isReadOnly}
                                                     onClick={() => {
                                                         const updated = isSelected
                                                             ? selected.filter((id: string) => id !== opt.id)
@@ -388,7 +449,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         setAnswers({ ...answers, [q.id]: updated });
                                                     }}
                                                     className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-4
-                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                                 >
                                                     <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0
                                                         ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -440,7 +501,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         type="text"
                                                         value={row.col1}
                                                         readOnly={isRowPrefilled}
-                                                        disabled={isRowPrefilled}
+                                                        disabled={isRowPrefilled || isReadOnly}
                                                         placeholder={q.col1Placeholder || '...'}
                                                         className={`w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 ${isRowPrefilled ? 'text-indigo-300 bg-slate-900/50 cursor-not-allowed border-none' : ''}`}
                                                         onChange={(e) => {
@@ -454,6 +515,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         <input
                                                             type="text"
                                                             value={row.col2}
+                                                            disabled={isReadOnly}
                                                             placeholder={q.col2Placeholder || '...'}
                                                             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                             onChange={(e) => {
@@ -467,6 +529,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         <input
                                                             type="text"
                                                             value={row.col3}
+                                                            disabled={isReadOnly}
                                                             placeholder={q.col3Placeholder || '...'}
                                                             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                             onChange={(e) => {
@@ -480,6 +543,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         <input
                                                             type="text"
                                                             value={row.col4}
+                                                            disabled={isReadOnly}
                                                             placeholder={q.col4Placeholder || '...'}
                                                             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                             onChange={(e) => {
@@ -494,6 +558,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         })}
                                         {!isPrefilled && (
                                             <button
+                                                disabled={isReadOnly}
                                                 onClick={() => setAnswers({ ...answers, [q.id]: [...tableData, { col1: '', col2: '', col3: '', col4: '' }] })}
                                                 className="mt-4 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
                                             >
@@ -530,6 +595,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     <input
                                                         type="text"
                                                         value={activity}
+                                                        disabled={isReadOnly}
                                                         placeholder="What do you do?"
                                                         className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
                                                         onChange={(e) => {
@@ -583,6 +649,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 <div className="text-sm font-bold text-indigo-400 uppercase tracking-wider">Rank {rankNum}</div>
                                                 <select
                                                     value={currentSelection.option}
+                                                    disabled={isReadOnly}
                                                     onChange={(e) => {
                                                         const newData = [...rankData];
                                                         newData[idx] = { ...newData[idx], option: e.target.value };
@@ -613,6 +680,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             return (
                                             <button
                                                 key={opt.id}
+                                                disabled={isReadOnly}
                                                 onClick={() => {
                                                     setAnswers({ ...answers, [q.id]: { option: opt.id, rating } });
                                                 }}
@@ -639,6 +707,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 min={1}
                                                 max={10}
                                                 value={rating}
+                                                disabled={isReadOnly}
                                                 className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                                                 onChange={(e) => setAnswers({ ...answers, [q.id]: { option: selectedOpt, rating: parseInt(e.target.value) } })}
                                             />
@@ -904,7 +973,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                             Back
                         </button>
                         <button onClick={handleNext} className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-lg shadow-indigo-500/20 text-sm tracking-wide">
-                            {currentStep === questions.length - 1 ? 'Submit Assessment' : 'Continue'}
+                            {currentStep === questions.length - 1 ? (isReadOnly ? 'Exit Assessment' : 'Submit Assessment') : 'Continue'}
                             {currentStep < questions.length - 1 && (
                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

@@ -41,7 +41,20 @@ export async function POST(
       return NextResponse.json({ error: 'Module not found' }, { status: 404 })
     }
 
-    if (clientModule.status === 'LOCKED' || clientModule.status === 'APPROVED') {
+    if (
+      clientModule.status === 'LOCKED' ||
+      clientModule.status === 'SUBMITTED' ||
+      clientModule.status === 'UNDER_REVIEW' ||
+      clientModule.status === 'APPROVED'
+    ) {
+      return NextResponse.json({ error: 'Module cannot be edited' }, { status: 403 })
+    }
+
+    const existingResponse = await prisma.moduleResponse.findUnique({
+      where: { clientModuleId: id }
+    })
+
+    if (existingResponse?.submittedAt) {
       return NextResponse.json({ error: 'Module cannot be edited' }, { status: 403 })
     }
 
