@@ -11,7 +11,7 @@ export default function QuestionnairesPage() {
     useEffect(() => {
         const fetchModules = async () => {
             try {
-                const res = await fetch('/api/client/dashboard');
+                const res = await fetch('/api/client/dashboard', { cache: 'no-store' });
                 const data = await res.json();
                 if (data.profile?.modules) {
                     setModules(data.profile.modules);
@@ -79,8 +79,8 @@ export default function QuestionnairesPage() {
                         return (
                             <div
                                 key={m.id}
-                                onClick={() => isActive && router.push(`/dashboard/modules/${m.id}`)}
-                                className={`p-6 rounded-xl border flex items-center justify-between transition-all ${statusColor} ${!isLocked && !isCompleted && !isReview ? 'hover:scale-[1.01]' : ''}`}
+                                onClick={() => !isLocked && router.push(`/dashboard/modules/${m.id}`)}
+                                className={`p-6 rounded-xl border flex items-center justify-between transition-all ${statusColor} ${!isLocked ? 'hover:scale-[1.01] cursor-pointer' : ''}`}
                             >
                                 <div className="flex items-center gap-6">
                                     <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center shrink-0 bg-white/5

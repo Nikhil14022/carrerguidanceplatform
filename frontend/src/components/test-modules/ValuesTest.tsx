@@ -15,6 +15,7 @@ interface ValuesTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 const MAX_PER_GENRE = 5;
@@ -106,7 +107,7 @@ function getInitialData(answers: Record<string, any>): ValuesResponse {
   };
 }
 
-export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTestProps) {
+export default function ValuesTest({ answers, setAnswers, onSubmit, readOnly = false }: ValuesTestProps) {
   const [step, setStep] = useState(1);
   const data = useMemo(() => getInitialData(answers), [answers]);
 
@@ -129,6 +130,7 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
 
   // ---- Step 1 handlers ----
   const toggleValue = (genre: ValueGenre, value: string) => {
+    if (readOnly) return;
     const current = data.selected[genre];
     let next: string[];
     if (current.includes(value)) {
@@ -165,6 +167,7 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
 
   // ---- Step 2 handlers ----
   const toggleRank = (value: string) => {
+    if (readOnly) return;
     const idx = data.ranked.indexOf(value);
     let nextRanked: string[];
     if (idx !== -1) {
@@ -183,6 +186,7 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
 
   // ---- Step 3 handlers ----
   const setCategoryForValue = (value: string, cat: ValueCategory) => {
+    if (readOnly) return;
     persist({
       ...data,
       categorized: { ...data.categorized, [value]: cat },
@@ -253,12 +257,12 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
                   <button
                     key={value}
                     type="button"
-                    disabled={isDisabled}
-                    onClick={() => toggleValue(genre, value)}
+                    disabled={isDisabled || readOnly}
+                    onClick={() => !readOnly && toggleValue(genre, value)}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                       isSelected
                         ? "bg-indigo-600/40 border-indigo-500 text-indigo-200"
-                        : isDisabled
+                        : (isDisabled || readOnly)
                         ? "bg-slate-800/50 border-slate-700/50 text-slate-600 cursor-not-allowed"
                         : "bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/50 hover:text-indigo-200"
                     }`}
@@ -292,12 +296,12 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
             <button
               key={value}
               type="button"
-              disabled={isFull}
-              onClick={() => toggleRank(value)}
+              disabled={isFull || readOnly}
+              onClick={() => !readOnly && toggleRank(value)}
               className={`relative px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
                 isRanked
                   ? "bg-indigo-600/40 border-indigo-500 text-indigo-200"
-                  : isFull
+                  : (isFull || readOnly)
                   ? "bg-slate-800/50 border-slate-700/50 text-slate-600 cursor-not-allowed"
                   : "bg-slate-800 border-slate-700 text-slate-300 hover:border-indigo-500/50 hover:text-indigo-200"
               }`}
@@ -357,12 +361,13 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
                     key={cat}
                     type="button"
                     title={CATEGORY_DESCRIPTIONS[cat]}
-                    onClick={() => setCategoryForValue(value, cat)}
+                    disabled={readOnly}
+                    onClick={() => !readOnly && setCategoryForValue(value, cat)}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
                       current === cat
                         ? "bg-indigo-600/50 border-indigo-500 text-indigo-200"
                         : "bg-slate-900 border-slate-700 text-slate-400 hover:border-indigo-500/50 hover:text-slate-200"
-                    }`}
+                    } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
                   >
                     {cat}
                   </button>
@@ -402,10 +407,10 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
             {step < 3 ? (
               <button
                 type="button"
-                disabled={step === 1 ? !canProceedStep1 : !canProceedStep2}
+                disabled={readOnly ? false : (step === 1 ? !canProceedStep1 : !canProceedStep2)}
                 onClick={() => setStep(step + 1)}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  (step === 1 ? canProceedStep1 : canProceedStep2)
+                  readOnly || (step === 1 ? canProceedStep1 : canProceedStep2)
                     ? "bg-indigo-600 text-white hover:bg-indigo-500"
                     : "bg-slate-800 text-slate-600 cursor-not-allowed"
                 }`}
@@ -415,15 +420,15 @@ export default function ValuesTest({ answers, setAnswers, onSubmit }: ValuesTest
             ) : (
               <button
                 type="button"
-                disabled={!canSubmitStep3}
+                disabled={!readOnly && !canSubmitStep3}
                 onClick={onSubmit}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  canSubmitStep3
+                  readOnly || canSubmitStep3
                     ? "bg-indigo-600 text-white hover:bg-indigo-500"
                     : "bg-slate-800 text-slate-600 cursor-not-allowed"
                 }`}
               >
-                Submit
+                {readOnly ? "Exit" : "Submit"}
               </button>
             )}
           </div>

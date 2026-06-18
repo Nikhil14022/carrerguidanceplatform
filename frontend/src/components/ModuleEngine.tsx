@@ -154,7 +154,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
 
     const fetchModule = async () => {
         try {
-            const res = await fetch(`/api/client/modules/${moduleId}`);
+            const res = await fetch(`/api/client/modules/${moduleId}`, { cache: 'no-store' });
             if (!res.ok) throw new Error('Failed to load module');
             const data = await res.json();
             if (data.module) setModule(data.module);

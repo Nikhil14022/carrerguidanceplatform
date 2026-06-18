@@ -29,6 +29,7 @@ interface SubjectMatterTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -217,26 +218,32 @@ export default function SubjectMatterTest({
   answers,
   setAnswers,
   onSubmit,
+  readOnly = false,
 }: SubjectMatterTestProps) {
   // Current step: 0..7 = scenarios, 8 = top-3 pick, 9 = summary
   const [step, setStep] = useState(0);
 
-  // Per-scenario answers
-  const [scenarioAnswers, setScenarioAnswers] = useState<Record<number, ScenarioAnswer>>(() => {
+  const testData = useMemo(() => {
     const existing = answers.__testData as SMIResponse | undefined;
-    if (existing?.scenarioAnswers) return existing.scenarioAnswers;
-    const init: Record<number, ScenarioAnswer> = {};
-    SCENARIOS.forEach((s) => {
-      init[s.id] = { selected: [], ranking: [] };
-    });
-    return init;
-  });
+    const scenarioAnswers = existing?.scenarioAnswers ?? (() => {
+      const init: Record<number, ScenarioAnswer> = {};
+      SCENARIOS.forEach((s) => {
+        init[s.id] = { selected: [], ranking: [] };
+      });
+      return init;
+    })();
+    const top3Scenarios = existing?.top3Scenarios ?? [];
+    const totals = computeColumnTotals(scenarioAnswers);
+    return {
+      scenarioAnswers,
+      top3Scenarios,
+      columnTotals: totals
+    };
+  }, [answers.__testData]);
 
-  // Top 3 scenarios the user would choose to live in
-  const [top3Scenarios, setTop3Scenarios] = useState<number[]>(() => {
-    const existing = answers.__testData as SMIResponse | undefined;
-    return existing?.top3Scenarios ?? [];
-  });
+  const scenarioAnswers = testData.scenarioAnswers;
+  const top3Scenarios = testData.top3Scenarios;
+  const columnTotals = testData.columnTotals;
 
   // Phase within a scenario: "select" or "rank"
   const currentScenario = step < 8 ? SCENARIOS[step] : null;
@@ -246,81 +253,99 @@ export default function SubjectMatterTest({
       ? "rank"
       : "select";
 
-  // Persist to parent whenever data changes
-  useEffect(() => {
-    const totals = computeColumnTotals(scenarioAnswers);
-    const data: SMIResponse = {
-      scenarioAnswers,
-      top3Scenarios,
-      columnTotals: totals,
-    };
-    setAnswers({ ...answers, __testData: data });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scenarioAnswers, top3Scenarios]);
-
   /* ---------- scenario handlers ---------- */
 
   const toggleActivity = useCallback(
     (activityIdx: number) => {
-      if (!currentScenario) return;
-      setScenarioAnswers((prev) => {
-        const ans = { ...prev[currentScenario.id] };
-        const sel = [...ans.selected];
-        const idx = sel.indexOf(activityIdx);
-        if (idx >= 0) {
-          sel.splice(idx, 1);
-          // Also remove from ranking if present
-          ans.ranking = ans.ranking.filter((r) => r !== activityIdx);
-        } else if (sel.length < 5) {
-          sel.push(activityIdx);
-        }
-        ans.selected = sel;
-        return { ...prev, [currentScenario.id]: ans };
+      if (!currentScenario || readOnly) return;
+      const ans = { ...scenarioAnswers[currentScenario.id] };
+      const sel = [...ans.selected];
+      const idx = sel.indexOf(activityIdx);
+      if (idx >= 0) {
+        sel.splice(idx, 1);
+        ans.ranking = ans.ranking.filter((r) => r !== activityIdx);
+      } else if (sel.length < 5) {
+        sel.push(activityIdx);
+      }
+      ans.selected = sel;
+      const nextScenarioAnswers = { ...scenarioAnswers, [currentScenario.id]: ans };
+      setAnswers({
+        ...answers,
+        __testData: {
+          ...testData,
+          scenarioAnswers: nextScenarioAnswers,
+          columnTotals: computeColumnTotals(nextScenarioAnswers),
+        },
       });
     },
-    [currentScenario]
+    [currentScenario, scenarioAnswers, answers, setAnswers, testData, readOnly]
   );
 
   const assignRank = useCallback(
     (activityIdx: number) => {
-      if (!currentScenario) return;
-      setScenarioAnswers((prev) => {
-        const ans = { ...prev[currentScenario.id] };
-        const ranking = [...ans.ranking];
-        const idx = ranking.indexOf(activityIdx);
-        if (idx >= 0) {
-          // Remove this and all after it (re-rank)
-          ranking.splice(idx);
-        } else if (ranking.length < 5) {
-          ranking.push(activityIdx);
-        }
-        ans.ranking = ranking;
-        return { ...prev, [currentScenario.id]: ans };
+      if (!currentScenario || readOnly) return;
+      const ans = { ...scenarioAnswers[currentScenario.id] };
+      const ranking = [...ans.ranking];
+      const idx = ranking.indexOf(activityIdx);
+      if (idx >= 0) {
+        ranking.splice(idx);
+      } else if (ranking.length < 5) {
+        ranking.push(activityIdx);
+      }
+      ans.ranking = ranking;
+      const nextScenarioAnswers = { ...scenarioAnswers, [currentScenario.id]: ans };
+      setAnswers({
+        ...answers,
+        __testData: {
+          ...testData,
+          scenarioAnswers: nextScenarioAnswers,
+          columnTotals: computeColumnTotals(nextScenarioAnswers),
+        },
       });
     },
-    [currentScenario]
+    [currentScenario, scenarioAnswers, answers, setAnswers, testData, readOnly]
   );
 
   const resetScenario = useCallback(() => {
-    if (!currentScenario) return;
-    setScenarioAnswers((prev) => ({
-      ...prev,
+    if (!currentScenario || readOnly) return;
+    const nextScenarioAnswers = {
+      ...scenarioAnswers,
       [currentScenario.id]: { selected: [], ranking: [] },
-    }));
-  }, [currentScenario]);
+    };
+    setAnswers({
+      ...answers,
+      __testData: {
+        ...testData,
+        scenarioAnswers: nextScenarioAnswers,
+        columnTotals: computeColumnTotals(nextScenarioAnswers),
+      },
+    });
+  }, [currentScenario, scenarioAnswers, answers, setAnswers, testData, readOnly]);
 
   /* ---------- top-3 handler ---------- */
 
-  const toggleTop3 = useCallback((scenarioId: number) => {
-    setTop3Scenarios((prev) => {
-      const idx = prev.indexOf(scenarioId);
+  const toggleTop3 = useCallback(
+    (scenarioId: number) => {
+      if (readOnly) return;
+      let nextTop3: number[];
+      const idx = top3Scenarios.indexOf(scenarioId);
       if (idx >= 0) {
-        return prev.filter((s) => s !== scenarioId);
+        nextTop3 = top3Scenarios.filter((s) => s !== scenarioId);
+      } else if (top3Scenarios.length < 3) {
+        nextTop3 = [...top3Scenarios, scenarioId];
+      } else {
+        nextTop3 = top3Scenarios;
       }
-      if (prev.length < 3) return [...prev, scenarioId];
-      return prev;
-    });
-  }, []);
+      setAnswers({
+        ...answers,
+        __testData: {
+          ...testData,
+          top3Scenarios: nextTop3,
+        },
+      });
+    },
+    [top3Scenarios, answers, setAnswers, testData, readOnly]
+  );
 
   /* ---------- navigation ---------- */
 
@@ -340,6 +365,10 @@ export default function SubjectMatterTest({
   const goBack = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmit = () => {
+    if (readOnly) {
+      onSubmit();
+      return;
+    }
     const totals = computeColumnTotals(scenarioAnswers);
     const data: SMIResponse = { scenarioAnswers, top3Scenarios, columnTotals: totals };
     setAnswers({ ...answers, __testData: data });
@@ -348,7 +377,6 @@ export default function SubjectMatterTest({
 
   /* ---------- column totals for summary ---------- */
 
-  const columnTotals = useMemo(() => computeColumnTotals(scenarioAnswers), [scenarioAnswers]);
   const maxTotal = useMemo(() => Math.max(...Object.values(columnTotals), 1), [columnTotals]);
 
   /* ---------------------------------------------------------------- */
@@ -453,6 +481,7 @@ export default function SubjectMatterTest({
 
           <button
             onClick={resetScenario}
+            disabled={readOnly}
             style={{
               marginLeft: "auto",
               padding: "4px 12px",
@@ -461,7 +490,8 @@ export default function SubjectMatterTest({
               background: "transparent",
               color: "#94a3b8",
               fontSize: 12,
-              cursor: "pointer",
+              cursor: readOnly ? "not-allowed" : "pointer",
+              opacity: readOnly ? 0.5 : 1,
             }}
           >
             Reset
@@ -471,14 +501,14 @@ export default function SubjectMatterTest({
         {!isRanking && (
           <p style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>
             {currentAnswer.selected.length}/5 selected
-            {currentAnswer.selected.length === 5 ? " \u2014 click any selected activity to start ranking" : ""}
+            {currentAnswer.selected.length === 5 ? (readOnly ? "" : " — click any selected activity to start ranking") : ""}
           </p>
         )}
 
         {isRanking && (
           <p style={{ fontSize: 13, color: "#64748b", marginBottom: 12 }}>
             Click activities in order of preference. {currentAnswer.ranking.length}/5 ranked.
-            {currentAnswer.ranking.length > 0 ? " Click a ranked item to undo from that point." : ""}
+            {currentAnswer.ranking.length > 0 && !readOnly ? " Click a ranked item to undo from that point." : ""}
           </p>
         )}
 
@@ -494,6 +524,7 @@ export default function SubjectMatterTest({
               <div
                 key={idx}
                 onClick={() => {
+                  if (readOnly) return;
                   if (isRanking && isSelected) {
                     assignRank(idx);
                   } else if (!isRanking) {
@@ -518,8 +549,8 @@ export default function SubjectMatterTest({
                     : isSelected
                     ? "rgba(71,85,105,0.15)"
                     : "#0f172a",
-                  cursor: disabled ? "not-allowed" : "pointer",
-                  opacity: disabled ? 0.4 : 1,
+                  cursor: (disabled || readOnly) ? "not-allowed" : "pointer",
+                  opacity: (disabled || readOnly) ? 0.5 : 1,
                   transition: "all 0.15s ease",
                   userSelect: "none" as const,
                 }}
@@ -587,14 +618,14 @@ export default function SubjectMatterTest({
           return (
             <div
               key={s.id}
-              onClick={() => !disabled && toggleTop3(s.id)}
+              onClick={() => !disabled && !readOnly && toggleTop3(s.id)}
               style={{
                 padding: "14px 16px",
                 borderRadius: 10,
                 border: `1.5px solid ${picked ? "#6366f1" : "#1e293b"}`,
                 background: picked ? "rgba(99,102,241,0.08)" : "#0f172a",
-                cursor: disabled ? "not-allowed" : "pointer",
-                opacity: disabled ? 0.4 : 1,
+                cursor: (disabled || readOnly) ? "not-allowed" : "pointer",
+                opacity: (disabled || readOnly) ? 0.5 : 1,
                 transition: "all 0.15s",
                 userSelect: "none" as const,
               }}
@@ -815,7 +846,9 @@ export default function SubjectMatterTest({
                 padding: "10px 28px",
                 borderRadius: 8,
                 border: "none",
-                background: "linear-gradient(135deg, #10b981, #059669)",
+                background: readOnly
+                  ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
+                  : "linear-gradient(135deg, #10b981, #059669)",
                 color: "#fff",
                 fontSize: 14,
                 fontWeight: 600,
@@ -823,7 +856,7 @@ export default function SubjectMatterTest({
                 transition: "all 0.15s",
               }}
             >
-              Submit
+              {readOnly ? "Exit" : "Submit"}
             </button>
           )}
         </div>

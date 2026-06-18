@@ -49,7 +49,7 @@ function DashboardContent() {
 
     const fetchDashboard = async () => {
         try {
-            const res = await fetch('/api/client/dashboard');
+            const res = await fetch('/api/client/dashboard', { cache: 'no-store' });
             const d = await res.json();
             setData(d);
         } catch (err) {

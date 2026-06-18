@@ -10,7 +10,10 @@ interface ParentsMeetingFormProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
+
+const ReadOnlyContext = React.createContext(false);
 
 interface TestData {
   // Q1
@@ -262,13 +265,15 @@ function Textarea({
   placeholder?: string;
   rows?: number;
 }) {
+  const readOnly = React.useContext(ReadOnlyContext);
   return (
     <textarea
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => !readOnly && onChange(e.target.value)}
+      disabled={readOnly}
       placeholder={placeholder}
       rows={rows}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40"
+      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
     />
   );
 }
@@ -282,13 +287,15 @@ function TextInput({
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
+  const readOnly = React.useContext(ReadOnlyContext);
   return (
     <input
       type="text"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => !readOnly && onChange(e.target.value)}
+      disabled={readOnly}
       placeholder={placeholder}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40"
+      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
     />
   );
 }
@@ -302,6 +309,7 @@ function RatingSlider({
   value: number;
   onChange: (v: number) => void;
 }) {
+  const readOnly = React.useContext(ReadOnlyContext);
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
@@ -315,8 +323,9 @@ function RatingSlider({
         min={1}
         max={10}
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full accent-indigo-500"
+        disabled={readOnly}
+        onChange={(e) => !readOnly && onChange(Number(e.target.value))}
+        className="w-full accent-indigo-500 disabled:opacity-50"
       />
       <div className="flex justify-between text-[10px] text-slate-600">
         <span>1</span>
@@ -336,18 +345,20 @@ function RadioGroup({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const readOnly = React.useContext(ReadOnlyContext);
   return (
     <div className="space-y-2">
       {options.map((opt) => (
         <button
           key={opt}
           type="button"
-          onClick={() => onChange(opt)}
+          disabled={readOnly}
+          onClick={() => !readOnly && onChange(opt)}
           className={`w-full rounded-lg border px-4 py-2.5 text-left text-sm font-medium transition-all ${
             value === opt
               ? "border-indigo-500 bg-indigo-600/20 text-indigo-300 ring-1 ring-indigo-500/40"
               : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-200"
-          }`}
+          } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
         >
           {opt}
         </button>
@@ -363,18 +374,20 @@ function YesNoToggle({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const readOnly = React.useContext(ReadOnlyContext);
   return (
     <div className="flex gap-2">
       {["Yes", "No"].map((opt) => (
         <button
           key={opt}
           type="button"
-          onClick={() => onChange(opt)}
+          disabled={readOnly}
+          onClick={() => !readOnly && onChange(opt)}
           className={`rounded-md border px-3 py-1 text-xs font-medium transition-all ${
             value === opt
               ? "border-indigo-500 bg-indigo-600/20 text-indigo-300"
               : "border-slate-700 bg-slate-900 text-slate-500 hover:border-slate-600"
-          }`}
+          } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
         >
           {opt}
         </button>
@@ -391,6 +404,7 @@ export default function ParentsMeetingForm({
   answers,
   setAnswers,
   onSubmit,
+  readOnly = false,
 }: ParentsMeetingFormProps) {
   const [page, setPage] = useState(0);
 
@@ -982,7 +996,8 @@ export default function ParentsMeetingForm({
   const isLastPage = page === TOTAL_QUESTIONS - 1;
 
   return (
-    <div className="space-y-6">
+    <ReadOnlyContext.Provider value={readOnly}>
+      <div className="space-y-6">
       {/* Progress indicator */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-slate-400">
@@ -1045,7 +1060,7 @@ export default function ParentsMeetingForm({
             onClick={onSubmit}
             className="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-all hover:bg-indigo-500"
           >
-            Submit
+            {readOnly ? "Exit" : "Submit"}
           </button>
         ) : (
           <button
@@ -1058,5 +1073,6 @@ export default function ParentsMeetingForm({
         )}
       </div>
     </div>
+    </ReadOnlyContext.Provider>
   );
 }

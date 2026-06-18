@@ -6,6 +6,7 @@ interface ColorTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 interface SectionQuestion {
@@ -133,7 +134,7 @@ function computeResult(data: ColorTestResponse): string | null {
   return `${primaryColor} ${secondaryColor} ${ei}`;
 }
 
-export default function ColorTest({ answers, setAnswers, onSubmit }: ColorTestProps) {
+export default function ColorTest({ answers, setAnswers, onSubmit, readOnly = false }: ColorTestProps) {
   const [currentSection, setCurrentSection] = useState(0);
   const [showResult, setShowResult] = useState(false);
 
@@ -156,6 +157,7 @@ export default function ColorTest({ answers, setAnswers, onSubmit }: ColorTestPr
   ];
 
   const handleSelect = (questionIndex: number, choice: "a" | "b") => {
+    if (readOnly) return;
     const key = sectionKeys[currentSection];
     const sectionArr = [...testData[key]];
     sectionArr[questionIndex] = choice;
@@ -197,6 +199,10 @@ export default function ColorTest({ answers, setAnswers, onSubmit }: ColorTestPr
   };
 
   const handleFinalSubmit = () => {
+    if (readOnly) {
+      onSubmit();
+      return;
+    }
     const finalResult = computeResult(testData);
     updateTestData({ ...testData, result: finalResult });
     onSubmit();
@@ -261,7 +267,7 @@ export default function ColorTest({ answers, setAnswers, onSubmit }: ColorTestPr
               onClick={handleFinalSubmit}
               className="flex-1 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors"
             >
-              Submit
+              {readOnly ? "Exit" : "Submit"}
             </button>
           </div>
         </div>
@@ -319,23 +325,25 @@ export default function ColorTest({ answers, setAnswers, onSubmit }: ColorTestPr
                 className="flex gap-3"
               >
                 <button
-                  onClick={() => handleSelect(qIdx, "a")}
+                  onClick={() => !readOnly && handleSelect(qIdx, "a")}
+                  disabled={readOnly}
                   className={`flex-1 p-4 rounded-xl text-left text-sm font-medium transition-all border ${
                     selected === "a"
                       ? "bg-indigo-600/20 border-indigo-500 text-indigo-200"
                       : "bg-gray-900 border-gray-800 text-gray-300 hover:border-gray-600 hover:bg-gray-800"
-                  }`}
+                  } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
                 >
                   <span className="text-xs text-gray-500 mr-2">{qIdx + 1}.</span>
                   {q.a}
                 </button>
                 <button
-                  onClick={() => handleSelect(qIdx, "b")}
+                  onClick={() => !readOnly && handleSelect(qIdx, "b")}
+                  disabled={readOnly}
                   className={`flex-1 p-4 rounded-xl text-left text-sm font-medium transition-all border ${
                     selected === "b"
                       ? "bg-indigo-600/20 border-indigo-500 text-indigo-200"
                       : "bg-gray-900 border-gray-800 text-gray-300 hover:border-gray-600 hover:bg-gray-800"
-                  }`}
+                  } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
                 >
                   {q.b}
                 </button>

@@ -6,6 +6,7 @@ interface SelfDiscoveryTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 interface Question {
@@ -172,7 +173,7 @@ const ADULT_ROUND2_SECTIONS: Section[] = [
   }
 ];
 
-export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: SelfDiscoveryTestProps) {
+export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readOnly = false }: SelfDiscoveryTestProps) {
   // Page 0: Age selection
   // Page 1-5: Round 1 sections
   // Page 6-9: Round 2 sections (dependent on age)
@@ -198,11 +199,13 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
   }, [answers.demo_age]);
 
   const handleAgeSelect = (selectedGroup: "13-18" | "18+") => {
+    if (readOnly) return;
     setAnswers({ ...answers, sd_age_group: selectedGroup });
     setError("");
   };
 
   const handleAnswerChange = (qId: string, val: string) => {
+    if (readOnly) return;
     setAnswers({ ...answers, [qId]: val });
     if (error) setError("");
   };
@@ -308,12 +311,13 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto justify-center">
               <button
                 type="button"
-                onClick={() => handleAgeSelect("13-18")}
+                disabled={readOnly}
+                onClick={() => !readOnly && handleAgeSelect("13-18")}
                 className={`flex-1 py-5 px-6 rounded-2xl border-2 transition-all font-bold text-center flex flex-col items-center justify-center gap-2 ${
                   ageGroup === "13-18"
                     ? "border-indigo-500 bg-indigo-500/15 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]"
                     : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
-                }`}
+                } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <span className="text-lg">Ages 13 – 18</span>
                 <span className="text-xs font-normal opacity-85">For School Students</span>
@@ -321,12 +325,13 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
 
               <button
                 type="button"
-                onClick={() => handleAgeSelect("18+")}
+                disabled={readOnly}
+                onClick={() => !readOnly && handleAgeSelect("18+")}
                 className={`flex-1 py-5 px-6 rounded-2xl border-2 transition-all font-bold text-center flex flex-col items-center justify-center gap-2 ${
                   ageGroup === "18+"
                     ? "border-purple-500 bg-purple-500/15 text-white shadow-[0_0_20px_rgba(168,85,247,0.15)]"
                     : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
-                }`}
+                } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <span className="text-lg">Ages 18 & Above</span>
                 <span className="text-xs font-normal opacity-85">For Degree Students & Professionals</span>
@@ -345,7 +350,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
               onClick={handleNext}
               className="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white shadow-lg hover:shadow-xl transition-all"
             >
-              Start Questionnaire
+              {readOnly ? "View Questionnaire" : "Start Questionnaire"}
             </button>
           </div>
         </div>
@@ -390,12 +395,14 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
                           <span className="text-slate-500 mr-1.5">{q.num}.</span>
                           {q.text}
                         </p>
-                        <button
-                          onClick={() => jumpToPage(secIdx + 1)}
-                          className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors shrink-0 uppercase tracking-wider ml-4 mt-0.5"
-                        >
-                          Edit
-                        </button>
+                        {!readOnly && (
+                          <button
+                            onClick={() => jumpToPage(secIdx + 1)}
+                            className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors shrink-0 uppercase tracking-wider ml-4 mt-0.5"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </div>
                       <div className="p-4 bg-slate-950/70 border border-slate-850 rounded-xl text-slate-400 text-sm italic leading-relaxed whitespace-pre-wrap">
                         {ansVal.trim() ? ansVal : "(No answer provided)"}
@@ -427,7 +434,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
             onClick={handleNext}
             className="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
           >
-            Submit Assessment 🚀
+            {readOnly ? "Exit Assessment" : "Submit Assessment 🚀"}
           </button>
         </div>
       </div>
@@ -515,10 +522,11 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit }: Sel
                 
                 <textarea
                   value={ansVal}
-                  onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                  onChange={(e) => !readOnly && handleAnswerChange(q.id, e.target.value)}
+                  disabled={readOnly}
                   placeholder="Type your thoughtful response here..."
                   rows={4}
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed"
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             );

@@ -21,12 +21,14 @@ interface PersonalityFactorsTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 export default function PersonalityFactorsTest({
   answers,
   setAnswers,
   onSubmit,
+  readOnly = false,
 }: PersonalityFactorsTestProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState("");
@@ -38,16 +40,19 @@ export default function PersonalityFactorsTest({
   );
 
   const handleAnswerChange = (qId: string, value: number) => {
+    if (readOnly) return;
     setAnswers({ ...answers, [qId]: value });
     if (error) setError("");
   };
 
   const handleNext = () => {
     // Validate current page
-    const allAnswered = currentQuestions.every((q) => answers[q.id] !== undefined);
-    if (!allAnswered) {
-      setError("Please answer all questions on this page before continuing.");
-      return;
+    if (!readOnly) {
+      const allAnswered = currentQuestions.every((q) => answers[q.id] !== undefined);
+      if (!allAnswered) {
+        setError("Please answer all questions on this page before continuing.");
+        return;
+      }
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -105,14 +110,15 @@ export default function PersonalityFactorsTest({
                           {[1, 2, 3, 4, 5].map((val) => (
                             <button
                               key={val}
-                              onClick={() => handleAnswerChange(q.id, val)}
+                              disabled={readOnly}
+                              onClick={() => !readOnly && handleAnswerChange(q.id, val)}
                               className={`
                                 relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200
                                 ${
                                   currentVal === val
                                     ? "border-indigo-500 bg-indigo-500/20 text-indigo-400 scale-110 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
                                     : "border-slate-700 hover:border-indigo-400/50 hover:bg-slate-800 text-slate-500"
-                                }
+                                } ${readOnly ? "cursor-not-allowed opacity-60" : ""}
                               `}
                             >
                               <div className={`w-3 h-3 rounded-full transition-all ${currentVal === val ? 'bg-indigo-400' : 'bg-transparent'}`} />
@@ -133,14 +139,15 @@ export default function PersonalityFactorsTest({
                           {[1, 2, 3, 4, 5].map((val) => (
                             <button
                               key={val}
-                              onClick={() => handleAnswerChange(q.id, val)}
+                              disabled={readOnly}
+                              onClick={() => !readOnly && handleAnswerChange(q.id, val)}
                               className={`
                                 relative flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200
                                 ${
                                   currentVal === val
                                     ? "border-purple-500 bg-purple-500/20 text-purple-400 scale-110 shadow-[0_0_15px_rgba(168,85,247,0.3)]"
                                     : "border-slate-700 hover:border-purple-400/50 hover:bg-slate-800 text-slate-500"
-                                }
+                                } ${readOnly ? "cursor-not-allowed opacity-60" : ""}
                               `}
                             >
                               <div className={`w-3 h-3 rounded-full transition-all ${currentVal === val ? 'bg-purple-400' : 'bg-transparent'}`} />
@@ -180,7 +187,7 @@ export default function PersonalityFactorsTest({
           onClick={handleNext}
           className="px-8 py-3 rounded-xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all ml-auto"
         >
-          {currentPage === TOTAL_PAGES ? "Complete Assessment 🚀" : "Next Page"}
+          {currentPage === TOTAL_PAGES ? (readOnly ? "Exit Assessment" : "Complete Assessment 🚀") : "Next Page"}
         </button>
       </div>
     </div>

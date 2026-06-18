@@ -248,6 +248,7 @@ interface RIASECTestProps {
   answers: Record<string, any>;
   setAnswers: (answers: Record<string, any>) => void;
   onSubmit: () => void;
+  readOnly?: boolean;
 }
 
 const emptyResponse: RIASECResponse = {
@@ -258,6 +259,7 @@ export default function RIASECTest({
   answers,
   setAnswers,
   onSubmit,
+  readOnly = false,
 }: RIASECTestProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -268,6 +270,7 @@ export default function RIASECTest({
 
   /* helpers */
   const toggleItem = (section: SectionKey, item: string) => {
+    if (readOnly) return;
     const current = testData[section] ?? [];
     const updated = current.includes(item)
       ? current.filter((i: string) => i !== item)
@@ -368,12 +371,13 @@ export default function RIASECTest({
                   <button
                     key={item}
                     type="button"
-                    onClick={() => toggleItem(activeTab, item)}
+                    disabled={readOnly}
+                    onClick={() => !readOnly && toggleItem(activeTab, item)}
                     className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all ${
                       checked
                         ? `${activeSection.color} ${activeSection.colorBg} ${activeSection.colorText} ring-1`
                         : "border-slate-700 bg-slate-900 text-slate-400 hover:border-slate-600 hover:text-slate-200"
-                    }`}
+                    } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
                   >
                     {checked && (
                       <svg
@@ -454,14 +458,14 @@ export default function RIASECTest({
         ) : (
           <button
             type="button"
-            disabled={totalChecked === 0}
+            disabled={!readOnly && totalChecked === 0}
             onClick={onSubmit}
             className={`px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-colors shadow-lg
-              ${totalChecked > 0 
+              ${readOnly || totalChecked > 0 
                 ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20' 
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
           >
-            Submit Assessment
+            {readOnly ? "Exit Assessment" : "Submit Assessment"}
           </button>
         )}
       </div>
