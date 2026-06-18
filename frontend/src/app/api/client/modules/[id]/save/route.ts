@@ -43,27 +43,23 @@ export async function POST(
 
     if (
       clientModule.status === 'LOCKED' ||
-      clientModule.status === 'SUBMITTED' ||
-      clientModule.status === 'UNDER_REVIEW' ||
       clientModule.status === 'APPROVED'
     ) {
       return NextResponse.json({ error: 'Module cannot be edited' }, { status: 403 })
     }
 
-    const existingResponse = await prisma.moduleResponse.findUnique({
-      where: { clientModuleId: id }
-    })
-
-    if (existingResponse?.submittedAt) {
-      return NextResponse.json({ error: 'Module cannot be edited' }, { status: 403 })
-    }
-
     const response = await prisma.moduleResponse.upsert({
       where: { clientModuleId: id },
-      update: { data: validatedData.data as any },
+      update: {
+        data: validatedData.data as any,
+        submittedAt: null,
+        approvedAt: null
+      },
       create: {
         clientModuleId: id,
-        data: validatedData.data as any
+        data: validatedData.data as any,
+        submittedAt: null,
+        approvedAt: null
       }
     })
 

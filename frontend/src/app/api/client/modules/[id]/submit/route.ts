@@ -45,8 +45,6 @@ export async function POST(
 
     if (
       clientModule.status === 'LOCKED' ||
-      clientModule.status === 'SUBMITTED' ||
-      clientModule.status === 'UNDER_REVIEW' ||
       clientModule.status === 'APPROVED'
     ) {
       return NextResponse.json({ error: 'Module cannot be submitted' }, { status: 403 })

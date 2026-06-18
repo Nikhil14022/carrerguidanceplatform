@@ -114,7 +114,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isDraggingFile, setIsDraggingFile] = useState(false);
 
-    const isReadOnly = module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false;
+    const isReadOnly = module ? ['APPROVED'].includes(module.status) : false;
 
     const setAnswers = (val: any) => {
         if (isReadOnly) return;
