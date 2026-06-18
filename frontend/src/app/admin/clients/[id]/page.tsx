@@ -242,16 +242,21 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
         }
 
         // Table data (array of arrays or array of objects)
-        if (Array.isArray(value) && value.length > 0 && Array.isArray(value[0])) {
+        if (Array.isArray(value) && value.length > 0 && (Array.isArray(value[0]) || (typeof value[0] === 'object' && value[0] !== null))) {
             return (
                 <div className="space-y-1">
-                    {value.map((row: any[], i: number) => (
-                        <div key={i} className="flex gap-3 p-2 bg-white/5 rounded-lg text-sm text-slate-300">
-                            {row.map((cell, j) => (
-                                <span key={j} className="flex-1">{cell || '—'}</span>
-                            ))}
-                        </div>
-                    ))}
+                    {value.map((row: any, i: number) => {
+                        const cells = Array.isArray(row)
+                            ? row
+                            : [row?.col1, row?.col2, row?.col3, row?.col4].filter(c => c !== undefined);
+                        return (
+                            <div key={i} className="flex gap-3 p-2 bg-white/5 rounded-lg text-sm text-slate-300">
+                                {cells.map((cell, j) => (
+                                    <span key={j} className="flex-1">{String(cell || '') || '—'}</span>
+                                ))}
+                            </div>
+                        );
+                    })}
                 </div>
             );
         }
@@ -301,14 +306,38 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
             );
         }
 
-        // Schedule object
-        if (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).some(k => k.includes('AM') || k.includes('PM'))) {
+        // Schedule (object or array of objects)
+        if (
+            (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).some(k => k.includes('AM') || k.includes('PM'))) ||
+            (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0] !== null && ('time' in value[0] || 'activity' in value[0] || 'col1' in value[0]))
+        ) {
+            let scheduleItems: { time: string; activity: string }[] = [];
+            if (Array.isArray(value)) {
+                if (value.length > 0 && typeof value[0] === 'string') {
+                    scheduleItems = value.map((act, idx) => {
+                        const hr = idx + 7;
+                        const ampm = hr >= 12 ? 'PM' : 'AM';
+                        const displayHr = hr > 12 ? hr - 12 : hr;
+                        return { time: `${displayHr}:00 ${ampm}`, activity: act };
+                    });
+                } else {
+                    scheduleItems = value.map((item: any) => ({
+                        time: item?.time || item?.col1 || '',
+                        activity: item?.activity || item?.col2 || ''
+                    }));
+                }
+            } else {
+                scheduleItems = Object.entries(value).map(([time, activity]) => ({
+                    time,
+                    activity: String(activity || '')
+                }));
+            }
             return (
                 <div className="space-y-1">
-                    {Object.entries(value).map(([time, activity]) => (
-                        <div key={time} className="flex gap-3 p-2 bg-white/5 rounded-lg text-sm">
-                            <span className="text-indigo-400 font-bold w-16 flex-shrink-0">{time}</span>
-                            <span className="text-slate-300">{String(activity) || '—'}</span>
+                    {scheduleItems.map((item, idx) => (
+                        <div key={idx} className="flex gap-3 p-2 bg-white/5 rounded-lg text-sm">
+                            <span className="text-indigo-400 font-bold w-20 flex-shrink-0">{item.time}</span>
+                            <span className="text-slate-300">{item.activity || '—'}</span>
                         </div>
                     ))}
                 </div>

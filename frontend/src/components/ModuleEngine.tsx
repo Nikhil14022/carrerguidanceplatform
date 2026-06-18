@@ -62,6 +62,14 @@ const TRAIT_MAP: Record<string, string> = {
     'Self-control': 'sw_self_control'
 };
 
+const TIME_OPTIONS: string[] = [];
+for (let h = 0; h < 24; h++) {
+    const hour = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    const ampm = h < 12 ? 'AM' : 'PM';
+    TIME_OPTIONS.push(`${hour}:00 ${ampm}`);
+    TIME_OPTIONS.push(`${hour}:30 ${ampm}`);
+}
+
 function migrateAnswers(data: Record<string, any>) {
     if (!data) return {};
     const migrated = { ...data };
@@ -75,6 +83,25 @@ function migrateAnswers(data: Record<string, any>) {
             }
         });
     }
+    
+    // Normalize demo_academic_overview values to match select options
+    if (Array.isArray(migrated.demo_academic_overview)) {
+        migrated.demo_academic_overview = migrated.demo_academic_overview.map((row: any) => {
+            if (!row || typeof row.col2 !== 'string') return row;
+            let col2 = row.col2.trim().replace(/’/g, "'"); // Replace curly apostrophe with straight one
+            
+            // Map common variants to exact option strings
+            if (col2 === "Don't Like but Score Well" || col2 === "Do not Like but Score Well") {
+                col2 = "Don't Like but Score Well";
+            } else if (col2 === "Like & Don't Score Well" || col2 === "Like & Do not Score Well") {
+                col2 = "Like & Don't Score Well";
+            } else if (col2 === "Don't Like & Don't Score" || col2 === "Do not Like & Do not Score") {
+                col2 = "Don't Like & Don't Score";
+            }
+            return { ...row, col2 };
+        });
+    }
+    
     return migrated;
 }
 
@@ -633,7 +660,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col2}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col2: e.target.value };
@@ -665,7 +692,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col3}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col3: e.target.value };
@@ -697,7 +724,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col4}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col4: e.target.value };
@@ -795,18 +822,27 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                             {scheduleData.map((item, i) => (
                                                 <div key={i} className="grid grid-cols-[150px_1fr_50px] gap-4 items-center">
-                                                    <input
-                                                        type="text"
+                                                    <select
                                                         value={item.time}
                                                         disabled={isReadOnly}
-                                                        placeholder="e.g. 7:00 AM"
-                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm font-semibold text-center"
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 text-sm font-semibold text-center"
                                                         onChange={(e) => {
                                                             const newData = [...scheduleData];
                                                             newData[i] = { ...newData[i], time: e.target.value };
                                                             setAnswers({ ...answers, [q.id]: newData });
                                                         }}
-                                                    />
+                                                    >
+                                                        <option value="">Select Time...</option>
+                                                        {(() => {
+                                                            const options = [...TIME_OPTIONS];
+                                                            if (item.time && !options.includes(item.time)) {
+                                                                options.unshift(item.time);
+                                                            }
+                                                            return options.map(opt => (
+                                                                <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
+                                                            ));
+                                                        })()}
+                                                    </select>
                                                     <input
                                                         type="text"
                                                         value={item.activity}

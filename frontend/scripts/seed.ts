@@ -84,9 +84,9 @@ export const modules = [
             col2Label: 'Category',
             col2Options: [
               'Like & Score Well',
-              'Do not Like but Score Well',
-              'Like & Do not Score Well',
-              'Do not Like & Do not Score'
+              "Don't Like but Score Well",
+              "Like & Don't Score Well",
+              "Don't Like & Don't Score"
             ]
           },
           {
@@ -524,7 +524,7 @@ export const modules = [
           },
           {
             id: 'friends_journey',
-            type: 'text',
+            type: 'textarea',
             question: 'Describe in 5 lines your friendship/school journey',
             placeholder: 'Your friendship story and school experience...'
           },

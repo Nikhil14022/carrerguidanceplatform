@@ -36,3 +36,9 @@ extract_full_content(
     'Interpretation document for interns (Khushi) 2025.docx',
     'extracted_interpretation_content.txt'
 )
+
+# Extract report format document
+extract_full_content(
+    'Report Format (2025) - K.docx',
+    'extracted_report_format.txt'
+)
