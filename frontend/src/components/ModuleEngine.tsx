@@ -21,6 +21,63 @@ const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     'SELF_DISCOVERY': SelfDiscoveryTest,
 };
 
+const TRAIT_MAP: Record<string, string> = {
+    'Communication': 'sw_communication',
+    'Organisational Skills': 'sw_organisational_skills',
+    'Organising Thoughts and Flow in Mind': 'sw_organising_thoughts',
+    'Responsibility': 'sw_responsibility',
+    'Problem Solving': 'sw_problem_solving',
+    'Adaptability': 'sw_adaptability',
+    'Prioritising': 'sw_prioritising',
+    'Patience': 'sw_patience',
+    'Curiosity': 'sw_curiosity',
+    'Perseverance': 'sw_perseverance',
+    'Thoughtfulness & Reflection': 'sw_thoughtfulness',
+    'Sticking to Deadlines': 'sw_deadlines',
+    'Generating Ideas': 'sw_generating_ideas',
+    'Multi-tasking': 'sw_multitasking',
+    'Time Management': 'sw_time_management',
+    'Independence': 'sw_independence',
+    'Seeking Help': 'sw_seeking_help',
+    'Goal Setting and Execution': 'sw_goal_setting',
+    'Stress Management': 'sw_stress_management',
+    'Team Work': 'sw_teamwork',
+    'Growth Mindset': 'sw_growth_mindset',
+    'Criticism': 'sw_criticism',
+    'Feedback': 'sw_feedback',
+    'Listening': 'sw_listening',
+    'Empathy / Sensitivity': 'sw_empathy',
+    'Procrastination': 'sw_procrastination',
+    'Working Individually/One Person': 'sw_working_individually',
+    'Social Interaction': 'sw_social_interaction',
+    'Expressiveness': 'sw_expressiveness',
+    'Accountability': 'sw_accountability',
+    'Spontaneity': 'sw_spontaneity',
+    'Rules and Routines': 'sw_rules_routines',
+    'Accepting Change': 'sw_accepting_change',
+    'Finding Direction': 'sw_finding_direction',
+    'Conversing with a Group': 'sw_conversing_group',
+    'Initiating Conversations': 'sw_initiating_conversations',
+    'Taking a Stand for Oneself': 'sw_taking_stand',
+    'Self-control': 'sw_self_control'
+};
+
+function migrateAnswers(data: Record<string, any>) {
+    if (!data) return {};
+    const migrated = { ...data };
+    if (Array.isArray(data.sw_grid)) {
+        data.sw_grid.forEach((row: any) => {
+            const trait = row.trait;
+            const rating = row.rating;
+            const traitId = TRAIT_MAP[trait];
+            if (traitId && migrated[traitId] === undefined) {
+                migrated[traitId] = rating;
+            }
+        });
+    }
+    return migrated;
+}
+
 export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, originalSetAnswers] = useState<Record<string, any>>({});
@@ -28,6 +85,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [isDraggingFile, setIsDraggingFile] = useState(false);
 
     const isReadOnly = module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false;
 
@@ -57,6 +115,11 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const router = useRouter();
     const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isSavingRef = useRef(false);
+    const answersRef = useRef(answers);
+
+    useEffect(() => {
+        answersRef.current = answers;
+    }, [answers]);
 
     useEffect(() => {
         fetchModule();
@@ -68,7 +131,10 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
             if (!res.ok) throw new Error('Failed to load module');
             const data = await res.json();
             if (data.module) setModule(data.module);
-            if (data.response?.data) originalSetAnswers(data.response.data);
+            if (data.response?.data) {
+                const migrated = migrateAnswers(data.response.data);
+                originalSetAnswers(migrated);
+            }
 
             // Inject Mentor Notes as a comment if they exist
             if (data.module?.mentorNotes) {
@@ -100,6 +166,34 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         };
     }, [answers, currentStep, isReadOnly]);
 
+    // Visibility and BeforeUnload event listeners to save immediately
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden' && autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+                autoSaveTimerRef.current = null;
+                handleSave(false);
+            }
+        };
+        const handleBeforeUnload = () => {
+            if (autoSaveTimerRef.current) {
+                const endpoint = `/api/client/modules/${moduleId}/save`;
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: answersRef.current }),
+                    keepalive: true
+                });
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [moduleId]);
+
     const handleSave = async (isFinal = false) => {
         if (isReadOnly || isSavingRef.current) {
             if (isReadOnly && isFinal) {
@@ -114,7 +208,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
             const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: answers }),
+                body: JSON.stringify({ data: answersRef.current }),
             });
             if (!res.ok) throw new Error('Failed to save progress');
             if (isFinal) router.push('/dashboard?status=submitted');
@@ -131,7 +225,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         while (next < (module?.schema?.questions?.length || 0)) {
             const q = module.schema.questions[next];
             if (!q.dependsOn) return next;
-            const depValue = answers[q.dependsOn.questionId || q.dependsOn.id];
+            const depValue = answersRef.current[q.dependsOn.questionId || q.dependsOn.id];
             const isMatch = Array.isArray(depValue) 
                 ? depValue.includes(q.dependsOn.value)
                 : depValue === q.dependsOn.value;
@@ -146,7 +240,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
         while (prev >= 0) {
             const q = module.schema.questions[prev];
             if (!q.dependsOn) return prev;
-            const depValue = answers[q.dependsOn.questionId || q.dependsOn.id];
+            const depValue = answersRef.current[q.dependsOn.questionId || q.dependsOn.id];
             const isMatch = Array.isArray(depValue) 
                 ? depValue.includes(q.dependsOn.value)
                 : depValue === q.dependsOn.value;
@@ -157,21 +251,29 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     };
 
     const handleNext = () => {
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+            autoSaveTimerRef.current = null;
+        }
         const next = getNextStep(currentStep);
         if (next < (module?.schema?.questions?.length || 0)) {
+            handleSave(false);
             setCurrentStep(next);
         } else {
-            if (autoSaveTimerRef.current) {
-                clearTimeout(autoSaveTimerRef.current);
-                autoSaveTimerRef.current = null;
-            }
             handleSave(true);
         }
     };
 
     const handleBack = () => {
+        if (autoSaveTimerRef.current) {
+            clearTimeout(autoSaveTimerRef.current);
+            autoSaveTimerRef.current = null;
+        }
         const prev = getPrevStep(currentStep);
-        if (prev >= 0) setCurrentStep(prev);
+        if (prev >= 0) {
+            handleSave(false);
+            setCurrentStep(prev);
+        }
     };
 
     if (loading) return (
@@ -340,21 +442,21 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                             )}
                             {q?.type === 'scale' && (
                                 <div className="space-y-8">
-                                    <div className="flex justify-between px-2 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                                        <span>{q.min} — Low</span>
-                                        <span>{q.max} — High</span>
+                                    <div className="flex justify-between px-2 text-xs font-bold text-slate-500 uppercase tracking-widest gap-4">
+                                        <span className="text-pink-400 text-left max-w-[45%]">{q.leftLabel || `${q.min} — Low`}</span>
+                                        <span className="text-emerald-400 text-right max-w-[45%]">{q.rightLabel || `${q.max} — High`}</span>
                                     </div>
                                     <input
                                         type="range"
                                         min={q.min}
                                         max={q.max}
-                                        value={answers[q.id] || (q.min + q.max) / 2}
+                                        value={answers[q.id] ?? Math.round((q.min + q.max) / 2)}
                                         disabled={isReadOnly}
                                         className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                                         onChange={(e) => setAnswers({ ...answers, [q.id]: parseInt(e.target.value) })}
                                     />
                                     <div className="text-center text-5xl font-bold text-indigo-400">
-                                        {answers[q.id] || (q.min + q.max) / 2}
+                                        {answers[q.id] ?? Math.round((q.min + q.max) / 2)}
                                     </div>
                                     <textarea
                                         placeholder="Why did you give this rating?"
@@ -397,37 +499,52 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                 );
                             })()}
                             {q?.type === 'multiselect' && (
-                                <div className="grid gap-3">
-                                    <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Select all that apply</p>
-                                    {q.options?.map((opt: any) => {
-                                        const selected: string[] = answers[q.id] || [];
-                                        const isSelected = selected.includes(opt.id);
-                                        return (
-                                            <button
-                                                key={opt.id}
+                                <div className="space-y-6">
+                                    <div className="grid gap-3">
+                                        <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Select all that apply</p>
+                                        {q.options?.map((opt: any) => {
+                                            const selected: string[] = answers[q.id] || [];
+                                            const isSelected = selected.includes(opt.id);
+                                            return (
+                                                <button
+                                                    key={opt.id}
+                                                    disabled={isReadOnly}
+                                                    onClick={() => {
+                                                        const current: string[] = answers[q.id] || [];
+                                                        const updated = isSelected
+                                                            ? current.filter((id: string) => id !== opt.id)
+                                                            : [...current, opt.id];
+                                                        setAnswers({ ...answers, [q.id]: updated });
+                                                    }}
+                                                    className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
+                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
+                                                >
+                                                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0
+                                                        ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
+                                                        {isSelected && (
+                                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    {opt.text}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    {q.hasOpenText && (
+                                        <div className="space-y-2 mt-4">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>
+                                            <textarea
+                                                value={answers[`${q.id}_open_text`] || ''}
                                                 disabled={isReadOnly}
-                                                onClick={() => {
-                                                    const current: string[] = answers[q.id] || [];
-                                                    const updated = isSelected
-                                                        ? current.filter((id: string) => id !== opt.id)
-                                                        : [...current, opt.id];
-                                                    setAnswers({ ...answers, [q.id]: updated });
-                                                }}
-                                                className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
-                                            >
-                                                <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0
-                                                    ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
-                                                    {isSelected && (
-                                                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                                        </svg>
-                                                    )}
-                                                </div>
-                                                {opt.text}
-                                            </button>
-                                        );
-                                    })}
+                                                rows={4}
+                                                placeholder={q.openTextPlaceholder || "Type in detail here..."}
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             {q?.type === 'dropdown_multi' && (() => {
@@ -512,46 +629,100 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         }}
                                                     />
                                                     {numCols >= 2 && (
-                                                        <input
-                                                            type="text"
-                                                            value={row.col2}
-                                                            disabled={isReadOnly}
-                                                            placeholder={q.col2Placeholder || '...'}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                                                            onChange={(e) => {
-                                                                const newData = [...tableData];
-                                                                newData[i] = { ...newData[i], col2: e.target.value };
-                                                                setAnswers({ ...answers, [q.id]: newData });
-                                                            }}
-                                                        />
+                                                        q.col2Options && Array.isArray(q.col2Options) ? (
+                                                            <select
+                                                                value={row.col2}
+                                                                disabled={isReadOnly}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col2: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            >
+                                                                <option value="">Select Option...</option>
+                                                                {q.col2Options.map((opt: string) => (
+                                                                    <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={row.col2}
+                                                                disabled={isReadOnly}
+                                                                placeholder={q.col2Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col2: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
+                                                        )
                                                     )}
                                                     {numCols >= 3 && (
-                                                        <input
-                                                            type="text"
-                                                            value={row.col3}
-                                                            disabled={isReadOnly}
-                                                            placeholder={q.col3Placeholder || '...'}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                                                            onChange={(e) => {
-                                                                const newData = [...tableData];
-                                                                newData[i] = { ...newData[i], col3: e.target.value };
-                                                                setAnswers({ ...answers, [q.id]: newData });
-                                                            }}
-                                                        />
+                                                        q.col3Options && Array.isArray(q.col3Options) ? (
+                                                            <select
+                                                                value={row.col3}
+                                                                disabled={isReadOnly}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col3: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            >
+                                                                <option value="">Select Option...</option>
+                                                                {q.col3Options.map((opt: string) => (
+                                                                    <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={row.col3}
+                                                                disabled={isReadOnly}
+                                                                placeholder={q.col3Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col3: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
+                                                        )
                                                     )}
                                                     {numCols >= 4 && (
-                                                        <input
-                                                            type="text"
-                                                            value={row.col4}
-                                                            disabled={isReadOnly}
-                                                            placeholder={q.col4Placeholder || '...'}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                                                            onChange={(e) => {
-                                                                const newData = [...tableData];
-                                                                newData[i] = { ...newData[i], col4: e.target.value };
-                                                                setAnswers({ ...answers, [q.id]: newData });
-                                                            }}
-                                                        />
+                                                        q.col4Options && Array.isArray(q.col4Options) ? (
+                                                            <select
+                                                                value={row.col4}
+                                                                disabled={isReadOnly}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm appearance-none"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col4: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            >
+                                                                <option value="">Select Option...</option>
+                                                                {q.col4Options.map((opt: string) => (
+                                                                    <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={row.col4}
+                                                                disabled={isReadOnly}
+                                                                placeholder={q.col4Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col4: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
+                                                        )
                                                     )}
                                                 </div>
                                             );
@@ -568,45 +739,118 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 Add Row
                                             </button>
                                         )}
+                                        {q.hasOpenText && (
+                                            <div className="space-y-2 mt-6">
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>
+                                                <textarea
+                                                    value={answers[`${q.id}_open_text`] || ''}
+                                                    disabled={isReadOnly}
+                                                    rows={4}
+                                                    placeholder={q.openTextPlaceholder || "Type in detail here..."}
+                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                    onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })()}
                             {q?.type === 'schedule' && (() => {
-                                const scheduleData = Array.isArray(answers[q.id]) && answers[q.id].length === 16 
-                                    ? answers[q.id] 
-                                    : Array.from({ length: 16 }).map((_, i) => answers[q.id]?.[i] || '');
+                                const rawData = answers[q.id];
+                                let scheduleData: { time: string; activity: string }[] = [];
                                 
-                                return (
-                                    <div className="space-y-2 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
-                                        <div className="grid grid-cols-[100px_1fr] gap-4 mb-2 px-2 sticky top-0 bg-slate-900 py-2 z-10">
-                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Time</div>
-                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Activity</div>
-                                        </div>
-                                        {scheduleData.map((activity: string, i: number) => {
+                                if (Array.isArray(rawData)) {
+                                    if (rawData.length > 0 && typeof rawData[0] === 'string') {
+                                        scheduleData = rawData.map((act, i) => {
                                             const hourNumber = i + 7;
                                             const ampm = hourNumber >= 12 ? 'PM' : 'AM';
                                             const displayHour = hourNumber > 12 ? hourNumber - 12 : hourNumber;
-                                            const timeLabel = `${displayHour}:00 ${ampm}`;
-                                            return (
-                                                <div key={i} className="grid grid-cols-[100px_1fr] gap-4 items-center">
-                                                    <div className="text-sm font-bold text-slate-400 text-right pr-4">
-                                                        {timeLabel}
-                                                    </div>
+                                            return { time: `${displayHour}:00 ${ampm}`, activity: act };
+                                        });
+                                    } else {
+                                        scheduleData = rawData.map((item: any) => ({
+                                            time: item?.time || item?.col1 || '',
+                                            activity: item?.activity || item?.col2 || ''
+                                        }));
+                                    }
+                                }
+                                
+                                if (scheduleData.length === 0) {
+                                    scheduleData = [
+                                        { time: '07:00 AM', activity: '' },
+                                        { time: '08:00 AM', activity: '' },
+                                        { time: '01:00 PM', activity: '' },
+                                        { time: '05:00 PM', activity: '' },
+                                        { time: '10:00 PM', activity: '' },
+                                    ];
+                                }
+                                
+                                return (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-[150px_1fr_50px] gap-4 mb-2 px-2">
+                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Time</div>
+                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Activity</div>
+                                            <div></div>
+                                        </div>
+                                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {scheduleData.map((item, i) => (
+                                                <div key={i} className="grid grid-cols-[150px_1fr_50px] gap-4 items-center">
                                                     <input
                                                         type="text"
-                                                        value={activity}
+                                                        value={item.time}
+                                                        disabled={isReadOnly}
+                                                        placeholder="e.g. 7:00 AM"
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm font-semibold text-center"
+                                                        onChange={(e) => {
+                                                            const newData = [...scheduleData];
+                                                            newData[i] = { ...newData[i], time: e.target.value };
+                                                            setAnswers({ ...answers, [q.id]: newData });
+                                                        }}
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={item.activity}
                                                         disabled={isReadOnly}
                                                         placeholder="What do you do?"
                                                         className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
                                                         onChange={(e) => {
                                                             const newData = [...scheduleData];
-                                                            newData[i] = e.target.value;
+                                                            newData[i] = { ...newData[i], activity: e.target.value };
                                                             setAnswers({ ...answers, [q.id]: newData });
                                                         }}
                                                     />
+                                                    <button
+                                                        type="button"
+                                                        disabled={isReadOnly}
+                                                        onClick={() => {
+                                                            const newData = scheduleData.filter((_, idx) => idx !== i);
+                                                            setAnswers({ ...answers, [q.id]: newData });
+                                                        }}
+                                                        className="text-slate-500 hover:text-red-400 p-2 disabled:opacity-50 transition-colors"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
-                                            )
-                                        })}
+                                            ))}
+                                        </div>
+                                        <button
+                                            type="button"
+                                            disabled={isReadOnly}
+                                            onClick={() => {
+                                                setAnswers({
+                                                    ...answers,
+                                                    [q.id]: [...scheduleData, { time: '', activity: '' }]
+                                                });
+                                            }}
+                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Add Time Slot
+                                        </button>
                                     </div>
                                 );
                             })()}
@@ -890,13 +1134,68 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                             {q?.type === 'file' && (() => {
                                 const files = Array.isArray(answers[q.id]) ? answers[q.id] : [];
                                 const isUploading = uploadingState[q.id] || false;
+                                
+                                const handleDragOver = (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    if (!isReadOnly) setIsDraggingFile(true);
+                                };
+                                const handleDragLeave = (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    setIsDraggingFile(false);
+                                };
+                                const handleDrop = async (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    setIsDraggingFile(false);
+                                    if (isReadOnly || !e.dataTransfer.files?.length) return;
+                                    
+                                    const droppedFiles = Array.from(e.dataTransfer.files);
+                                    const allowedExtensions = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'];
+                                    const validFiles = droppedFiles.filter(file => {
+                                        const name = file.name.toLowerCase();
+                                        return allowedExtensions.some(ext => name.endsWith(ext));
+                                    });
+                                    
+                                    if (validFiles.length === 0) {
+                                        alert("Invalid file type. Only PDF, Word Documents, and Images are allowed.");
+                                        return;
+                                    }
+                                    
+                                    setUploadingState(prev => ({ ...prev, [q.id]: true }));
+                                    const formData = new FormData();
+                                    validFiles.forEach(f => formData.append('files', f));
+                                    
+                                    try {
+                                        const res = await fetch('/api/upload', {
+                                            method: 'POST',
+                                            body: formData
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            setAnswers({ ...answers, [q.id]: [...files, ...data.files] });
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                    } finally {
+                                        setUploadingState(prev => ({ ...prev, [q.id]: false }));
+                                    }
+                                };
+                                
                                 return (
                                 <div className="space-y-4">
-                                    <label className="block w-full border-2 border-dashed border-slate-700 bg-slate-900/50 hover:bg-slate-800/50 rounded-2xl p-8 cursor-pointer transition-colors text-center group">
+                                    <label 
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                        className={`block w-full border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-colors text-center group
+                                            ${isDraggingFile 
+                                                ? 'border-indigo-500 bg-indigo-500/10' 
+                                                : 'border-slate-700 bg-slate-900/50 hover:bg-slate-800/50'}`}
+                                    >
                                         <input 
                                             type="file" 
                                             className="hidden" 
                                             multiple
+                                            accept=".pdf,.doc,.docx,image/*"
                                             onChange={async (e) => {
                                                 if (!e.target.files?.length) return;
                                                 setUploadingState(prev => ({ ...prev, [q.id]: true }));
@@ -931,7 +1230,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 <span className="text-indigo-400 font-bold">Click to upload</span> or drag and drop files
                                             </div>
                                             <div className="text-xs text-slate-500">
-                                                PDF, DOC, DOCX, Images
+                                                PDF, Word Documents (DOC, DOCX), Images
                                             </div>
                                         </div>
                                     </label>

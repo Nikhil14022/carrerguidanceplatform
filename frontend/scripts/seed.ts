@@ -1,42 +1,7 @@
 import { hash } from 'bcryptjs'
 import prisma from '../src/lib/prisma'
 
-async function main() {
-  const hashedPassword = await hash('admin123', 12)
-
-  // ── Cleanup: delete ALL existing modules (and linked data) then recreate fresh ──
-  const allModules = await prisma.module.findMany({ select: { id: true } })
-  if (allModules.length > 0) {
-    const allIds = allModules.map(m => m.id)
-    const linked = await prisma.clientModule.findMany({
-      where: { moduleId: { in: allIds } }, select: { id: true }
-    })
-    const linkedIds = linked.map(cm => cm.id)
-    if (linkedIds.length > 0) {
-      await prisma.moduleComment.deleteMany({ where: { clientModuleId: { in: linkedIds } } })
-      await prisma.moduleResponse.deleteMany({ where: { clientModuleId: { in: linkedIds } } })
-      await prisma.clientModule.deleteMany({ where: { id: { in: linkedIds } } })
-    }
-    await prisma.module.deleteMany({})
-    console.log(`Removed ${allModules.length} existing module(s) — recreating fresh.`)
-  }
-  // ── End cleanup ──
-
-  const adminEmail = 'admin@careerflow.com'
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } })
-
-  if (existingAdmin) {
-    await prisma.user.update({
-      where: { email: adminEmail },
-      data: { name: 'CareerFlow Admin', role: 'ADMIN', password: hashedPassword }
-    })
-  } else {
-    await prisma.user.create({
-      data: { email: adminEmail, password: hashedPassword, name: 'CareerFlow Admin', role: 'ADMIN' }
-    })
-  }
-
-  const modules = [
+export const modules = [
 
     // ══════════════════════════════════════════════════════════════
     // TOPIC MODULES (from Word document — 11 sections)
@@ -85,14 +50,6 @@ async function main() {
             placeholder: 'e.g., Mother, Father, Grandparents...'
           },
           {
-            id: 'demo_subjects',
-            type: 'table',
-            question: 'Subjects (current)',
-            minRows: 3,
-            col1Label: 'Subject',
-            col2Label: 'Views'
-          },
-          {
             id: 'demo_exams',
             type: 'table',
             question: 'Additional Exams (completed / giving / planning to give)',
@@ -124,7 +81,13 @@ async function main() {
             description: 'Categories: Like & Score Well | Do not Like but Score Well | Like & Do not Score Well | Do not Like & Do not Score',
             minRows: 5,
             col1Label: 'Subject',
-            col2Label: 'Category'
+            col2Label: 'Category',
+            col2Options: [
+              'Like & Score Well',
+              'Do not Like but Score Well',
+              'Like & Do not Score Well',
+              'Do not Like & Do not Score'
+            ]
           },
           {
             id: 'demo_thoughts_academics',
@@ -412,13 +375,6 @@ async function main() {
             col1Label: 'Movie Name'
           },
           {
-            id: 'visual_fav_series',
-            type: 'table',
-            question: 'Favourite TV Serials / Series (Top 5)',
-            minRows: 5,
-            col1Label: 'Series Name'
-          },
-          {
             id: 'visual_genres',
             type: 'rank',
             question: 'Genres of movies/series you enjoy (Rank your top 5)',
@@ -455,6 +411,13 @@ async function main() {
               { id: 'western', text: 'Western' },
               { id: 'short', text: 'Short Films' }
             ]
+          },
+          {
+            id: 'visual_fav_series',
+            type: 'table',
+            question: 'Favourite TV Serials / Series (Top 5)',
+            minRows: 5,
+            col1Label: 'Series Name'
           },
           {
             id: 'visual_superpower',
@@ -539,13 +502,7 @@ async function main() {
             minRows: 3,
             col1Label: 'Content Genre',
             question: 'Content genres you follow online (List them)'
-          },
-          {
-            id: 'visual_content_creators',
-            type: 'text',
-            question: 'Any specific Bloggers/YouTubers/Channels you follow? (Share your subscription/following list)',
-            placeholder: 'Specific channels/creators you love: ...'
-          },
+          }
         ]
       },
       defaultOrder: 5
@@ -581,15 +538,18 @@ async function main() {
           },
           {
             id: 'friends_3',
-            type: 'text',
+            type: 'textarea',
             question: 'What kind of people do you think you can easily form a friendship with & why?',
             description: 'Examples: Trustworthy | Honest | Reliable | Knowledgeable | Playful | Active | Sporty | Talkative | Silent | Popular | Intellectual | Emotional | Unpopular | Gossiper | Adventurous | Cautious | Supportive | Fun loving | Well mannered | Funny | Fashionable | Helpful | Humorous | Authoritative | Persuasive | Nurturer | Practical | Spontaneous | Strong Headed | Shy | Foodie | Caring | Realistic | Visionaries | Outgoing | Down to earth | Understanding | Liberal/Broadminded | Traditional/Conservative | Quiet/less talkative',
             placeholder: 'Describe the qualities of people you connect with and why...'
           },
           {
             id: 'friends_4',
-            type: 'choice',
+            type: 'multiselect',
             question: 'You and Friends: Who are you here?',
+            hasOpenText: true,
+            openTextLabel: 'Give details below if you have things to add or share:',
+            openTextPlaceholder: 'Type in detail here...',
             options: [
               { id: '1', text: 'I have a lot of friends & honestly, they mean a lot to me. I really enjoy being with them' },
               { id: '2', text: 'I have a lot of friends & have a mixed combination of good / difficult time with them' },
@@ -650,7 +610,7 @@ async function main() {
           },
           {
             id: 'friends_7c',
-            type: 'choice',
+            type: 'multiselect',
             question: 'Imagine 2 of your friends are fighting — what role would you play in such a situation?',
             options: [
               { id: '1', text: 'Try to mediate between both of them and make sure things do not escalate' },
@@ -666,7 +626,7 @@ async function main() {
           },
           {
             id: 'friends_8',
-            type: 'choice',
+            type: 'multiselect',
             question: 'What do you do when you disagree with your friends on certain things?',
             options: [
               { id: '1', text: 'Strongly disagree & take a stand for what I believe in or want to do' },
@@ -681,7 +641,7 @@ async function main() {
           },
           {
             id: 'friends_9',
-            type: 'choice',
+            type: 'multiselect',
             question: 'Do you like meeting new people and making friends?',
             options: [
               { id: '1', text: 'Yes of course, I love meeting new people' },
@@ -698,11 +658,16 @@ async function main() {
           },
           {
             id: 'friends_10',
-            type: 'scale',
-            min: 1,
-            max: 10,
-            question: 'How happy are you with your existing group of friends? (Rate 1–10)',
-            description: '1 = Not happy at all, 10 = Extremely happy'
+            type: 'table',
+            question: 'How happy are you with your existing group of friends? (Rate different groups on a scale of 1–10)',
+            description: 'Scale: 1 = Not happy at all, 10 = Extremely happy',
+            minRows: 2,
+            col1Label: 'Friend Group (e.g. School, Colony)',
+            col2Label: 'Rating (1-10)',
+            col2Options: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            hasOpenText: true,
+            openTextLabel: 'Share more details about your friend groups and ratings below:',
+            openTextPlaceholder: 'Type in detail here...'
           }
         ]
       },
@@ -731,7 +696,7 @@ async function main() {
           },
           {
             id: 'family_3',
-            type: 'choice',
+            type: 'multiselect',
             question: 'How would you describe your family space for now?',
             options: [
               { id: '1', text: "We all are very connected to each other & share everything. There's open space for sharing anything & everything & it's a beautiful support system within. We do give individual space to each other too." },
@@ -1005,52 +970,54 @@ async function main() {
       description: 'Rate yourself on each trait (1–10). 1 = Weakness side very high, 10 = Strength side very high.',
       schema: {
         questions: [
-          {
-            id: 'sw_grid',
-            type: 'trait_grid',
-            question: 'Rate yourself on each trait (1–10). 1 = Weakness, 10 = Strength.',
-            traits: [
-              { id: 'sw_communication', label: 'Communication', leftLabel: 'I sometimes struggle to convey my thoughts', rightLabel: 'I am able to convey my thoughts effectively' },
-              { id: 'sw_organisational_skills', label: 'Organisational Skills', leftLabel: 'Disorganized', rightLabel: 'Organized' },
-              { id: 'sw_organising_thoughts', label: 'Organising Thoughts and Flow in Mind', leftLabel: 'Scattered thoughts', rightLabel: 'Can organise my thoughts well' },
-              { id: 'sw_responsibility', label: 'Responsibility', leftLabel: 'Irresponsible', rightLabel: 'Responsible' },
-              { id: 'sw_problem_solving', label: 'Problem Solving', leftLabel: 'Avoiding the problem', rightLabel: 'Clear strategy and effective solutions' },
-              { id: 'sw_adaptability', label: 'Adaptability', leftLabel: 'Find it challenging to adapt', rightLabel: 'Adapt well to new situations' },
-              { id: 'sw_prioritising', label: 'Prioritising', leftLabel: 'Struggle to prioritise', rightLabel: 'Identify what is most important' },
-              { id: 'sw_patience', label: 'Patience', leftLabel: 'Impatient', rightLabel: 'Patient while working through challenges' },
-              { id: 'sw_curiosity', label: 'Curiosity', leftLabel: 'Lack curiosity and motivation', rightLabel: 'Always eager to learn new things' },
-              { id: 'sw_perseverance', label: 'Perseverance', leftLabel: 'Give up easily', rightLabel: 'Persist through difficulties' },
-              { id: 'sw_thoughtfulness', label: 'Thoughtfulness & Reflection', leftLabel: 'Act without taking time to think', rightLabel: 'Reflect and think things through' },
-              { id: 'sw_deadlines', label: 'Sticking to Deadlines', leftLabel: 'Struggle to stick to deadlines', rightLabel: 'Stick to deadlines' },
-              { id: 'sw_generating_ideas', label: 'Generating Ideas', leftLabel: 'Challenging to come up with ideas', rightLabel: 'Contribute creative ideas' },
-              { id: 'sw_multitasking', label: 'Multi-tasking', leftLabel: 'Struggle to multitask', rightLabel: 'Can multitask' },
-              { id: 'sw_time_management', label: 'Time Management', leftLabel: 'Trouble managing my time', rightLabel: 'Manage time effectively' },
-              { id: 'sw_independence', label: 'Independence', leftLabel: 'Rely too much on others', rightLabel: 'Work well independently' },
-              { id: 'sw_seeking_help', label: 'Seeking Help', leftLabel: 'Hesitate to ask for help', rightLabel: 'Know when to ask for help' },
-              { id: 'sw_goal_setting', label: 'Goal Setting and Execution', leftLabel: 'Difficulty setting/executing goals', rightLabel: 'Set clear goals and work hard' },
-              { id: 'sw_stress_management', label: 'Stress Management', leftLabel: 'Cannot work under stress', rightLabel: 'Work under stressful situations' },
-              { id: 'sw_teamwork', label: 'Team Work', leftLabel: 'Don\'t work well in groups', rightLabel: 'Work well in groups' },
-              { id: 'sw_growth_mindset', label: 'Growth Mindset', leftLabel: 'Abilities are innate/cannot improve', rightLabel: 'Embrace challenges and opportunities' },
-              { id: 'sw_criticism', label: 'Criticism', leftLabel: 'Cannot take criticism', rightLabel: 'Can take criticism' },
-              { id: 'sw_feedback', label: 'Feedback', leftLabel: 'Giving unconstructive feedback', rightLabel: 'Giving constructive feedback' },
-              { id: 'sw_listening', label: 'Listening', leftLabel: 'Not paying attention', rightLabel: 'Good listener and pay attention' },
-              { id: 'sw_empathy', label: 'Empathy / Sensitivity', leftLabel: 'Struggle to be empathetic', rightLabel: 'Sensitive and empathetic' },
-              { id: 'sw_procrastination', label: 'Procrastination', leftLabel: 'Procrastinate a lot', rightLabel: 'Don\'t procrastinate' },
-              { id: 'sw_working_individually', label: 'Working Individually/One Person', leftLabel: 'Cannot work effectively with one person', rightLabel: 'Can work well with one person' },
-              { id: 'sw_social_interaction', label: 'Social Interaction', leftLabel: 'Avoiding social interaction', rightLabel: 'Like social interaction' },
-              { id: 'sw_expressiveness', label: 'Expressiveness', leftLabel: 'Unable to express easily', rightLabel: 'Able to express easily & verbally' },
-              { id: 'sw_accountability', label: 'Accountability', leftLabel: 'Not accepting mistakes', rightLabel: 'Accepting mistakes & owning up' },
-              { id: 'sw_spontaneity', label: 'Spontaneity', leftLabel: 'Cannot do things impulsively', rightLabel: 'Can do things impulsively' },
-              { id: 'sw_rules_routines', label: 'Rules and Routines', leftLabel: 'Not following rules/routines', rightLabel: 'Following rules/routines' },
-              { id: 'sw_accepting_change', label: 'Accepting Change', leftLabel: 'Cannot accept change', rightLabel: 'Open to and can accept change' },
-              { id: 'sw_finding_direction', label: 'Finding Direction', leftLabel: 'Struggle to find direction', rightLabel: 'Good at finding direction/path' },
-              { id: 'sw_conversing_group', label: 'Conversing with a Group', leftLabel: 'Not able to talk to many people', rightLabel: 'Talking to many people' },
-              { id: 'sw_initiating_conversations', label: 'Initiating Conversations', leftLabel: 'Cannot start conversations', rightLabel: 'Can start conversations easily' },
-              { id: 'sw_taking_stand', label: 'Taking a Stand for Oneself', leftLabel: 'Not being able to take a stand', rightLabel: 'Taking a stand for oneself' },
-              { id: 'sw_self_control', label: 'Self-control', leftLabel: 'Cannot control own impulses', rightLabel: 'Controlling actions/learning to ignore impulses' }
-            ]
-          }
-        ]
+          { id: 'sw_communication', label: 'Communication', leftLabel: 'I sometimes struggle to convey my thoughts', rightLabel: 'I am able to convey my thoughts effectively' },
+          { id: 'sw_organisational_skills', label: 'Organisational Skills', leftLabel: 'Disorganized', rightLabel: 'Organized' },
+          { id: 'sw_organising_thoughts', label: 'Organising Thoughts and Flow in Mind', leftLabel: 'Scattered thoughts', rightLabel: 'Can organise my thoughts well' },
+          { id: 'sw_responsibility', label: 'Responsibility', leftLabel: 'Irresponsible', rightLabel: 'Responsible' },
+          { id: 'sw_problem_solving', label: 'Problem Solving', leftLabel: 'Avoiding the problem', rightLabel: 'Clear strategy and effective solutions' },
+          { id: 'sw_adaptability', label: 'Adaptability', leftLabel: 'Find it challenging to adapt', rightLabel: 'Adapt well to new situations' },
+          { id: 'sw_prioritising', label: 'Prioritising', leftLabel: 'Struggle to prioritise', rightLabel: 'Identify what is most important' },
+          { id: 'sw_patience', label: 'Patience', leftLabel: 'Impatient', rightLabel: 'Patient while working through challenges' },
+          { id: 'sw_curiosity', label: 'Curiosity', leftLabel: 'Lack curiosity and motivation', rightLabel: 'Always eager to learn new things' },
+          { id: 'sw_perseverance', label: 'Perseverance', leftLabel: 'Give up easily', rightLabel: 'Persist through difficulties' },
+          { id: 'sw_thoughtfulness', label: 'Thoughtfulness & Reflection', leftLabel: 'Act without taking time to think', rightLabel: 'Reflect and think things through' },
+          { id: 'sw_deadlines', label: 'Sticking to Deadlines', leftLabel: 'Struggle to stick to deadlines', rightLabel: 'Stick to deadlines' },
+          { id: 'sw_generating_ideas', label: 'Generating Ideas', leftLabel: 'Challenging to come up with ideas', rightLabel: 'Contribute creative ideas' },
+          { id: 'sw_multitasking', label: 'Multi-tasking', leftLabel: 'Struggle to multitask', rightLabel: 'Can multitask' },
+          { id: 'sw_time_management', label: 'Time Management', leftLabel: 'Trouble managing my time', rightLabel: 'Manage time effectively' },
+          { id: 'sw_independence', label: 'Independence', leftLabel: 'Rely too much on others', rightLabel: 'Work well independently' },
+          { id: 'sw_seeking_help', label: 'Seeking Help', leftLabel: 'Hesitate to ask for help', rightLabel: 'Know when to ask for help' },
+          { id: 'sw_goal_setting', label: 'Goal Setting and Execution', leftLabel: 'Difficulty setting/executing goals', rightLabel: 'Set clear goals and work hard' },
+          { id: 'sw_stress_management', label: 'Stress Management', leftLabel: 'Cannot work under stress', rightLabel: 'Work under stressful situations' },
+          { id: 'sw_teamwork', label: 'Team Work', leftLabel: 'Don\'t work well in groups', rightLabel: 'Work well in groups' },
+          { id: 'sw_growth_mindset', label: 'Growth Mindset', leftLabel: 'Abilities are innate/cannot improve', rightLabel: 'Embrace challenges and opportunities' },
+          { id: 'sw_criticism', label: 'Criticism', leftLabel: 'Cannot take criticism', rightLabel: 'Can take criticism' },
+          { id: 'sw_feedback', label: 'Feedback', leftLabel: 'Giving unconstructive feedback', rightLabel: 'Giving constructive feedback' },
+          { id: 'sw_listening', label: 'Listening', leftLabel: 'Not paying attention', rightLabel: 'Good listener and pay attention' },
+          { id: 'sw_empathy', label: 'Empathy / Sensitivity', leftLabel: 'Struggle to be empathetic', rightLabel: 'Sensitive and empathetic' },
+          { id: 'sw_procrastination', label: 'Procrastination', leftLabel: 'Procrastinate a lot', rightLabel: 'Don\'t procrastinate' },
+          { id: 'sw_working_individually', label: 'Working Individually/One Person', leftLabel: 'Cannot work effectively with one person', rightLabel: 'Can work well with one person' },
+          { id: 'sw_social_interaction', label: 'Social Interaction', leftLabel: 'Avoiding social interaction', rightLabel: 'Like social interaction' },
+          { id: 'sw_expressiveness', label: 'Expressiveness', leftLabel: 'Unable to express easily', rightLabel: 'Able to express easily & verbally' },
+          { id: 'sw_accountability', label: 'Accountability', leftLabel: 'Not accepting mistakes', rightLabel: 'Accepting mistakes & owning up' },
+          { id: 'sw_spontaneity', label: 'Spontaneity', leftLabel: 'Cannot do things impulsively', rightLabel: 'Can do things impulsively' },
+          { id: 'sw_rules_routines', label: 'Rules and Routines', leftLabel: 'Not following rules/routines', rightLabel: 'Following rules/routines' },
+          { id: 'sw_accepting_change', label: 'Accepting Change', leftLabel: 'Cannot accept change', rightLabel: 'Open to and can accept change' },
+          { id: 'sw_finding_direction', label: 'Finding Direction', leftLabel: 'Struggle to find direction', rightLabel: 'Good at finding direction/path' },
+          { id: 'sw_conversing_group', label: 'Conversing with a Group', leftLabel: 'Not able to talk to many people', rightLabel: 'Talking to many people' },
+          { id: 'sw_initiating_conversations', label: 'Initiating Conversations', leftLabel: 'Cannot start conversations', rightLabel: 'Can start conversations easily' },
+          { id: 'sw_taking_stand', label: 'Taking a Stand for Oneself', leftLabel: 'Not being able to take a stand', rightLabel: 'Taking a stand for oneself' },
+          { id: 'sw_self_control', label: 'Self-control', leftLabel: 'Cannot control own impulses', rightLabel: 'Controlling actions/learning to ignore impulses' }
+        ].map(t => ({
+          id: t.id,
+          type: 'scale',
+          min: 1,
+          max: 10,
+          question: t.label,
+          leftLabel: t.leftLabel,
+          rightLabel: t.rightLabel,
+          description: `Rate yourself on **${t.label}** from 1 to 10:<br/>**1** = ${t.leftLabel}<br/>**10** = ${t.rightLabel}`
+        }))
       },
       defaultOrder: 10
     },
@@ -1286,6 +1253,32 @@ async function main() {
             max: 10,
             question: 'Fear of Being Late',
             description: '1 = Not at all, 10 = Extremely high'
+          },
+          {
+            id: 'fear_technology',
+            type: 'scale',
+            min: 1,
+            max: 10,
+            question: 'Fear of Technology (using, adapting to, or being left behind by technology)',
+            description: '1 = Not at all, 10 = Extremely high'
+          },
+          {
+            id: 'fear_getting_rid_of_things',
+            type: 'scale',
+            min: 1,
+            max: 10,
+            question: 'Fear of Getting Rid of Things (discomfort with decluttering, throwing away items, or letting go of possessions)',
+            description: '1 = Not at all, 10 = Extremely high'
+          },
+          {
+            id: 'fears_other',
+            type: 'table',
+            question: 'Other Fears / Discomforts',
+            description: 'Please list any other specific fears or discomforts you experience and rate them from 1 to 10.',
+            minRows: 3,
+            col1Label: 'Fear / Discomfort Description',
+            col2Label: 'Rating (1-10)',
+            col2Options: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
           }
         ]
       },
@@ -1389,6 +1382,41 @@ async function main() {
 
   ]
 
+async function main() {
+  const hashedPassword = await hash('admin123', 12)
+
+  // ── Cleanup: delete ALL existing modules (and linked data) then recreate fresh ──
+  const allModules = await prisma.module.findMany({ select: { id: true } })
+  if (allModules.length > 0) {
+    const allIds = allModules.map(m => m.id)
+    const linked = await prisma.clientModule.findMany({
+      where: { moduleId: { in: allIds } }, select: { id: true }
+    })
+    const linkedIds = linked.map(cm => cm.id)
+    if (linkedIds.length > 0) {
+      await prisma.moduleComment.deleteMany({ where: { clientModuleId: { in: linkedIds } } })
+      await prisma.moduleResponse.deleteMany({ where: { clientModuleId: { in: linkedIds } } })
+      await prisma.clientModule.deleteMany({ where: { id: { in: linkedIds } } })
+    }
+    await prisma.module.deleteMany({})
+    console.log(`Removed ${allModules.length} existing module(s) — recreating fresh.`)
+  }
+  // ── End cleanup ──
+
+  const adminEmail = 'admin@careerflow.com'
+  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } })
+
+  if (existingAdmin) {
+    await prisma.user.update({
+      where: { email: adminEmail },
+      data: { name: 'CareerFlow Admin', role: 'ADMIN', password: hashedPassword }
+    })
+  } else {
+    await prisma.user.create({
+      data: { email: adminEmail, password: hashedPassword, name: 'CareerFlow Admin', role: 'ADMIN' }
+    })
+  }
+
   for (const mod of modules) {
     await prisma.module.create({
       data: {
@@ -1403,11 +1431,21 @@ async function main() {
   console.log('Seeded successfully: 11 topic modules + 7 test modules = 18 modules total')
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+// Only run main if executed directly, not when imported
+const isMain = typeof require !== 'undefined' && require.main === module;
+const isExecutedDirectly = process.argv[1] && (
+  process.argv[1].endsWith('seed.ts') || 
+  process.argv[1].endsWith('seed') || 
+  process.argv[1].includes('seed.ts')
+);
+
+if (isMain || isExecutedDirectly) {
+  main()
+    .catch((e) => {
+      console.error(e)
+      process.exit(1)
+    })
+    .finally(async () => {
+      await prisma.$disconnect()
+    })
+}

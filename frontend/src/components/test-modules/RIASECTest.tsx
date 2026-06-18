@@ -259,9 +259,12 @@ export default function RIASECTest({
   setAnswers,
   onSubmit,
 }: RIASECTestProps) {
-  const [activeTab, setActiveTab] = useState<SectionKey>("R");
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const testData: RIASECResponse = answers.__testData ?? { ...emptyResponse };
+
+  const activeSection = sections[currentIndex];
+  const activeTab = activeSection.key;
 
   /* helpers */
   const toggleItem = (section: SectionKey, item: string) => {
@@ -284,16 +287,14 @@ export default function RIASECTest({
     0
   );
 
-  const activeSection = sections.find((s) => s.key === activeTab)!;
-
   /* colour helpers -- we use static class maps so Tailwind can tree-shake */
   const tabColors: Record<SectionKey, { active: string; inactive: string }> = {
-    R: { active: "border-red-500 text-red-300",    inactive: "border-transparent text-slate-500 hover:text-red-400" },
-    I: { active: "border-blue-500 text-blue-300",   inactive: "border-transparent text-slate-500 hover:text-blue-400" },
-    A: { active: "border-purple-500 text-purple-300", inactive: "border-transparent text-slate-500 hover:text-purple-400" },
-    S: { active: "border-green-500 text-green-300",  inactive: "border-transparent text-slate-500 hover:text-green-400" },
-    E: { active: "border-amber-500 text-amber-300",  inactive: "border-transparent text-slate-500 hover:text-amber-400" },
-    C: { active: "border-teal-500 text-teal-300",   inactive: "border-transparent text-slate-500 hover:text-teal-400" },
+    R: { active: "border-red-500 text-red-300",    inactive: "border-transparent text-slate-500" },
+    I: { active: "border-blue-500 text-blue-300",   inactive: "border-transparent text-slate-500" },
+    A: { active: "border-purple-500 text-purple-300", inactive: "border-transparent text-slate-500" },
+    S: { active: "border-green-500 text-green-300",  inactive: "border-transparent text-slate-500" },
+    E: { active: "border-amber-500 text-amber-300",  inactive: "border-transparent text-slate-500" },
+    C: { active: "border-teal-500 text-teal-300",   inactive: "border-transparent text-slate-500" },
   };
 
   const barColors: Record<SectionKey, string> = {
@@ -316,20 +317,18 @@ export default function RIASECTest({
 
   return (
     <div className="space-y-5">
-      {/* ---- Tab navigation ---- */}
+      {/* ---- Step-by-Step progress indicator ---- */}
       <div className="flex overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
-        {sections.map((sec) => {
-          const isActive = sec.key === activeTab;
+        {sections.map((sec, idx) => {
+          const isActive = idx === currentIndex;
           const count = countFor(sec.key);
           return (
-            <button
+            <div
               key={sec.key}
-              type="button"
-              onClick={() => setActiveTab(sec.key)}
               className={`flex-1 min-w-[90px] border-b-2 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide transition-colors ${
                 isActive
                   ? tabColors[sec.key].active
-                  : tabColors[sec.key].inactive
+                  : "border-transparent text-slate-600"
               }`}
             >
               <span className="block text-base font-bold">{sec.key}</span>
@@ -337,20 +336,25 @@ export default function RIASECTest({
                 {sec.label}
               </span>
               {count > 0 && (
-                <span className="mt-1 inline-block rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium">
+                <span className="mt-1 inline-block rounded-full bg-indigo-500/20 text-indigo-300 px-2 py-0.5 text-[10px] font-medium">
                   {count}
                 </span>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
 
       {/* ---- Active section content ---- */}
       <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-6">
-        <h2 className={`text-lg font-bold ${barTextColors[activeTab]}`}>
-          {activeSection.label}
-        </h2>
+        <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h2 className={`text-lg font-bold ${barTextColors[activeTab]}`}>
+            {activeSection.label} Interest Area
+          </h2>
+          <span className="text-xs font-bold text-slate-500">
+            Step {currentIndex + 1} of 6
+          </span>
+        </div>
 
         {activeSection.groups.map((group) => (
           <div key={group.heading}>
@@ -419,21 +423,48 @@ export default function RIASECTest({
         </div>
       </div>
 
-      {/* ---- Submit ---- */}
-      <button
-        type="button"
-        disabled={totalChecked === 0}
-        onClick={onSubmit}
-        className={`w-full rounded-xl py-3 text-sm font-semibold transition-all ${
-          totalChecked > 0
-            ? "bg-indigo-600 text-white hover:bg-indigo-500"
-            : "cursor-not-allowed bg-slate-800 text-slate-500"
-        }`}
-      >
-        {totalChecked > 0
-          ? `Submit (${totalChecked} items selected)`
-          : "Select at least one item to continue"}
-      </button>
+      {/* ---- Step Navigation Buttons ---- */}
+      <div className="flex justify-between gap-4 pt-4">
+        <button
+          type="button"
+          disabled={currentIndex === 0}
+          onClick={() => setCurrentIndex(prev => prev - 1)}
+          className={`flex items-center gap-2 px-6 py-3 rounded-xl border font-bold uppercase tracking-wider text-xs transition-colors
+            ${currentIndex === 0 
+              ? 'border-slate-800 text-slate-600 cursor-not-allowed' 
+              : 'border-slate-700 text-slate-300 hover:bg-slate-900 hover:text-white'}`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+          Back
+        </button>
+        
+        {currentIndex < 5 ? (
+          <button
+            type="button"
+            onClick={() => setCurrentIndex(prev => prev + 1)}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-colors shadow-lg shadow-indigo-500/20"
+          >
+            Continue
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled={totalChecked === 0}
+            onClick={onSubmit}
+            className={`px-8 py-3 rounded-xl font-bold uppercase tracking-wider text-xs transition-colors shadow-lg
+              ${totalChecked > 0 
+                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20' 
+                : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+          >
+            Submit Assessment
+          </button>
+        )}
+      </div>
     </div>
   );
 }
