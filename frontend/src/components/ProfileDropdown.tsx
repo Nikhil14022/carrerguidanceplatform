@@ -20,10 +20,18 @@ export default function ProfileDropdown() {
     const { data: session } = useSession();
     const role = (session?.user as any)?.role || 'CLIENT';
 
+    // Determine friendly role name for menu display
+    const getFriendlyRoleName = (roleStr: string) => {
+        const lower = roleStr.toLowerCase();
+        if (lower.startsWith('mentor')) return 'Mentor';
+        if (lower === 'super_admin') return 'Super Admin';
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+    };
+
     // Determine the base path based on role
     const getBasePath = () => {
-        if (role === 'ADMIN') return '/admin';
-        if (role === 'MENTOR') return '/mentor';
+        if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/admin';
+        if (role === 'EXPERT' || role.startsWith('MENTOR')) return '/mentor';
         if (role === 'PARENT') return '/parent';
         return '/dashboard'; // Default client path
     };
@@ -50,9 +58,9 @@ export default function ProfileDropdown() {
                         <Link
                             href={`${basePath}/profile`}
                             onClick={() => setIsOpen(false)}
-                            className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors capitalize"
+                            className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >
-                            {role.toLowerCase()} Profile
+                            {getFriendlyRoleName(role)} Profile
                         </Link>
                         <Link
                             href={`${basePath}/settings`}
