@@ -50,23 +50,7 @@ export default function MentorDashboardPage() {
         return matchesFilter && matchesSearch;
     });
 
-    const getTestBadges = (modules: ClientModule[]) => {
-        const badges: { label: string; value: string; color: string }[] = [];
-        for (const mod of modules) {
-            const testType = mod.module?.schema?.testType;
-            const scored = (mod.response?.data as any)?.__scored;
-            if (!testType || !scored?.scores) continue;
 
-            if (testType === '16PF') {
-                badges.push({ label: 'MBTI', value: scored.scores.type, color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' });
-            } else if (testType === 'RIASEC') {
-                badges.push({ label: 'Holland', value: scored.scores.hollandCode, color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' });
-            } else if (testType === 'COLOR') {
-                badges.push({ label: 'Color', value: `${scored.scores.primaryColor}/${scored.scores.secondaryColor}`, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' });
-            }
-        }
-        return badges;
-    };
 
     const statusColor = (s: string) => {
         switch (s?.toLowerCase()) {
@@ -156,9 +140,7 @@ export default function MentorDashboardPage() {
                         <thead>
                             <tr className="border-b border-white/10 bg-white/5">
                                 <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Client</th>
-                                <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Journey Focus</th>
                                 <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Modules Status</th>
-                                <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Test Results</th>
                                 <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Status</th>
                                 <th className="py-4 px-6 text-right text-[10px] font-bold uppercase tracking-widest text-slate-500">Actions</th>
                             </tr>
@@ -175,25 +157,9 @@ export default function MentorDashboardPage() {
                                             <div className="text-xs text-slate-500 mt-1">{client.user.email}</div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="text-sm font-medium text-slate-300">Stage {client.currentStage}</div>
-                                            {client.assignedAt && <div className="text-[10px] text-slate-500 mt-1">Assigned: {new Date(client.assignedAt).toLocaleDateString()}</div>}
-                                        </td>
-                                        <td className="py-4 px-6">
                                             <div className="flex flex-col gap-1">
                                                 <div className="text-xs font-medium text-slate-400">{completedModules} / {client.modules.length} modules completed</div>
                                                 {pending > 0 && <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest mt-1">⚠ {pending} Pending Review</span>}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex flex-wrap gap-1">
-                                                {getTestBadges(client.modules).map(b => (
-                                                    <span key={b.label} className={`px-2 py-0.5 rounded-md border text-[9px] font-bold ${b.color}`}>
-                                                        {b.label}: {b.value}
-                                                    </span>
-                                                ))}
-                                                {getTestBadges(client.modules).length === 0 && (
-                                                    <span className="text-[10px] text-slate-600 italic">No tests scored</span>
-                                                )}
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
