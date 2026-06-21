@@ -27,8 +27,8 @@ export async function POST(req: Request) {
         // Generate if not exists
         const research = await generateCareerResearch(careerOptionId)
         return NextResponse.json(research)
-    } catch (error) {
+    } catch (error: any) {
         console.error('API research generate error:', error)
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+        return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
     }
 }
