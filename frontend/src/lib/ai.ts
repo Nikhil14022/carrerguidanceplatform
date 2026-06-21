@@ -1,10 +1,22 @@
 import Groq from "groq-sdk";
 import prisma from './prisma'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groqClient: Groq | null = null;
+
+function getGroqClient() {
+  if (!groqClient) {
+    const apiKey = process.env.GROQ_API_KEY || '';
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY is not set in environment variables. Please check your Vercel or environment settings.");
+    }
+    groqClient = new Groq({ apiKey });
+  }
+  return groqClient;
+}
 
 async function callGroq(prompt: string): Promise<string> {
-  const result = await groq.chat.completions.create({
+  const client = getGroqClient();
+  const result = await client.chat.completions.create({
     messages: [
       {
         role: "system",
@@ -12,7 +24,7 @@ async function callGroq(prompt: string): Promise<string> {
       },
       { role: "user", content: prompt }
     ],
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-8b-instant",
     temperature: 0.7,
     response_format: { type: "json_object" },
   });
@@ -478,9 +490,10 @@ Your task is to answer specific questions about their responses, provide insight
 Keep your responses detailed, professional, encouraging, and directly rooted in the student's actual responses. Use markdown formatting to make your answers easy to read.`
   };
 
-  const result = await groq.chat.completions.create({
+  const client = getGroqClient();
+  const result = await client.chat.completions.create({
     messages: [systemMessage, ...messages] as any,
-    model: "llama-3.3-70b-versatile",
+    model: "llama-3.1-8b-instant",
     temperature: 0.7,
   });
 

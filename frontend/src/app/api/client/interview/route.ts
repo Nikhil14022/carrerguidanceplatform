@@ -2,7 +2,18 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' });
+let groqClient: Groq | null = null;
+
+function getGroqClient() {
+    if (!groqClient) {
+        const apiKey = process.env.GROQ_API_KEY;
+        if (!apiKey) {
+            throw new Error("GROQ_API_KEY is not set in environment variables. Please check your Vercel or environment settings.");
+        }
+        groqClient = new Groq({ apiKey });
+    }
+    return groqClient;
+}
 
 export async function POST(req: Request) {
     try {
@@ -13,8 +24,9 @@ export async function POST(req: Request) {
         const { action, career, question, answer, difficulty } = body;
 
         if (action === 'generate_questions') {
-            const completion = await groq.chat.completions.create({
-                model: 'llama-3.3-70b-versatile',
+            const client = getGroqClient();
+            const completion = await client.chat.completions.create({
+                model: 'llama-3.1-8b-instant',
                 messages: [
                     {
                         role: 'system',
@@ -44,8 +56,9 @@ export async function POST(req: Request) {
         }
 
         if (action === 'evaluate_answer') {
-            const completion = await groq.chat.completions.create({
-                model: 'llama-3.3-70b-versatile',
+            const client = getGroqClient();
+            const completion = await client.chat.completions.create({
+                model: 'llama-3.1-8b-instant',
                 messages: [
                     {
                         role: 'system',
