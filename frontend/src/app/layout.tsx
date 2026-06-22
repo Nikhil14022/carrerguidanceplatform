@@ -6,7 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Career Path | AI-Guided Career Guidance",
+  title: "Career Explore Journey | AI-Guided Career Guidance",
   description: "Advanced hybrid career guidance platform merging AI intelligence with expert human validation.",
 };
 
