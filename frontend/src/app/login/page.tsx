@@ -67,7 +67,7 @@ function LoginForm() {
 
             <div className="max-w-md w-full glass-card p-10 relative overflow-hidden">
                 {/* Role Selector */}
-                <div className="flex bg-white/5 p-1 rounded-xl mb-8">
+                <div className="flex bg-slate-800 p-1 rounded-xl mb-8 border border-slate-700">
                     {['client', 'parent', 'admin'].map((r) => (
                         <button
                             key={r}
@@ -106,7 +106,7 @@ function LoginForm() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="name@company.com"
                             required
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                         />
                     </div>
 
@@ -121,7 +121,7 @@ function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
                             required
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                         />
                     </div>
 

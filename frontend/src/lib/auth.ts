@@ -101,7 +101,8 @@ const { handlers, auth: nextAuth, signIn, signOut } = NextAuth({
     }
   },
   pages: {
-    signIn: '/login'
+    signIn: '/login',
+    signOut: '/login'
   },
   session: {
     strategy: 'jwt'

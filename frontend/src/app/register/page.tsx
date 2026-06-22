@@ -70,7 +70,7 @@ export default function RegisterPage() {
                             </div>
                         )}
 
-                        <div className="flex p-1 bg-white/5 rounded-xl border border-white/5">
+                        <div className="flex p-1 bg-slate-800 rounded-xl border border-slate-700">
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
@@ -94,7 +94,7 @@ export default function RegisterPage() {
                                     required
                                     type="text"
                                     placeholder="John Doe"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 />
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                                     required
                                     type="email"
                                     placeholder="name@example.com"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 />
@@ -118,7 +118,7 @@ export default function RegisterPage() {
                                     required
                                     type="password"
                                     placeholder="••••••••"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 />

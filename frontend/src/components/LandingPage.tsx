@@ -60,7 +60,7 @@ export const Hero = () => (
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1] text-slate-100">
                 Your Future, <span className="text-gradient">Tailored</span>. <br />
-                AI Guided, <span className="text-white/40">Human Vetted</span>.
+                AI Guided, <span className="text-slate-400">Human Vetted</span>.
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">

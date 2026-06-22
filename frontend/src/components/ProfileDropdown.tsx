@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function ProfileDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -71,13 +71,15 @@ export default function ProfileDropdown() {
                         </Link>
                     </div>
                     <div className="p-2 border-t border-slate-800">
-                        <Link
-                            href="/api/auth/signout"
-                            onClick={() => setIsOpen(false)}
-                            className="block px-3 py-2 text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        <button
+                            onClick={() => {
+                                setIsOpen(false);
+                                signOut({ callbackUrl: '/' });
+                            }}
+                            className="w-full text-left block px-3 py-2 text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                         >
                             Log Out
-                        </Link>
+                        </button>
                     </div>
                 </div>
             )}
