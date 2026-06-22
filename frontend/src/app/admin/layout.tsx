@@ -140,7 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-0">
-                <header className="bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between z-10 md:bg-transparent md:border-transparent md:justify-end md:px-8 md:pt-8 md:pb-0">
+                <header className="relative z-50 bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between md:bg-transparent md:border-transparent md:justify-end md:px-8 md:pt-8 md:pb-0">
                     <h1 className="font-bold text-lg text-slate-100 md:hidden">Admin Portal</h1>
                     <div className="flex items-center gap-4 ml-auto">
                         <NotificationDropdown />
