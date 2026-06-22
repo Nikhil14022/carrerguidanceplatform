@@ -127,13 +127,13 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
 
     if (loading) {
         return (
-            <div className="h-screen bg-[#030712] flex items-center justify-center">
+            <div className="h-screen bg-slate-950 flex items-center justify-center">
                 <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
             </div>
         );
     }
 
-    if (!report) return <div className="min-h-screen bg-[#030712] text-slate-100 flex items-center justify-center">Report not found</div>;
+    if (!report) return <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">Report not found</div>;
 
     // Extract module responses
     const modules = report.clientProfile?.modules || [];
@@ -267,7 +267,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
     };
 
     return (
-        <div className="min-h-screen bg-[#030712] text-slate-100 p-8">
+        <div className="min-h-screen bg-slate-950 text-slate-100 p-8">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Header */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-6">

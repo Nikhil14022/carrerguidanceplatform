@@ -21,10 +21,11 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
         <div className="h-full flex flex-col">
             <div className="p-6">
                 <div className="flex items-center justify-between">
-                    <Link href="/parent">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
-                            Career Path
-                        </h2>
+                    <Link href="/parent" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
+                        <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md" />
+                        <span className="text-lg font-extrabold text-slate-100 leading-none">
+                            Career <span className="text-[var(--color-brand-yellow)]">Explore</span> Journey
+                        </span>
                     </Link>
                 </div>
                 <p className="text-sm text-slate-500 mt-1">Parent Portal</p>
@@ -52,7 +53,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
     );
 
     return (
-        <div className="flex h-screen bg-[#030712] overflow-hidden text-slate-300">
+        <div className="flex h-screen bg-slate-950 overflow-hidden text-slate-300">
             {/* Mobile Sidebar Overlay */}
             {isMobileMenuOpen && (
                 <div
@@ -74,7 +75,7 @@ export default function ParentLayout({ children }: { children: React.ReactNode }
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-0">
                 <header className="bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between z-10 md:bg-transparent md:border-transparent md:justify-end md:px-8 md:pt-8 md:pb-0">
-                    <h1 className="font-bold text-lg text-white md:hidden">Parent Portal</h1>
+                    <h1 className="font-bold text-lg text-slate-100 md:hidden">Parent Portal</h1>
                     <div className="flex items-center gap-4 ml-auto">
                         <NotificationDropdown />
                         <ProfileDropdown />

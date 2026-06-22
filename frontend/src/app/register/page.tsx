@@ -54,11 +54,9 @@ export default function RegisterPage() {
 
             <div className="w-full max-w-md space-y-8 animate-fade-in">
                 <div className="text-center">
-                    <div className="inline-flex items-center gap-2 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
-                            <div className="w-5 h-5 rounded-sm bg-white/20 rotate-45" />
-                        </div>
-                        <span className="text-3xl font-bold tracking-tighter">Career Path</span>
+                    <div className="inline-flex items-center gap-3 mb-6">
+                        <img src="/logo.jpg" alt="Logo" className="w-10 h-10 object-contain rounded-md" />
+                        <span className="text-3xl font-extrabold tracking-tighter">Career Explore Journey</span>
                     </div>
                     <h1 className="text-2xl font-bold">Create your account</h1>
                     <p className="text-slate-400 mt-2">Start your personalized career journey today.</p>

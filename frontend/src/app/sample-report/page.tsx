@@ -37,7 +37,7 @@ export default function SampleReportPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#030712] text-slate-100 p-8">
+        <div className="min-h-screen bg-slate-950 text-slate-100 p-8">
             <div className="max-w-5xl mx-auto space-y-12">
                 {/* Header */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-white/5 pb-12">

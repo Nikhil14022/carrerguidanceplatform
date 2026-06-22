@@ -31,14 +31,14 @@ export default function ReportsListPage() {
 
     if (loading) {
         return (
-            <div className="h-screen bg-[#030712] flex items-center justify-center">
+            <div className="h-screen bg-slate-950 flex items-center justify-center">
                 <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#030712] text-slate-100 p-8">
+        <div className="min-h-screen bg-slate-950 text-slate-100 p-8">
             <div className="max-w-5xl mx-auto space-y-12">
                 <header className="flex justify-between items-center">
                     <div>

@@ -59,11 +59,9 @@ function LoginForm() {
     return (
         <main className="min-h-screen mesh-gradient flex items-center justify-center p-6">
             <div className="absolute top-8 left-8">
-                <a href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
-                        <div className="w-4 h-4 rounded-sm bg-white/20 rotate-45" />
-                    </div>
-                    <span>Career Path</span>
+                <a href="/" className="text-2xl font-extrabold tracking-tighter flex items-center gap-3">
+                    <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md" />
+                    <span>Career Explore Journey</span>
                 </a>
             </div>
 

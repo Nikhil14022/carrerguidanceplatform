@@ -1,21 +1,234 @@
 @import "tailwindcss";
 
 @theme {
-  --color-midnight: #121212;
-  --color-glass-slate: rgba(26, 26, 26, 0.7);
+  --color-midnight: #ffffff;
+  --color-glass-slate: rgba(255, 255, 255, 0.75);
   --color-brand-yellow: #f1b317;
   --color-brand-yellow-hover: #dca311;
-  --color-brand-charcoal: #1a1a1a;
-  --color-brand-grey: #262626;
-  --color-soft-quartz: #f8fafc;
-  --color-muted-steel: #a3a3a3;
+  --color-brand-red: #ef4444;
+  --color-brand-red-hover: #dc2626;
+  --color-brand-charcoal: #ffffff;
+  --color-brand-grey: #fafafa;
+  --color-soft-quartz: #171717;
+  --color-muted-steel: #737373;
+
+  /* Invert all neutrals so dashboard's slate classes default to light theme */
+  --color-slate-50: #0a0a0a;
+  --color-slate-100: #171717;
+  --color-slate-200: #262626;
+  --color-slate-300: #404040;
+  --color-slate-400: #737373;
+  --color-slate-500: #a3a3a3;
+  --color-slate-600: #cbd5e1;
+  --color-slate-700: #e2e8f0;
+  --color-slate-800: #f1f5f9;
+  --color-slate-900: #f8fafc;
+  --color-slate-950: #ffffff;
+
+  --color-zinc-50: #0a0a0a;
+  --color-zinc-100: #171717;
+  --color-zinc-200: #262626;
+  --color-zinc-300: #404040;
+  --color-zinc-400: #737373;
+  --color-zinc-500: #a3a3a3;
+  --color-zinc-600: #cbd5e1;
+  --color-zinc-700: #e2e8f0;
+  --color-zinc-800: #f1f5f9;
+  --color-zinc-900: #f8fafc;
+  --color-zinc-950: #ffffff;
+
+  --color-gray-50: #0a0a0a;
+  --color-gray-100: #171717;
+  --color-gray-200: #262626;
+  --color-gray-300: #404040;
+  --color-gray-400: #737373;
+  --color-gray-500: #a3a3a3;
+  --color-gray-600: #cbd5e1;
+  --color-gray-700: #e2e8f0;
+  --color-gray-800: #f1f5f9;
+  --color-gray-900: #f8fafc;
+  --color-gray-950: #ffffff;
+
+  --color-neutral-50: #0a0a0a;
+  --color-neutral-100: #171717;
+  --color-neutral-200: #262626;
+  --color-neutral-300: #404040;
+  --color-neutral-400: #737373;
+  --color-neutral-500: #a3a3a3;
+  --color-neutral-600: #cbd5e1;
+  --color-neutral-700: #e2e8f0;
+  --color-neutral-800: #f1f5f9;
+  --color-neutral-900: #f8fafc;
+  --color-neutral-950: #ffffff;
+
+  /* Map all indigo to brand yellow */
+  --color-indigo-50: #fffbeb;
+  --color-indigo-100: #fef3c7;
+  --color-indigo-200: #fde68a;
+  --color-indigo-300: #fcd34d;
+  --color-indigo-400: #fbbf24;
+  --color-indigo-500: #f1b317;
+  --color-indigo-600: #dca311;
+  --color-indigo-700: #b28009;
+  --color-indigo-800: #886004;
+  --color-indigo-900: #78350f;
+  --color-indigo-950: #451a03;
+
+  /* Map violet and purple to brand red */
+  --color-violet-50: #fef2f2;
+  --color-violet-100: #fee2e2;
+  --color-violet-200: #fecaca;
+  --color-violet-300: #fca5a5;
+  --color-violet-400: #f87171;
+  --color-violet-500: #ef4444;
+  --color-violet-600: #dc2626;
+  --color-violet-700: #b91c1c;
+  --color-violet-800: #991b1b;
+  --color-violet-900: #7f1d1d;
+  --color-violet-950: #450a0a;
+
+  --color-purple-50: #fef2f2;
+  --color-purple-100: #fee2e2;
+  --color-purple-200: #fecaca;
+  --color-purple-300: #fca5a5;
+  --color-purple-400: #f87171;
+  --color-purple-500: #ef4444;
+  --color-purple-600: #dc2626;
+  --color-purple-700: #b91c1c;
+  --color-purple-800: #991b1b;
+  --color-purple-900: #7f1d1d;
+  --color-purple-950: #450a0a;
+
+  /* Map blue and sky to brand yellow */
+  --color-blue-50: #fffbeb;
+  --color-blue-100: #fef3c7;
+  --color-blue-200: #fde68a;
+  --color-blue-300: #fcd34d;
+  --color-blue-400: #fbbf24;
+  --color-blue-500: #f1b317;
+  --color-blue-600: #dca311;
+  --color-blue-700: #b28009;
+  --color-blue-800: #886004;
+  --color-blue-900: #78350f;
+  --color-blue-950: #451a03;
+
+  --color-sky-50: #fffbeb;
+  --color-sky-100: #fef3c7;
+  --color-sky-200: #fde68a;
+  --color-sky-300: #fcd34d;
+  --color-sky-400: #fbbf24;
+  --color-sky-500: #f1b317;
+  --color-sky-600: #dca311;
+  --color-sky-700: #b28009;
+  --color-sky-800: #886004;
+  --color-sky-900: #78350f;
+  --color-sky-950: #451a03;
+
+  /* Map emerald, teal, and green to brand yellow */
+  --color-emerald-50: #fffbeb;
+  --color-emerald-100: #fef3c7;
+  --color-emerald-200: #fde68a;
+  --color-emerald-300: #fcd34d;
+  --color-emerald-400: #fbbf24;
+  --color-emerald-500: #f1b317;
+  --color-emerald-600: #dca311;
+  --color-emerald-700: #b28009;
+  --color-emerald-800: #886004;
+  --color-emerald-900: #78350f;
+  --color-emerald-950: #451a03;
+
+  --color-teal-50: #fffbeb;
+  --color-teal-100: #fef3c7;
+  --color-teal-200: #fde68a;
+  --color-teal-300: #fcd34d;
+  --color-teal-400: #fbbf24;
+  --color-teal-500: #f1b317;
+  --color-teal-600: #dca311;
+  --color-teal-700: #b28009;
+  --color-teal-800: #886004;
+  --color-teal-900: #78350f;
+  --color-teal-950: #451a03;
+
+  --color-green-50: #fffbeb;
+  --color-green-100: #fef3c7;
+  --color-green-200: #fde68a;
+  --color-green-300: #fcd34d;
+  --color-green-400: #fbbf24;
+  --color-green-500: #f1b317;
+  --color-green-600: #dca311;
+  --color-green-700: #b28009;
+  --color-green-800: #886004;
+  --color-green-900: #78350f;
+  --color-green-950: #451a03;
+
+  /* Map orange and amber to brand yellow */
+  --color-orange-50: #fffbeb;
+  --color-orange-100: #fef3c7;
+  --color-orange-200: #fde68a;
+  --color-orange-300: #fcd34d;
+  --color-orange-400: #fbbf24;
+  --color-orange-500: #f1b317;
+  --color-orange-600: #dca311;
+  --color-orange-700: #b28009;
+  --color-orange-800: #886004;
+  --color-orange-900: #78350f;
+  --color-orange-950: #451a03;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f1b317;
+  --color-amber-600: #dca311;
+  --color-amber-700: #b28009;
+  --color-amber-800: #886004;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+
+  /* Map pink, rose, and red to brand red */
+  --color-pink-50: #fef2f2;
+  --color-pink-100: #fee2e2;
+  --color-pink-200: #fecaca;
+  --color-pink-300: #fca5a5;
+  --color-pink-400: #f87171;
+  --color-pink-500: #ef4444;
+  --color-pink-600: #dc2626;
+  --color-pink-700: #b91c1c;
+  --color-pink-800: #991b1b;
+  --color-pink-900: #7f1d1d;
+  --color-pink-950: #450a0a;
+
+  --color-rose-50: #fef2f2;
+  --color-rose-100: #fee2e2;
+  --color-rose-200: #fecaca;
+  --color-rose-300: #fca5a5;
+  --color-rose-400: #f87171;
+  --color-rose-500: #ef4444;
+  --color-rose-600: #dc2626;
+  --color-rose-700: #b91c1c;
+  --color-rose-800: #991b1b;
+  --color-rose-900: #7f1d1d;
+  --color-rose-950: #450a0a;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #7f1d1d;
+  --color-red-950: #450a0a;
 }
 
 @utility glass {
   background-color: var(--color-glass-slate);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
 }
 
 @utility glass-card {
@@ -23,14 +236,14 @@
 
   &:hover {
     border-color: rgba(241, 179, 23, 0.25);
-    box-shadow: 0 25px 50px -12px rgba(241, 179, 23, 0.08);
+    box-shadow: 0 20px 25px -5px rgba(241, 179, 23, 0.08);
   }
 }
 
 @utility text-gradient {
   background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, #f1b317, #f59e0b, #fbbf24);
+  background-image: linear-gradient(to right, #f1b317, #f59e0b, #ef4444);
 }
 
 @utility btn-primary {
@@ -38,14 +251,15 @@
 }
 
 @utility btn-secondary {
-  @apply px-6 py-3 rounded-full border border-white/10 glass text-white font-medium transition-all duration-300 hover:bg-white/5 hover:border-brand-yellow/30 cursor-pointer;
+  @apply px-6 py-3 rounded-full border border-black/10 glass text-black font-medium transition-all duration-300 hover:bg-black/5 hover:border-brand-yellow/30 cursor-pointer;
 }
 
 @utility mesh-gradient {
+  background-color: #ffffff;
   background-image:
-    radial-gradient(at 0% 0%, hsla(0, 0%, 7%, 1) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(39, 80%, 6%, 1) 0, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(0, 0%, 10%, 1) 0, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(241, 179, 23, 0.04) 0, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(239, 68, 68, 0.02) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(241, 179, 23, 0.04) 0, transparent 50%);
   background-attachment: fixed;
 }
 
@@ -53,7 +267,7 @@
   body {
     background-color: var(--color-midnight);
     color: var(--color-soft-quartz);
-    @apply antialiased selection:bg-indigo-500/30;
+    @apply antialiased selection:bg-brand-yellow/30;
     font-feature-settings: "cv02", "cv05", "cv11";
   }
 }

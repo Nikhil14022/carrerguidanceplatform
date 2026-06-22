@@ -76,7 +76,7 @@ export default function AdminQueriesPage() {
     };
 
     if (loading) return (
-        <div className="h-screen bg-[#030712] flex items-center justify-center">
+        <div className="h-screen bg-slate-950 flex items-center justify-center">
             <div className="w-10 h-10 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
         </div>
     );
