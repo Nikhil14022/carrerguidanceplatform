@@ -42,7 +42,7 @@ export default function ProfileDropdown() {
         <div className="relative flex items-center" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors focus:outline-none"
+                className="p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-full transition-colors focus:outline-none"
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -50,33 +50,33 @@ export default function ProfileDropdown() {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.5)] overflow-hidden z-[9999] transform origin-top-right transition-all text-slate-200">
-                    <div className="px-4 py-3 border-b border-slate-800 bg-slate-950/50">
-                        <p className="text-sm font-medium text-white">Menu</p>
+                <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-[9999] transform origin-top-right transition-all text-slate-200">
+                    <div className="px-4 py-3 border-b border-slate-700 bg-slate-800">
+                        <p className="text-sm font-bold text-slate-100">Menu</p>
                     </div>
                     <div className="p-2 space-y-1">
                         <Link
                             href={`${basePath}/profile`}
                             onClick={() => setIsOpen(false)}
-                            className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            className="block px-3 py-2 text-sm text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
                         >
                             {getFriendlyRoleName(role)} Profile
                         </Link>
                         <Link
                             href={`${basePath}/settings`}
                             onClick={() => setIsOpen(false)}
-                            className="block px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            className="block px-3 py-2 text-sm text-slate-300 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
                         >
                             Settings
                         </Link>
                     </div>
-                    <div className="p-2 border-t border-slate-800">
+                    <div className="p-2 border-t border-slate-700">
                         <button
                             onClick={() => {
                                 setIsOpen(false);
                                 signOut({ callbackUrl: '/' });
                             }}
-                            className="w-full text-left block px-3 py-2 text-sm text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                            className="w-full text-left block px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                         >
                             Log Out
                         </button>

@@ -143,7 +143,7 @@ export default function NotificationDropdown() {
             {/* Bell Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-300 transition-colors focus:outline-none"
+                className="relative p-2 rounded-full text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors focus:outline-none"
             >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -165,10 +165,10 @@ export default function NotificationDropdown() {
                         onClick={() => setIsOpen(false)}
                     />
 
-                    <div className="absolute right-0 top-full mt-3 w-[calc(100vw-2rem)] max-w-[22rem] sm:max-w-[28rem] sm:w-[28rem] bg-white/5 rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/10 overflow-hidden z-50 transform origin-top-right transition-all max-h-[80vh] flex flex-col">
+                    <div className="absolute right-0 top-full mt-3 w-[calc(100vw-2rem)] max-w-[22rem] sm:max-w-[28rem] sm:w-[28rem] bg-slate-900 rounded-2xl shadow-xl border border-slate-700 overflow-hidden z-50 transform origin-top-right transition-all max-h-[80vh] flex flex-col">
                         {/* Header */}
-                        <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-white/5">
-                            <h3 className="font-semibold text-slate-200">Notifications</h3>
+                        <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between bg-slate-800">
+                            <h3 className="font-semibold text-slate-100">Notifications</h3>
                             {unreadCount > 0 && (
                                 <button
                                     onClick={markAllAsRead}
@@ -196,9 +196,9 @@ export default function NotificationDropdown() {
                                         <div
                                             key={notification.id}
                                             onClick={() => !notification.isRead && markAsRead(notification.id)}
-                                            className={`flex items-start p-4 m-1 rounded-xl transition-colors cursor-pointer ${!notification.isRead ? 'bg-indigo-500/10/50 hover:bg-indigo-500/10' : 'hover:bg-white/5'}`}
+                                            className={`flex items-start p-4 m-1 rounded-xl transition-colors cursor-pointer ${!notification.isRead ? 'bg-indigo-500/5 hover:bg-indigo-500/10' : 'hover:bg-slate-800'}`}
                                         >
-                                            <div className={`mt-1 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm border border-white ${getIconTheme(notification.type)}`}>
+                                            <div className={`mt-1 flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm border border-slate-700 ${getIconTheme(notification.type)}`}>
                                                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                                 </svg>
@@ -265,8 +265,8 @@ export default function NotificationDropdown() {
 
                         {/* Footer */}
                         {notifications.length > 0 && (
-                            <div className="p-3 border-t border-white/5 bg-white/5">
-                                <button className="w-full text-center text-sm text-slate-500 hover:text-slate-200 font-medium">
+                            <div className="p-3 border-t border-slate-700 bg-slate-800">
+                                <button className="w-full text-center text-sm text-slate-500 hover:text-slate-100 font-medium">
                                     View all notifications
                                 </button>
                             </div>
