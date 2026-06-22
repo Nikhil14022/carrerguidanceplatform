@@ -167,33 +167,7 @@ function DashboardContent() {
                 </div>
             </section>
 
-            {/* Analytics Section */}
-            <section className="grid md:grid-cols-2 gap-8">
-                {/* Competency Radar */}
-                <SkillRadar data={[
-                    { subject: 'Analysis', A: 85, fullMark: 100 },
-                    { subject: 'Communication', A: 65, fullMark: 100 },
-                    { subject: 'Problem Solving', A: 90, fullMark: 100 },
-                    { subject: 'Leadership', A: 45, fullMark: 100 },
-                    { subject: 'Technical', A: 75, fullMark: 100 },
-                    { subject: 'Adaptability', A: 80, fullMark: 100 },
-                ]} />
 
-                {/* Additional Insight Blocks could go here in the future */}
-                <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 flex flex-col justify-center">
-                    <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">AI Insight Snapshot</h3>
-                    <p className="text-slate-300 mb-6 leading-relaxed text-sm">
-                        Based on your recent modules, you show strong indicators in <strong className="text-indigo-400">Analytical Tracking</strong> and <strong className="text-indigo-400">Problem Solving</strong>.
-                        Your roadmap will likely skew towards technical and strategy-based roles. Complete remaining modules to finalize your alignment map.
-                    </p>
-                    <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4">
-                        <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                            Top Trait: Analytical Modeler
-                        </span>
-                    </div>
-                </div>
-            </section>
 
             {/* Journey Timeline component */}
             <section className="bg-white/5 border shadow-sm rounded-2xl p-8 space-y-8">

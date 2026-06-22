@@ -7,48 +7,114 @@ import NotificationDropdown from '@/components/NotificationDropdown';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
 const adminNavItems = [
-    { label: 'Mentors & Clients', href: '/admin' },
-    { label: 'Module Builder', href: '/admin/modules' },
-    { label: 'Workflow Config', href: '/admin/workflow' },
-    { label: 'Workshop Management', href: '/admin/workshops' },
+    { 
+        label: 'Mentors & Clients', 
+        href: '/admin',
+        icon: (
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        )
+    },
+    { 
+        label: 'Module Builder', 
+        href: '/admin/modules',
+        icon: (
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+        )
+    },
+    { 
+        label: 'Workflow Config', 
+        href: '/admin/workflow',
+        icon: (
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        )
+    },
+    { 
+        label: 'Workshop Management', 
+        href: '/admin/workshops',
+        icon: (
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+        )
+    },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('admin-sidebar-minimized') === 'true';
+        }
+        return false;
+    });
+
+    const toggleMinimize = () => {
+        setIsMinimized(prev => {
+            const next = !prev;
+            localStorage.setItem('admin-sidebar-minimized', String(next));
+            return next;
+        });
+    };
 
     const sidebarContent = (
-        <div className="h-full flex flex-col">
-            <div className="p-6">
-                <div className="flex items-center justify-between">
-                    <Link href="/admin" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
-                        <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md" />
-                        <span className="text-lg font-extrabold text-slate-100 leading-none">
-                            Career <span className="text-[var(--color-brand-yellow)]">Explore</span> Journey
-                        </span>
-                    </Link>
+        <div className="h-full flex flex-col justify-between">
+            <div className="flex-1 flex flex-col">
+                <div className={`p-6 ${isMinimized ? 'flex justify-center' : ''}`}>
+                    <div className="flex items-center justify-between w-full">
+                        <Link href="/admin" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
+                            <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md shrink-0" />
+                            {!isMinimized && (
+                                <span className="text-lg font-extrabold text-slate-100 leading-none">
+                                    Career <span className="text-[var(--color-brand-yellow)]">Explore</span> Journey
+                                </span>
+                            )}
+                        </Link>
+                    </div>
+                    {!isMinimized && <p className="text-sm text-slate-500 mt-1">Admin Portal</p>}
                 </div>
-                <p className="text-sm text-slate-500 mt-1">Admin Portal</p>
+
+                <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+                    {adminNavItems.map((item) => {
+                        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
+                                    ? 'bg-orange-500/10 text-orange-400 font-medium'
+                                    : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                                    } ${isMinimized ? 'justify-center px-2' : ''}`}
+                                title={isMinimized ? item.label : undefined}
+                            >
+                                <span className="shrink-0">{item.icon}</span>
+                                {!isMinimized && <span className="transition-all duration-300">{item.label}</span>}
+                            </Link>
+                        );
+                    })}
+                </nav>
             </div>
 
-            <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-                {adminNavItems.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={`block px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                ? 'bg-orange-500/10 text-orange-400 font-medium'
-                                : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                                }`}
-                        >
-                            {item.label}
-                        </Link>
-                    );
-                })}
-            </nav>
+            {/* Minimizer Toggle Button at bottom */}
+            <div className="p-4 border-t border-slate-800">
+                <button
+                    onClick={toggleMinimize}
+                    className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors cursor-pointer w-full flex items-center justify-center gap-2"
+                >
+                    <svg className={`w-5 h-5 transition-transform duration-300 ${isMinimized ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                    </svg>
+                    {!isMinimized && <span className="text-xs font-bold uppercase tracking-widest">Minimize</span>}
+                </button>
+            </div>
         </div>
     );
 
@@ -63,12 +129,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             )}
 
             {/* Desktop Sidebar (Always occupies space on large screens) */}
-            <aside className="hidden md:flex flex-col w-64 shrink-0 bg-slate-950 border-r border-slate-800 z-10 transition-all">
+            <aside className={`hidden md:flex flex-col shrink-0 bg-slate-950 border-r border-slate-800 z-10 transition-all duration-300 ${isMinimized ? 'w-20' : 'w-64'}`}>
                 {sidebarContent}
             </aside>
 
             {/* Mobile Sidebar (Fixed overlay on small screens) */}
-            <aside className={`fixed inset-y-0 left-0 w-64 bg-slate-950 border-r border-slate-800 z-50 transform transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <aside className="fixed inset-y-0 left-0 w-64 bg-slate-950 border-r border-slate-800 z-50 transform transition-transform duration-300 ease-in-out md:hidden" style={{ transform: isMobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)' }}>
                 {sidebarContent}
             </aside>
 

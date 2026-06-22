@@ -281,7 +281,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-widest">
               Setup
             </div>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+            <h2 className="text-3xl font-extrabold text-slate-100 tracking-tight">
               Self Discovery Questionnaire
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto leading-relaxed text-sm md:text-base">
@@ -315,7 +315,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
                 onClick={() => !readOnly && handleAgeSelect("13-18")}
                 className={`flex-1 py-5 px-6 rounded-2xl border-2 transition-all font-bold text-center flex flex-col items-center justify-center gap-2 ${
                   ageGroup === "13-18"
-                    ? "border-indigo-500 bg-indigo-500/15 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)]"
+                    ? "border-indigo-500 bg-indigo-500/15 text-slate-100 shadow-[0_0_20px_rgba(99,102,241,0.15)]"
                     : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
                 } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
               >
@@ -329,7 +329,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
                 onClick={() => !readOnly && handleAgeSelect("18+")}
                 className={`flex-1 py-5 px-6 rounded-2xl border-2 transition-all font-bold text-center flex flex-col items-center justify-center gap-2 ${
                   ageGroup === "18+"
-                    ? "border-purple-500 bg-purple-500/15 text-white shadow-[0_0_20px_rgba(168,85,247,0.15)]"
+                    ? "border-purple-500 bg-purple-500/15 text-slate-100 shadow-[0_0_20px_rgba(168,85,247,0.15)]"
                     : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700 hover:text-slate-200"
                 } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
               >
@@ -365,7 +365,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
         {/* Header */}
         <div className="flex items-center justify-between bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div>
-            <h2 className="text-xl font-bold text-white bg-clip-text">
+            <h2 className="text-xl font-bold text-slate-100 bg-clip-text">
               Review and Submit
             </h2>
             <p className="text-slate-400 text-xs mt-1">Review your answers before completing the assessment.</p>
@@ -451,7 +451,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
       {/* Header and Quick Navigation Progress Circles */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-white bg-clip-text">
+          <h2 className="text-lg font-bold text-slate-100 bg-clip-text">
             {currentSectionData.title}
           </h2>
           <p className="text-slate-400 text-xs mt-0.5">{currentSectionData.subtitle}</p>
@@ -526,7 +526,7 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
                   disabled={readOnly}
                   placeholder="Type your thoughtful response here..."
                   rows={4}
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             );

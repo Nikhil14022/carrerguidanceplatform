@@ -453,7 +453,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                     value={answers[q.id] || ''}
                                     rows={4}
                                     disabled={isReadOnly}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
                                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                                 />
                             )}
@@ -463,7 +463,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                     placeholder={q?.placeholder || "Enter your answer..."}
                                     value={answers[q.id] || ''}
                                     disabled={isReadOnly}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg [color-scheme:dark]"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg [color-scheme:dark]"
                                     onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                                 />
                             )}
@@ -490,7 +490,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                         value={answers[`${q.id}_reason`] || ''}
                                         rows={2}
                                         disabled={isReadOnly}
-                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 mt-4 text-sm"
+                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 mt-4 text-sm"
                                         onChange={(e) => setAnswers({ ...answers, [`${q.id}_reason`]: e.target.value })}
                                     />
                                 </div>
@@ -510,7 +510,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 setAnswers({ ...answers, [q.id]: [opt.id] });
                                             }}
                                             className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
+                                                ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                         >
                                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                                                 ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -544,7 +544,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         setAnswers({ ...answers, [q.id]: updated });
                                                     }}
                                                     className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
+                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                                 >
                                                     <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0
                                                         ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -567,7 +567,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 disabled={isReadOnly}
                                                 rows={4}
                                                 placeholder={q.openTextPlaceholder || "Type in detail here..."}
-                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
                                                 onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
                                             />
                                         </div>
@@ -593,7 +593,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         setAnswers({ ...answers, [q.id]: updated });
                                                     }}
                                                     className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-4
-                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
+                                                        ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
                                                 >
                                                     <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0
                                                         ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -647,7 +647,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         readOnly={isRowPrefilled}
                                                         disabled={isRowPrefilled || isReadOnly}
                                                         placeholder={q.col1Placeholder || '...'}
-                                                        className={`w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 ${isRowPrefilled ? 'text-indigo-300 bg-slate-900/50 cursor-not-allowed border-none' : ''}`}
+                                                        className={`w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 ${isRowPrefilled ? 'text-indigo-300 bg-slate-900/50 cursor-not-allowed border-none' : ''}`}
                                                         onChange={(e) => {
                                                             if (isRowPrefilled) return;
                                                             const newData = [...tableData];
@@ -660,7 +660,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col2}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col2: e.target.value };
@@ -678,7 +678,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                 value={row.col2}
                                                                 disabled={isReadOnly}
                                                                 placeholder={q.col2Placeholder || '...'}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col2: e.target.value };
@@ -692,7 +692,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col3}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col3: e.target.value };
@@ -710,7 +710,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                 value={row.col3}
                                                                 disabled={isReadOnly}
                                                                 placeholder={q.col3Placeholder || '...'}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col3: e.target.value };
@@ -724,7 +724,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             <select
                                                                 value={row.col4}
                                                                 disabled={isReadOnly}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 text-sm"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col4: e.target.value };
@@ -742,7 +742,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                 value={row.col4}
                                                                 disabled={isReadOnly}
                                                                 placeholder={q.col4Placeholder || '...'}
-                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                                                                 onChange={(e) => {
                                                                     const newData = [...tableData];
                                                                     newData[i] = { ...newData[i], col4: e.target.value };
@@ -825,7 +825,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     <select
                                                         value={item.time}
                                                         disabled={isReadOnly}
-                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-indigo-500 text-sm font-semibold text-center"
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm font-semibold text-center"
                                                         onChange={(e) => {
                                                             const newData = [...scheduleData];
                                                             newData[i] = { ...newData[i], time: e.target.value };
@@ -848,7 +848,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         value={item.activity}
                                                         disabled={isReadOnly}
                                                         placeholder="What do you do?"
-                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
+                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 text-sm"
                                                         onChange={(e) => {
                                                             const newData = [...scheduleData];
                                                             newData[i] = { ...newData[i], activity: e.target.value };
@@ -935,7 +935,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         newData[idx] = { ...newData[idx], option: e.target.value };
                                                         setAnswers({ ...answers, [q.id]: newData });
                                                     }}
-                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-white focus:outline-none focus:border-indigo-500 appearance-none"
+                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 focus:outline-none focus:border-indigo-500 appearance-none"
                                                 >
                                                     <option value="">Select an option...</option>
                                                     {availableOptions?.map((opt: any) => (
@@ -965,7 +965,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     setAnswers({ ...answers, [q.id]: { option: opt.id, rating } });
                                                 }}
                                                 className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
                                             >
                                                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                                                     ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -1024,7 +1024,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     setAnswers({ ...answers, [q.id]: { selected: newSelected, ranked: [...newRanked, ...newlyAdded] } });
                                                 }}
                                                 className={`w-full p-4 rounded-xl border text-left transition-all flex items-center gap-4
-                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
+                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'}`}
                                             >
                                                 <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0
                                                     ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
@@ -1062,7 +1062,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                 <option key={i} value={i + 1}>{i + 1}</option>
                                                             ))}
                                                         </select>
-                                                        <span className="text-sm text-white">{opt.text}</span>
+                                                        <span className="text-sm text-slate-100">{opt.text}</span>
                                                     </div>
                                                 );
                                             })}
@@ -1093,7 +1093,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                         }}
                                                         className="w-5 h-5 rounded border-slate-700 text-indigo-500 bg-slate-900 focus:ring-indigo-500/50 focus:ring-offset-slate-950"
                                                     />
-                                                    <span className={`font-bold ${data.active ? 'text-white' : 'text-slate-400'}`}>{level.label}</span>
+                                                    <span className={`font-bold ${data.active ? 'text-slate-100' : 'text-slate-400'}`}>{level.label}</span>
                                                 </label>
                                                 {data.active && (
                                                     <div className="grid md:grid-cols-2 gap-4 pl-9">
@@ -1102,14 +1102,14 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                             value={data.name}
                                                             placeholder={`${level.label} Name...`}
                                                             onChange={(e) => setAnswers({ ...answers, [q.id]: { ...eduData, [level.key]: { ...data, name: e.target.value } } })}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
                                                         />
                                                         <input
                                                             type="text"
                                                             value={data.grade}
                                                             placeholder="Current Year / Grade..."
                                                             onChange={(e) => setAnswers({ ...answers, [q.id]: { ...eduData, [level.key]: { ...data, grade: e.target.value } } })}
-                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+                                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
                                                         />
                                                     </div>
                                                 )}
@@ -1137,7 +1137,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                     {traitData.map((row: any, i: number) => {
                                         return (
                                             <div key={i} className="grid grid-cols-[minmax(120px,1.2fr)_minmax(100px,1fr)_minmax(100px,1fr)_80px] gap-3 items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
-                                                <div className="text-sm font-bold text-white leading-tight">
+                                                <div className="text-sm font-bold text-slate-100 leading-tight">
                                                     {row.trait}
                                                 </div>
                                                 <div className="text-[10px] text-pink-400/70 text-center leading-tight">
@@ -1363,7 +1363,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                 value={newComment}
                                 onChange={(e) => setNewComment(e.target.value)}
                                 placeholder="Reply or ask a question..."
-                                className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 pr-12 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 resize-none"
+                                className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 pr-12 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 resize-none"
                                 rows={2}
                             />
                             <button
