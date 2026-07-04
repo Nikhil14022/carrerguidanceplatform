@@ -3,14 +3,45 @@ import React from 'react';
 import { useSession, signOut } from 'next-auth/react';
 
 export const Navbar = () => {
+    const { data: session, status } = useSession();
+
     return (
         <nav className="fixed top-0 w-full z-50 px-6 py-6">
-            <div className="max-w-7xl mx-auto glass rounded-full px-8 py-4 flex items-center justify-center">
-                <div className="flex flex-col sm:flex-row items-center gap-4 text-center">
-                    <img src="/logo.jpg" alt="Logo" className="w-14 h-14 object-contain rounded-xl shrink-0 shadow-lg shadow-black/20" />
-                    <a href="/" className="hover:opacity-90 transition-opacity font-black text-slate-100 text-2xl md:text-3xl tracking-tighter">
+            <div className="max-w-7xl mx-auto glass rounded-full px-8 py-3.5 flex items-center justify-between">
+                <div className="text-2xl font-bold tracking-tighter flex items-center gap-3">
+                    <img src="/logo.jpg" alt="Logo" className="w-12 h-12 object-contain rounded-xl shrink-0 shadow-md shadow-black/15" />
+                    <a href="/" className="hover:opacity-90 transition-opacity font-black text-slate-100 text-xl md:text-2xl tracking-tighter">
                         Career <span className="text-[var(--color-brand-yellow)]">Explore</span> Journey
                     </a>
+                </div>
+
+                <div className="flex items-center gap-6 min-h-[40px]">
+                    {status === 'loading' ? (
+                        <div className="w-20 h-4 bg-white/5 animate-pulse rounded" />
+                    ) : session ? (
+                        <>
+                            <a 
+                                href={(session?.user as any)?.role === 'ADMIN' ? '/admin' : (session?.user as any)?.role === 'PARENT' ? '/parent' : '/dashboard'} 
+                                className="text-xs font-bold text-[var(--color-brand-yellow)] hover:text-amber-400 transition-colors uppercase tracking-widest"
+                            >
+                                Dashboard
+                            </a>
+                            <button
+                                onClick={async () => {
+                                    await signOut({ redirect: false });
+                                    window.location.href = '/';
+                                }}
+                                className="text-xs font-bold text-slate-450 hover:text-white transition-colors cursor-pointer uppercase tracking-widest"
+                            >
+                                Sign Out
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <a href="/login" className="text-xs font-bold text-slate-350 hover:text-[var(--color-brand-yellow)] transition-colors uppercase tracking-widest">Log In</a>
+                            <a href="/register" className="btn-primary text-xs py-2.5 px-5 font-bold uppercase tracking-wider rounded-xl">Get Started</a>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>
