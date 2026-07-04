@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import TestAnswersRenderer from "@/components/TestAnswersRenderer";
 
 interface QuestionSchema {
     id: string;
@@ -434,232 +435,149 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                         </div>
                                     </div>
 
-                                    {/* Render Scored Test Details ifScored */}
-                                    {testType && answers.__scored && (
-                                        <div className="bg-slate-950/60 border border-indigo-900/20 rounded-2xl p-5 space-y-4">
-                                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-900 pb-2">
-                                                Computed Test Results ({testType})
-                                            </div>
-                                            <pre className="text-xs text-slate-400 whitespace-pre-wrap leading-relaxed overflow-x-auto max-h-[300px]">
-                                                {JSON.stringify(answers.__scored.scores, null, 2)}
-                                            </pre>
+                                    {testType ? (
+                                        <div className="bg-slate-950/20 border border-white/5 rounded-2xl p-6">
+                                            <TestAnswersRenderer testType={testType} answers={answers} />
                                         </div>
-                                    )}
+                                    ) : (
+                                        visibleQuestions.length > 0 && (
+                                            <div className="space-y-6">
+                                                {visibleQuestions.map((q) => {
+                                                    const value = answers[q.id];
+                                                    const isEditingThis = editingModuleId === m.id && editingKey === q.id;
 
-                                    {/* Render Self Discovery Specialized Questions */}
-                                    {testType === 'SELF_DISCOVERY' && (
-                                        <div className="space-y-4">
-                                            {Object.entries(answers).map(([key, val]) => {
-                                                if (key === '__scored' || key === '__testData') return null;
-                                                const qText = SELF_DISCOVERY_QUESTIONS[key];
-                                                if (!qText) return null;
-
-                                                // Filter based on search query
-                                                if (searchQuery && !qText.toLowerCase().includes(searchQuery.toLowerCase()) && !String(val).toLowerCase().includes(searchQuery.toLowerCase())) {
-                                                    return null;
-                                                }
-
-                                                const isEditingThis = editingModuleId === m.id && editingKey === key;
-
-                                                return (
-                                                    <div key={key} className="space-y-2 border-b border-slate-850 pb-4 last:border-b-0 group">
-                                                        <div className="flex justify-between items-start gap-4">
-                                                            <p className="text-slate-300 font-semibold text-sm leading-relaxed">{qText}</p>
-                                                            {!isEditingThis && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingModuleId(m.id);
-                                                                        setEditingKey(key);
-                                                                        setEditingValue(val);
-                                                                    }}
-                                                                    className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors uppercase tracking-wider shrink-0 mt-0.5 print:hidden"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            )}
-                                                        </div>
-
-                                                        {isEditingThis ? (
-                                                            <div className="space-y-2 pt-2">
-                                                                <textarea
-                                                                    value={editingValue}
-                                                                    onChange={e => setEditingValue(e.target.value)}
-                                                                    rows={3}
-                                                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
-                                                                />
-                                                                <div className="flex gap-2">
-                                                                    <button
-                                                                        onClick={() => handleSaveAnswer(m.id, key, editingValue)}
-                                                                        disabled={saving}
-                                                                        className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-600 transition-all disabled:opacity-50"
-                                                                    >
-                                                                        {saving ? 'Saving...' : 'Save'}
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => { setEditingKey(null); setEditingModuleId(null); }}
-                                                                        className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
-                                                                    >
-                                                                        Cancel
-                                                                    </button>
+                                                    return (
+                                                        <div key={q.id} className="space-y-2 border-b border-slate-850 pb-4 last:border-0 group">
+                                                            <div className="flex justify-between items-start gap-4">
+                                                                <div>
+                                                                    <p className="text-slate-300 font-semibold text-sm leading-relaxed">{q.question}</p>
+                                                                    {q.description && <p className="text-[10px] text-slate-500 mt-0.5">{q.description}</p>}
                                                                 </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="text-slate-400 text-sm leading-relaxed whitespace-pre-wrap pl-4 border-l border-slate-800 mt-1">
-                                                                {String(val) || <span className="italic text-slate-600">Not answered</span>}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-
-                                    {/* Render Dynamic Questions & Answers (Modules 1-11) */}
-                                    {!testType && visibleQuestions.length > 0 && (
-                                        <div className="space-y-6">
-                                            {visibleQuestions.map((q) => {
-                                                const value = answers[q.id];
-                                                const isEditingThis = editingModuleId === m.id && editingKey === q.id;
-
-                                                return (
-                                                    <div key={q.id} className="space-y-2 border-b border-slate-850 pb-4 last:border-0 group">
-                                                        <div className="flex justify-between items-start gap-4">
-                                                            <div>
-                                                                <p className="text-slate-300 font-semibold text-sm leading-relaxed">{q.question}</p>
-                                                                {q.description && <p className="text-[10px] text-slate-500 mt-0.5">{q.description}</p>}
-                                                            </div>
-                                                            {!isEditingThis && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingModuleId(m.id);
-                                                                        setEditingKey(q.id);
-                                                                        setEditingValue(value);
-                                                                    }}
-                                                                    className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors uppercase tracking-wider shrink-0 mt-0.5 print:hidden"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            )}
-                                                        </div>
-
-                                                        {isEditingThis ? (
-                                                            <div className="space-y-2 pt-2">
-                                                                {q.type === 'choice' && q.options ? (
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {q.options.map(opt => (
-                                                                            <button 
-                                                                                key={opt.id} 
-                                                                                onClick={() => setEditingValue([opt.id])}
-                                                                                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wider transition-all ${
-                                                                                    (Array.isArray(editingValue) ? editingValue.includes(opt.id) : editingValue === opt.id)
-                                                                                        ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
-                                                                                        : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'
-                                                                                }`}
-                                                                            >{opt.text}</button>
-                                                                        ))}
-                                                                    </div>
-                                                                ) : (
-                                                                    <textarea
-                                                                        value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
-                                                                        onChange={e => {
-                                                                            try {
-                                                                                setEditingValue(JSON.parse(e.target.value));
-                                                                            } catch {
-                                                                                setEditingValue(e.target.value);
-                                                                            }
+                                                                {!isEditingThis && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setEditingModuleId(m.id);
+                                                                            setEditingKey(q.id);
+                                                                            setEditingValue(value);
                                                                         }}
-                                                                        rows={3}
-                                                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
-                                                                    />
-                                                                )}
-                                                                <div className="flex gap-2">
-                                                                    <button
-                                                                        onClick={() => handleSaveAnswer(m.id, q.id, editingValue)}
-                                                                        disabled={saving}
-                                                                        className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-600 transition-all disabled:opacity-50"
+                                                                        className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors uppercase tracking-wider shrink-0 mt-0.5 print:hidden"
                                                                     >
-                                                                        {saving ? 'Saving...' : 'Save'}
+                                                                        Edit
                                                                     </button>
-                                                                    <button
-                                                                        onClick={() => { setEditingKey(null); setEditingModuleId(null); }}
-                                                                        className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
-                                                                    >
-                                                                        Cancel
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="text-slate-400 text-sm leading-relaxed pl-4 border-l border-slate-800 mt-1 whitespace-pre-wrap">
-                                                                {Array.isArray(value) ? (
-                                                                    <div className="flex flex-wrap gap-1.5 mt-1">
-                                                                        {value
-                                                                            .map((valItem: any) => {
-                                                                                if (valItem && typeof valItem === 'object') {
-                                                                                    const values = Object.values(valItem)
-                                                                                        .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
-                                                                                        .filter(v => v !== '');
-                                                                                    return values.length > 0 ? values.join(' - ') : '';
-                                                                                }
-                                                                                if (q.options) {
-                                                                                    const opt = q.options.find(o => o.id === valItem);
-                                                                                    if (opt) return opt.text;
-                                                                                }
-                                                                                return String(valItem);
-                                                                            })
-                                                                            .filter(valStr => valStr !== '')
-                                                                            .map((valStr: string, idx: number) => (
-                                                                                <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
-                                                                                    {valStr}
-                                                                                </span>
-                                                                            ))
-                                                                        }
-                                                                    </div>
-                                                                ) : value && typeof value === 'object' && Array.isArray((value as any).ranked) ? (
-                                                                    <div className="flex flex-wrap gap-1.5 mt-1">
-                                                                        {(value as any).ranked
-                                                                            .map((valItem: any) => {
-                                                                                if (q.options) {
-                                                                                    const opt = q.options.find(o => o.id === valItem);
-                                                                                    if (opt) return opt.text;
-                                                                                }
-                                                                                return String(valItem);
-                                                                            })
-                                                                            .map((valStr: string, idx: number) => (
-                                                                                <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
-                                                                                    {idx + 1}. {valStr}
-                                                                                </span>
-                                                                            ))
-                                                                        }
-                                                                    </div>
-                                                                ) : typeof value === 'object' ? (
-                                                                    <pre className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
-                                                                ) : isFileUrl(value) ? (
-                                                                    <a href={value} target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline flex items-center gap-1.5 text-xs font-semibold">
-                                                                        📄 View Document File
-                                                                    </a>
-                                                                ) : (
-                                                                    (() => {
-                                                                        if (q.options) {
-                                                                            const opt = q.options.find(o => o.id === value);
-                                                                            if (opt) return opt.text;
-                                                                        }
-                                                                        return String(value);
-                                                                    })() || <span className="italic text-slate-600">Not answered</span>
                                                                 )}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
 
-                                    {/* If no questions but standard test answers exist (Fallbacks for VALUES, RIASEC, COLOR etc) */}
-                                    {testType && testType !== 'SELF_DISCOVERY' && !answers.__scored && (
-                                        <div className="bg-slate-950/40 p-4 border border-slate-850 rounded-2xl text-xs text-slate-400 max-h-40 overflow-y-auto">
-                                            <p className="font-semibold uppercase text-slate-500 tracking-wider mb-2">Raw Data responses</p>
-                                            <pre>{JSON.stringify(answers, null, 2)}</pre>
-                                        </div>
+                                                            {isEditingThis ? (
+                                                                <div className="space-y-2 pt-2">
+                                                                    {q.type === 'choice' && q.options ? (
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {q.options.map(opt => (
+                                                                                <button 
+                                                                                    key={opt.id} 
+                                                                                    onClick={() => setEditingValue([opt.id])}
+                                                                                    className={`px-3 py-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wider transition-all ${
+                                                                                        (Array.isArray(editingValue) ? editingValue.includes(opt.id) : editingValue === opt.id)
+                                                                                            ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
+                                                                                            : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'
+                                                                                    }`}
+                                                                                >{opt.text}</button>
+                                                                            ))}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <textarea
+                                                                            value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
+                                                                            onChange={e => {
+                                                                                try {
+                                                                                    setEditingValue(JSON.parse(e.target.value));
+                                                                                } catch {
+                                                                                    setEditingValue(e.target.value);
+                                                                                }
+                                                                            }}
+                                                                            rows={3}
+                                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                        />
+                                                                    )}
+                                                                    <div className="flex gap-2">
+                                                                        <button
+                                                                            onClick={() => handleSaveAnswer(m.id, q.id, editingValue)}
+                                                                            disabled={saving}
+                                                                            className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-600 transition-all disabled:opacity-50"
+                                                                        >
+                                                                            {saving ? 'Saving...' : 'Save'}
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => { setEditingKey(null); setEditingModuleId(null); }}
+                                                                            className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-slate-400 text-sm leading-relaxed pl-4 border-l border-slate-800 mt-1 whitespace-pre-wrap">
+                                                                    {Array.isArray(value) ? (
+                                                                        <div className="flex flex-wrap gap-1.5 mt-1">
+                                                                            {value
+                                                                                .map((valItem: any) => {
+                                                                                    if (valItem && typeof valItem === 'object') {
+                                                                                        const values = Object.values(valItem)
+                                                                                            .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
+                                                                                            .filter(v => v !== '');
+                                                                                        return values.length > 0 ? values.join(' - ') : '';
+                                                                                    }
+                                                                                    if (q.options) {
+                                                                                        const opt = q.options.find(o => o.id === valItem);
+                                                                                        if (opt) return opt.text;
+                                                                                    }
+                                                                                    return String(valItem);
+                                                                                })
+                                                                                .filter(valStr => valStr !== '')
+                                                                                .map((valStr: string, idx: number) => (
+                                                                                    <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                        {valStr}
+                                                                                    </span>
+                                                                                ))
+                                                                            }
+                                                                        </div>
+                                                                    ) : value && typeof value === 'object' && Array.isArray((value as any).ranked) ? (
+                                                                        <div className="flex flex-wrap gap-1.5 mt-1">
+                                                                            {(value as any).ranked
+                                                                                .map((valItem: any) => {
+                                                                                    if (q.options) {
+                                                                                        const opt = q.options.find(o => o.id === valItem);
+                                                                                        if (opt) return opt.text;
+                                                                                    }
+                                                                                    return String(valItem);
+                                                                                })
+                                                                                .map((valStr: string, idx: number) => (
+                                                                                    <span key={idx} className="px-2.5 py-1 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                        {idx + 1}. {valStr}
+                                                                                    </span>
+                                                                                ))
+                                                                            }
+                                                                        </div>
+                                                                    ) : typeof value === 'object' ? (
+                                                                        <pre className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
+                                                                    ) : isFileUrl(value) ? (
+                                                                        <a href={value} target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline flex items-center gap-1.5 text-xs font-semibold">
+                                                                            📄 View Document File
+                                                                        </a>
+                                                                    ) : (
+                                                                        (() => {
+                                                                            if (q.options) {
+                                                                                const opt = q.options.find(o => o.id === value);
+                                                                                if (opt) return opt.text;
+                                                                            }
+                                                                            return String(value);
+                                                                        })() || <span className="italic text-slate-600">Not answered</span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )
                                     )}
                                 </div>
                             );

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import TestAnswersRenderer from "@/components/TestAnswersRenderer";
 
 interface QuestionSchema {
     id: string;
@@ -31,7 +32,7 @@ interface ModuleData {
     order: number;
     filledBy: string;
     mentorNotes?: string | null;
-    module: { title: string; description: string; schema: { questions: QuestionSchema[] } };
+    module: { title: string; description: string; schema: { questions: QuestionSchema[]; testType?: string } };
     response: { data: Record<string, any>; submittedAt: string; approvedAt: string | null } | null;
 }
 
@@ -47,6 +48,11 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
     const [notesEditing, setNotesEditing] = useState(false);
     const [notesValue, setNotesValue] = useState('');
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (mod) {
@@ -474,7 +480,7 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                             'bg-slate-800 text-slate-500 border-slate-700'
                         }`}>{mod.status.replace('_', ' ')}</span>
                         {mod.response?.submittedAt && (
-                            <span className="text-[10px] text-slate-500">Submitted {new Date(mod.response.submittedAt).toLocaleDateString()}</span>
+                            <span className="text-[10px] text-slate-500">Submitted {mounted ? new Date(mod.response.submittedAt).toLocaleDateString() : ""}</span>
                         )}
                     </div>
                 </div>
@@ -482,8 +488,13 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
 
             {/* Questions & Answers */}
             <div className="space-y-6">
-                {visibleQuestions.map((q: QuestionSchema, idx: number) => {
-                    const value = answers[q.id];
+                {mod.module.schema?.testType ?
+                    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-6">
+                        <TestAnswersRenderer testType={mod.module.schema.testType} answers={answers} />
+                    </div>
+                :
+                    visibleQuestions.map((q: QuestionSchema, idx: number) => {
+                        const value = answers[q.id];
                     const isEditingThis = editingKey === q.id;
 
                     return (
@@ -548,10 +559,11 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                                         </button>
                                     </div>
                                 )}
-                            </div>
+                        </div>
                         </div>
                     );
-                })}
+                })
+            }
             </div>
 
             {/* Mentor Notes Section */}

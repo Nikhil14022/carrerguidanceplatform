@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import TestAnswersRenderer from '@/components/TestAnswersRenderer';
 
 interface ModuleData {
     id: string;
@@ -366,6 +367,15 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
 
     const renderResponseData = (data: any) => {
         if (!data) return <p className="text-slate-400 italic">No response data</p>;
+
+        const testType = selectedModule?.module?.schema?.testType;
+        if (testType) {
+            return (
+                <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+                    <TestAnswersRenderer testType={testType} answers={data} />
+                </div>
+            );
+        }
 
         if (isEditing) {
             return (
