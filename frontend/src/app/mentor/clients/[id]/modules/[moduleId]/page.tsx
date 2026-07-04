@@ -18,6 +18,10 @@ interface QuestionSchema {
     traits?: { trait: string; leftLabel: string; rightLabel: string }[];
     dependsOn?: { questionId: string; value: string };
     numRanks?: number;
+    allowFileUpload?: boolean;
+    useTextarea?: boolean;
+    showcaseRankOrder?: boolean;
+    hasOpenText?: boolean;
 }
 
 interface ModuleData {
@@ -217,7 +221,7 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
             );
         }
 
-        // Table data (array of arrays)
+        // Table data (array of arrays or array of objects)
         if (question.type === 'table' && Array.isArray(value)) {
             const labels = [question.col1Label, question.col2Label, question.col3Label, question.col4Label].filter(Boolean);
             return (
@@ -233,13 +237,18 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                             </thead>
                         )}
                         <tbody>
-                            {value.map((row: any[], i: number) => (
-                                <tr key={i} className="border-b border-white/5">
-                                    {(Array.isArray(row) ? row : [row]).map((cell, j) => (
-                                        <td key={j} className="p-2 text-slate-300">{cell || '—'}</td>
-                                    ))}
-                                </tr>
-                            ))}
+                            {value.map((row: any, i: number) => {
+                                const cells = Array.isArray(row)
+                                    ? row
+                                    : [row?.col1, row?.col2, row?.col3, row?.col4].filter(c => c !== undefined);
+                                return (
+                                    <tr key={i} className="border-b border-white/5">
+                                        {cells.map((cell, j) => (
+                                            <td key={j} className="p-2 text-slate-300">{String(cell || '') || '—'}</td>
+                                        ))}
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -485,9 +494,15 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                                     </div>
                                 ) : (
                                     <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1 min-w-0">
-                                            {renderAnswer(q, value)}
-                                        </div>
+                                         <div className="flex-1 min-w-0">
+                                             {renderAnswer(q, value)}
+                                             {q.allowFileUpload && answers[`${q.id}_files`] && (
+                                                 <div className="mt-4 border-t border-white/5 pt-4">
+                                                     <p className="text-xs font-bold text-slate-500 mb-2">Uploaded Playlist Image / Files:</p>
+                                                     {renderAnswer({ ...q, type: 'file' }, answers[`${q.id}_files`])}
+                                                 </div>
+                                             )}
+                                         </div>
                                         <button
                                             onClick={() => { setEditingKey(q.id); setEditValue(value); }}
                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 uppercase tracking-widest transition-all flex-shrink-0 border border-transparent hover:border-indigo-500/20"

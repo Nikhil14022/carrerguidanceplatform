@@ -95,11 +95,48 @@ function migrateAnswers(data: Record<string, any>) {
                 col2 = "Don't Like but Score Well";
             } else if (col2 === "Like & Don't Score Well" || col2 === "Like & Do not Score Well") {
                 col2 = "Like & Don't Score Well";
-            } else if (col2 === "Don't Like & Don't Score" || col2 === "Do not Like & Do not Score") {
+            } else if (col2 === "Don't Like & Don't Score" || col2 === "Do not Like & Don't Score") {
                 col2 = "Don't Like & Don't Score";
             }
             return { ...row, col2 };
         });
+    }
+
+    // Migrate friends_2 from table array of objects to textarea string
+    if (Array.isArray(data.friends_2)) {
+        migrated.friends_2 = data.friends_2
+            .map((row: any, idx: number) => {
+                if (!row) return '';
+                const item = row.col1 || '';
+                const detail = row.col2 || '';
+                if (!item && !detail) return '';
+                return `${idx + 1}. Craziest Thing: ${item}${detail ? ` (When/Why: ${detail})` : ''}`;
+            })
+            .filter(Boolean)
+            .join('\n');
+    }
+
+    // Migrate family_6 from choice ID to rank objects
+    if (data.family_6 && (typeof data.family_6 === 'string' || (Array.isArray(data.family_6) && data.family_6.length > 0 && typeof data.family_6[0] === 'string'))) {
+        const family6Options = [
+            { id: '1', text: "They are very open for me to explore anything I would love to do including out of the box options. They want me to express myself even if it's any offbeat space. Earning isn't really first priority & they are ok even if my journey is random to start with. They don't have any specific timeline" },
+            { id: '2', text: "They are open for me to explore anything I would love to do including out of the box career options but want me to be clearer about what I want now/work. They need me to work towards it now & find my pathway" },
+            { id: '3', text: "They say they are ok with offbeat spaces but honestly, I see them scared. They may still allow me to do what I want but internally they will always be skeptical" },
+            { id: '4', text: "They want to choose safe options, get done with degree & then whatever I want to do later" },
+            { id: '5', text: "They have specific things in their mind which they keep expressing directly or indirectly & somehow, I am stuck there. Their opinion has become my opinion now" },
+            { id: '6', text: "They are clear of what they want me to do & I don't have a lot of say & thought here for now. I am scared of putting my thoughts as they have counter questions for which I have no answers" },
+            { id: '7', text: "They want me to be safe & secured in a way they understand/fields they know which I don't agree & thus there's always a battle" },
+            { id: '8', text: "They want me to do good with academics, get into good college & then its upto me" },
+            { id: '9', text: "Everyone in family is into something & they are looking for me to get into the same thing" },
+            { id: '10', text: "They say but I do what I want to do & that's how it goes." }
+        ];
+        const selectedId = Array.isArray(data.family_6) ? data.family_6[0] : data.family_6;
+        const matchedOpt = family6Options.find(o => o.id === selectedId);
+        if (matchedOpt) {
+            migrated.family_6 = [{ option: matchedOpt.text }, { option: '' }, { option: '' }];
+        } else {
+            migrated.family_6 = [{ option: '' }, { option: '' }, { option: '' }];
+        }
     }
     
     return migrated;
@@ -447,16 +484,141 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
 
                         <div className="py-6">
                             {/* Question Inputs */}
-                            {(q?.type === 'text' || q?.type === 'textarea') && (
-                                <textarea
-                                    placeholder={q?.placeholder || "Enter your answer..."}
-                                    value={answers[q.id] || ''}
-                                    rows={4}
-                                    disabled={isReadOnly}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
-                                    onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
-                                />
-                            )}
+                            {(q?.type === 'text' || q?.type === 'textarea') && (() => {
+                                const fileKey = `${q.id}_files`;
+                                const files = Array.isArray(answers[fileKey]) ? answers[fileKey] : [];
+                                const isUploading = uploadingState[fileKey] || false;
+                                
+                                const handleDragOver = (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    if (!isReadOnly) setIsDraggingFile(true);
+                                };
+                                const handleDragLeave = (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    setIsDraggingFile(false);
+                                };
+                                const handleDrop = async (e: React.DragEvent) => {
+                                    e.preventDefault();
+                                    setIsDraggingFile(false);
+                                    if (isReadOnly || !e.dataTransfer.files?.length) return;
+                                    
+                                    const droppedFiles = Array.from(e.dataTransfer.files);
+                                    const allowedExtensions = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'];
+                                    const validFiles = droppedFiles.filter(file => {
+                                        const name = file.name.toLowerCase();
+                                        return allowedExtensions.some(ext => name.endsWith(ext));
+                                    });
+                                    
+                                    if (validFiles.length === 0) {
+                                        alert("Invalid file type. Only PDF, Word Documents, and Images are allowed.");
+                                        return;
+                                    }
+                                    
+                                    setUploadingState(prev => ({ ...prev, [fileKey]: true }));
+                                    const formData = new FormData();
+                                    validFiles.forEach(f => formData.append('files', f));
+                                    
+                                    try {
+                                        const res = await fetch('/api/upload', {
+                                            method: 'POST',
+                                            body: formData
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) {
+                                            setAnswers({ ...answers, [fileKey]: [...files, ...data.files] });
+                                        }
+                                    } catch (err) {
+                                        console.error(err);
+                                    } finally {
+                                        setUploadingState(prev => ({ ...prev, [fileKey]: false }));
+                                    }
+                                };
+
+                                return (
+                                    <div className="space-y-4 w-full">
+                                        <textarea
+                                            placeholder={q?.placeholder || "Enter your answer..."}
+                                            value={answers[q.id] || ''}
+                                            rows={4}
+                                            disabled={isReadOnly}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
+                                            onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
+                                        />
+                                        {q.allowFileUpload && (
+                                            <div className="space-y-4 mt-4">
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.fileUploadLabel || "Upload files:"}</p>
+                                                <label 
+                                                    onDragOver={handleDragOver}
+                                                    onDragLeave={handleDragLeave}
+                                                    onDrop={handleDrop}
+                                                    className={`block w-full border-2 border-dashed rounded-2xl p-6 cursor-pointer transition-colors text-center group
+                                                        ${isDraggingFile 
+                                                            ? 'border-indigo-500 bg-indigo-500/10' 
+                                                            : 'border-slate-700 bg-slate-900/50 hover:bg-slate-800/50'}`}
+                                                >
+                                                    <input 
+                                                        type="file" 
+                                                        className="hidden" 
+                                                        multiple
+                                                        accept=".pdf,.doc,.docx,image/*"
+                                                        onChange={async (e) => {
+                                                            if (!e.target.files?.length) return;
+                                                            setUploadingState(prev => ({ ...prev, [fileKey]: true }));
+                                                            const formData = new FormData();
+                                                            Array.from(e.target.files).forEach(f => formData.append('files', f));
+                                                            
+                                                            try {
+                                                                const res = await fetch('/api/upload', {
+                                                                    method: 'POST',
+                                                                    body: formData
+                                                                });
+                                                                const data = await res.json();
+                                                                if (data.success) {
+                                                                    setAnswers({ ...answers, [fileKey]: [...files, ...data.files] });
+                                                                }
+                                                            } catch (err) {
+                                                                console.error(err);
+                                                            } finally {
+                                                                setUploadingState(prev => ({ ...prev, [fileKey]: false }));
+                                                            }
+                                                        }}
+                                                    />
+                                                    <div className="flex flex-col items-center gap-3">
+                                                        {isUploading ? (
+                                                            <div className="w-8 h-8 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                                                        ) : (
+                                                            <svg className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                            </svg>
+                                                        )}
+                                                        <div className="text-xs text-slate-400">
+                                                            <span className="text-indigo-400 font-bold">Click to upload</span> or drag and drop playlist image
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                                {files.map((filepath: string, i: number) => (
+                                                    <div key={i} className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 text-xs flex justify-between items-center group">
+                                                        <a href={filepath} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-2">
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                                                            {filepath.split('/').pop()}
+                                                        </a>
+                                                        <button 
+                                                            onClick={() => {
+                                                                const newFiles = [...files];
+                                                                newFiles.splice(i, 1);
+                                                                setAnswers({...answers, [fileKey]: newFiles});
+                                                            }}
+                                                            className="text-slate-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-all"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
                             {(q?.type === 'date' || q?.type === 'number') && (
                                 <input
                                     type={q.type}
@@ -498,30 +660,45 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                             {q?.type === 'choice' && (() => {
                                 const selectedId: string = Array.isArray(answers[q.id]) ? answers[q.id][0] : answers[q.id];
                                 return (
-                                <div className="grid gap-3">
-                                    <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Select one option</p>
-                                    {q.options?.map((opt: any) => {
-                                        const isSelected = selectedId === opt.id;
-                                        return (
-                                        <button
-                                            key={opt.id}
-                                            disabled={isReadOnly}
-                                            onClick={() => {
-                                                setAnswers({ ...answers, [q.id]: [opt.id] });
-                                            }}
-                                            className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
-                                                ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
-                                        >
-                                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                                                ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
-                                                {isSelected && (
-                                                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                                                )}
-                                            </div>
-                                            {opt.text}
-                                        </button>
-                                        );
-                                    })}
+                                <div className="space-y-6">
+                                    <div className="grid gap-3">
+                                        <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1">Select one option</p>
+                                        {q.options?.map((opt: any) => {
+                                            const isSelected = selectedId === opt.id;
+                                            return (
+                                            <button
+                                                key={opt.id}
+                                                disabled={isReadOnly}
+                                                onClick={() => {
+                                                    setAnswers({ ...answers, [q.id]: [opt.id] });
+                                                }}
+                                                className={`w-full p-5 rounded-xl border text-left transition-all flex items-center gap-4
+                                                    ${isSelected ? 'bg-indigo-500/20 border-indigo-500 text-slate-100' : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-800'} ${isReadOnly ? 'opacity-80' : ''}`}
+                                            >
+                                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                                                    ${isSelected ? 'border-indigo-400 bg-indigo-500' : 'border-slate-700'}`}>
+                                                    {isSelected && (
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                                                    )}
+                                                </div>
+                                                {opt.text}
+                                            </button>
+                                            );
+                                        })}
+                                    </div>
+                                    {q.hasOpenText && (
+                                        <div className="space-y-2 mt-4">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>
+                                            <textarea
+                                                value={answers[`${q.id}_open_text`] || ''}
+                                                disabled={isReadOnly}
+                                                rows={4}
+                                                placeholder={q.openTextPlaceholder || "Type in detail here..."}
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 );
                             })()}
@@ -672,6 +849,19 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                     <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
                                                                 ))}
                                                             </select>
+                                                        ) : q.useTextarea ? (
+                                                            <textarea
+                                                                value={row.col2}
+                                                                disabled={isReadOnly}
+                                                                rows={3}
+                                                                placeholder={q.col2Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 resize-y"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col2: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
                                                         ) : (
                                                             <input
                                                                 type="text"
@@ -704,6 +894,19 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                     <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
                                                                 ))}
                                                             </select>
+                                                        ) : q.useTextarea ? (
+                                                            <textarea
+                                                                value={row.col3}
+                                                                disabled={isReadOnly}
+                                                                rows={3}
+                                                                placeholder={q.col3Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 resize-y"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col3: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
                                                         ) : (
                                                             <input
                                                                 type="text"
@@ -736,6 +939,19 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                                     <option key={opt} value={opt} className="bg-slate-950">{opt}</option>
                                                                 ))}
                                                             </select>
+                                                        ) : q.useTextarea ? (
+                                                            <textarea
+                                                                value={row.col4}
+                                                                disabled={isReadOnly}
+                                                                rows={3}
+                                                                placeholder={q.col4Placeholder || '...'}
+                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 resize-y"
+                                                                onChange={(e) => {
+                                                                    const newData = [...tableData];
+                                                                    newData[i] = { ...newData[i], col4: e.target.value };
+                                                                    setAnswers({ ...answers, [q.id]: newData });
+                                                                }}
+                                                            />
                                                         ) : (
                                                             <input
                                                                 type="text"
@@ -766,6 +982,31 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 Add Row
                                             </button>
                                         )}
+                                        {q.showcaseRankOrder && (() => {
+                                            const rankedItems = tableData
+                                                .map((row: any) => ({
+                                                    name: row.col1,
+                                                    rank: parseInt(row.col2, 10)
+                                                }))
+                                                .filter((item: any) => !isNaN(item.rank))
+                                                .sort((a: any, b: any) => a.rank - b.rank);
+                                                
+                                            if (rankedItems.length === 0) return null;
+                                            
+                                            return (
+                                                <div className="mt-6 bg-slate-950 border border-slate-850 rounded-xl p-6 space-y-3">
+                                                    <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Selected Priority Order</p>
+                                                    <div className="flex flex-col gap-2">
+                                                        {rankedItems.map((item: any, idx: number) => (
+                                                            <div key={idx} className="flex items-center gap-3 text-sm px-4 py-3 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-xl">
+                                                                <span className="font-black text-indigo-400 bg-indigo-500/20 px-2 py-0.5 rounded text-xs">Rank {item.rank}</span>
+                                                                <span className="font-semibold">{item.name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
                                         {q.hasOpenText && (
                                             <div className="space-y-2 mt-6">
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>

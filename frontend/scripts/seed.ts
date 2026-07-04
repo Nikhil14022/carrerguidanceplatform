@@ -420,6 +420,44 @@ export const modules = [
             col1Label: 'Series Name'
           },
           {
+            id: 'visual_series_genres',
+            type: 'rank',
+            question: 'Genres of series you enjoy (Rank your top 5)',
+            numRanks: 5,
+            options: [
+              { id: 'action', text: 'Action' },
+              { id: 'adventure', text: 'Adventure' },
+              { id: 'comedy', text: 'Comedy' },
+              { id: 'drama', text: 'Dramas' },
+              { id: 'horror', text: 'Horror' },
+              { id: 'crime', text: 'Crime' },
+              { id: 'mystery', text: 'Mystery' },
+              { id: 'scifi', text: 'Sci-fi' },
+              { id: 'parody', text: 'Parody' },
+              { id: 'thriller', text: 'Thrillers' },
+              { id: 'romance', text: 'Romance' },
+              { id: 'documentary', text: 'Documentaries' },
+              { id: 'sports', text: 'Sports' },
+              { id: 'historical', text: 'Historical' },
+              { id: 'musical', text: 'Musical' },
+              { id: 'superhero', text: 'Superhero' },
+              { id: 'psychological', text: 'Psychological' },
+              { id: 'legal', text: 'Legal Drama' },
+              { id: 'anime', text: 'Anime' },
+              { id: 'tollywood', text: 'Tollywood' },
+              { id: 'animation', text: 'Animation' },
+              { id: 'fantasy', text: 'Fantasy' },
+              { id: 'romcom', text: 'Rom-Com' },
+              { id: 'classical', text: 'Classical' },
+              { id: 'family', text: 'Family' },
+              { id: 'filmnoir', text: 'Film Noir' },
+              { id: 'war', text: 'War' },
+              { id: 'biography', text: 'Biography' },
+              { id: 'western', text: 'Western' },
+              { id: 'short', text: 'Short Films' }
+            ]
+          },
+          {
             id: 'visual_superpower',
             type: 'text',
             question: 'If you could have a superpower, what would it be and why?',
@@ -439,6 +477,9 @@ export const modules = [
             type: 'multiselect',
             dependsOn: { questionId: 'visual_books', value: 'yes' },
             question: 'Different genre of books you like reading or would like to read? (Select all that apply)',
+            hasOpenText: true,
+            openTextLabel: 'If you want to add any book names, please enter them below:',
+            openTextPlaceholder: 'Enter book names here...',
             options: [
               { id: 'fiction', text: 'Fiction' },
               { id: 'nonfiction', text: 'Non-fiction' },
@@ -483,11 +524,14 @@ export const modules = [
             id: 'visual_music',
             type: 'text',
             question: 'Favourite music genres?',
-            placeholder: 'e.g., Pop, Hip-hop, Classical, Rock, EDM, Folk, Jazz...'
+            placeholder: 'e.g., Pop, Hip-hop, Classical, Rock, EDM, Folk, Jazz...',
+            allowFileUpload: true,
+            fileUploadLabel: 'Upload an image of your playlist (optional):'
           },
           {
             id: 'visual_youtube_insta',
             type: 'table',
+            useTextarea: true,
             question: 'Do you use YouTube and/or Instagram? List your Top Channels/Pages on each.',
             prefilledRows: [
               'YouTube Top Channels',
@@ -530,11 +574,9 @@ export const modules = [
           },
           {
             id: 'friends_2',
-            type: 'table',
+            type: 'textarea',
             question: 'Top 3 craziest things you have done with your friends (stupid, funny, hilarious, embarrassing, most memorable)',
-            minRows: 3,
-            col1Label: 'Craziest Thing',
-            col2Label: 'When/Why'
+            placeholder: 'Type your answer here...'
           },
           {
             id: 'friends_3',
@@ -736,8 +778,9 @@ export const modules = [
           },
           {
             id: 'family_6',
-            type: 'choice',
-            question: 'Thoughts about career in family (Select the one that best applies)',
+            type: 'rank',
+            question: 'Thoughts about career in family (Select top 3 and rank them)',
+            numRanks: 3,
             options: [
               { id: '1', text: "They are very open for me to explore anything I would love to do including out of the box options. They want me to express myself even if it's any offbeat space. Earning isn't really first priority & they are ok even if my journey is random to start with. They don't have any specific timeline" },
               { id: '2', text: 'They are open for me to explore anything I would love to do including out of the box career options but want me to be clearer about what I want now/work. They need me to work towards it now & find my pathway' },
@@ -867,6 +910,9 @@ export const modules = [
             id: 'lifestyle_10',
             type: 'choice',
             question: 'Your thoughts on India vs Abroad? What do your parents say in this?',
+            hasOpenText: true,
+            openTextLabel: 'If you have any other answer, type it in below:',
+            openTextPlaceholder: 'Type your answer here...',
             options: [
               { id: 'india', text: 'India / Current Country — prefer to stay here' },
               { id: 'abroad_study', text: 'Abroad – for Study only' },
@@ -892,6 +938,7 @@ export const modules = [
           {
             id: 'lifestyle_career_priorities',
             type: 'table',
+            showcaseRankOrder: true,
             question: 'Career Priorities for the next 5 Years (Degree Only) — Rank your priority in each area',
             prefilledRows: [
               'Academics',
@@ -906,7 +953,8 @@ export const modules = [
               'Relationship'
             ],
             col1Label: 'Area',
-            col2Label: 'Priority Rank'
+            col2Label: 'Priority Rank',
+            col2Options: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
           }
         ]
       },
