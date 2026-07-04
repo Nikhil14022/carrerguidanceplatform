@@ -556,6 +556,28 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                                 ))
                                                                             }
                                                                         </div>
+                                                                    ) : value && typeof value === 'object' && !Array.isArray(value) && (value.school || value.college || value.university) ? (
+                                                                        <div className="space-y-2 mt-1">
+                                                                            {['school', 'college', 'university'].map(level => {
+                                                                                const d = (value as any)[level];
+                                                                                if (!d?.active) return null;
+                                                                                return (
+                                                                                    <div key={level} className="p-2.5 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                        <span className="font-bold text-indigo-450 capitalize">{level}: </span>
+                                                                                        {d.name || 'N/A'} — Grade: {d.grade || 'N/A'}
+                                                                                    </div>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    ) : value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).some(k => k.includes('AM') || k.includes('PM')) ? (
+                                                                        <div className="grid grid-cols-2 gap-1.5 mt-1">
+                                                                            {Object.entries(value).map(([time, activity]) => (
+                                                                                <div key={time} className="flex gap-3 p-2 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                    <span className="text-indigo-450 font-bold w-20 flex-shrink-0">{time}</span>
+                                                                                    <span className="text-slate-350">{String(activity) || '—'}</span>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
                                                                     ) : typeof value === 'object' ? (
                                                                         <pre className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
                                                                     ) : isFileUrl(value) ? (
