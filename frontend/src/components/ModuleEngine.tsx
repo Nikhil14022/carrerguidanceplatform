@@ -971,16 +971,34 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             );
                                         })}
                                         {!isPrefilled && (
-                                            <button
-                                                disabled={isReadOnly}
-                                                onClick={() => setAnswers({ ...answers, [q.id]: [...tableData, { col1: '', col2: '', col3: '', col4: '' }] })}
-                                                className="mt-4 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
-                                            >
-                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                                </svg>
-                                                Add Row
-                                            </button>
+                                            <div className="flex items-center gap-4 mt-6">
+                                                <button
+                                                    disabled={isReadOnly}
+                                                    onClick={() => setAnswers({ ...answers, [q.id]: [...tableData, { col1: '', col2: '', col3: '', col4: '' }] })}
+                                                    className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 shadow-lg shadow-indigo-600/20 active:scale-95 cursor-pointer"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    Add Row
+                                                </button>
+                                                {tableData.length > minRows && (
+                                                    <button
+                                                        disabled={isReadOnly}
+                                                        onClick={() => {
+                                                            const newData = [...tableData];
+                                                            newData.pop();
+                                                            setAnswers({ ...answers, [q.id]: newData });
+                                                        }}
+                                                        className="px-5 py-2.5 bg-rose-950/40 hover:bg-rose-900 border border-rose-800/40 text-rose-300 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 active:scale-95 cursor-pointer"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                                        </svg>
+                                                        Delete Row
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
                                         {q.showcaseRankOrder && (() => {
                                             const rankedItems = tableData

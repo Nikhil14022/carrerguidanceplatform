@@ -572,3 +572,11 @@ model WorkshopEnrollment {
   status         String   @default("PENDING") // PENDING, APPROVED, REJECTED
   respondedAt    DateTime?
 }
+
+model UploadedFile {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  filename  String
+  mimeType  String
+  data      String   // Base64 encoded file content
+  createdAt DateTime @default(now())
+}

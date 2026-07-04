@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -18,11 +19,26 @@ export async function POST(request: Request) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
 
-      const filename = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-      const filepath = join(process.cwd(), 'public', 'uploads', filename);
+      // Save to database (highly compatible with Vercel serverless functions)
+      const dbFile = await prisma.uploadedFile.create({
+        data: {
+          filename: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          data: buffer.toString('base64')
+        }
+      });
 
-      await writeFile(filepath, buffer);
-      uploadedPaths.push(`/uploads/${filename}`);
+      // Try to write to local public/uploads directory for local dev environment (fails silently if read-only)
+      try {
+        const filename = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+        const filepath = join(process.cwd(), 'public', 'uploads', filename);
+        await writeFile(filepath, buffer);
+      } catch (fsError) {
+        console.warn('Local filesystem write skipped (expected on read-only environments like Vercel):', fsError);
+      }
+
+      // Return the database endpoint path
+      uploadedPaths.push(`/api/upload/${dbFile.id}`);
     }
 
     return NextResponse.json({ success: true, files: uploadedPaths });
