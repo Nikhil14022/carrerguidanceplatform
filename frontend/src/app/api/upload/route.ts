@@ -37,8 +37,9 @@ export async function POST(request: Request) {
         console.warn('Local filesystem write skipped (expected on read-only environments like Vercel):', fsError);
       }
 
-      // Return the database endpoint path
-      uploadedPaths.push(`/api/upload/${dbFile.id}`);
+      // Return catch-all path including filename to ensure standard file checkers work properly
+      const safeFilename = encodeURIComponent(file.name.replace(/\s+/g, '_'));
+      uploadedPaths.push(`/api/upload/${dbFile.id}/${safeFilename}`);
     }
 
     return NextResponse.json({ success: true, files: uploadedPaths });

@@ -45,6 +45,14 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
     const [editValue, setEditValue] = useState<any>(null);
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
+    const [notesEditing, setNotesEditing] = useState(false);
+    const [notesValue, setNotesValue] = useState('');
+
+    useEffect(() => {
+        if (mod) {
+            setNotesValue(mod.mentorNotes || '');
+        }
+    }, [mod]);
 
     useEffect(() => {
         params.then(p => {
@@ -95,9 +103,34 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
         }
     };
 
+    const handleSaveNotes = async () => {
+        if (!mod) return;
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/mentor/modules/${mod.id}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'SAVE_NOTES', notes: notesValue })
+            });
+            const result = await res.json();
+            if (result.success) {
+                setNotification({ type: 'success', msg: 'Notes saved successfully' });
+                setNotesEditing(false);
+                await fetchModule(clientId, moduleId);
+            } else {
+                setNotification({ type: 'error', msg: result.error || 'Failed to save notes' });
+            }
+        } catch (err) {
+            setNotification({ type: 'error', msg: 'Network error' });
+        } finally {
+            setSaving(false);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
     const isFileUrl = (val: any): boolean => {
         if (typeof val !== 'string') return false;
-        return val.startsWith('/uploads/') || (val.startsWith('http') && val.includes('/uploads/'));
+        return val.startsWith('/uploads/') || val.startsWith('/api/upload/') || (val.startsWith('http') && (val.includes('/uploads/') || val.includes('/api/upload/')));
     };
 
     const renderAnswer = (question: QuestionSchema, value: any): React.ReactNode => {
@@ -522,12 +555,62 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
             </div>
 
             {/* Mentor Notes Section */}
-            {mod.mentorNotes && (
-                <div className="bg-amber-500/5 border border-amber-500/20 rounded-2xl p-6">
-                    <h3 className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2">Mentor Notes</h3>
-                    <p className="text-sm text-slate-300 whitespace-pre-wrap">{mod.mentorNotes}</p>
+            <div className="bg-slate-900/40 border border-white/5 rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        <h3 className="text-xs font-bold text-slate-200 uppercase tracking-widest">Mentor Session Notes</h3>
+                    </div>
+                    {!notesEditing && (
+                        <button 
+                            onClick={() => setNotesEditing(true)}
+                            className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-[#121212] text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 cursor-pointer"
+                        >
+                            {mod.mentorNotes ? 'Edit Notes' : 'Add Notes'}
+                        </button>
+                    )}
                 </div>
-            )}
+                
+                {notesEditing ? (
+                    <div className="space-y-4">
+                        <textarea
+                            value={notesValue}
+                            onChange={(e) => setNotesValue(e.target.value)}
+                            rows={6}
+                            className="w-full bg-slate-950 border border-white/10 rounded-xl p-4 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20"
+                            placeholder="Type guidelines, action items, or remarks for this client meeting session..."
+                        />
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                onClick={handleSaveNotes}
+                                disabled={saving}
+                                className="px-4 py-2 bg-indigo-650 hover:bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer"
+                            >
+                                {saving ? 'Saving...' : 'Save Notes'}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setNotesEditing(false);
+                                    setNotesValue(mod.mentorNotes || '');
+                                }}
+                                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-bold uppercase tracking-widest rounded-xl border border-white/10 transition-all cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-sm text-slate-300 leading-relaxed bg-slate-950/40 rounded-xl p-4 border border-white/5">
+                        {mod.mentorNotes ? (
+                            <p className="whitespace-pre-wrap">{mod.mentorNotes}</p>
+                        ) : (
+                            <span className="text-slate-550 italic">No mentor session notes added yet. Click &quot;Add Notes&quot; to write guidelines for the live session.</span>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

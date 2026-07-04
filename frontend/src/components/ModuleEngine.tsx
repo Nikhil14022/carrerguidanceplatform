@@ -982,7 +982,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     </svg>
                                                     Add Row
                                                 </button>
-                                                {tableData.length > minRows && (
+                                                {tableData.length > 1 && (
                                                     <button
                                                         disabled={isReadOnly}
                                                         onClick={() => {
