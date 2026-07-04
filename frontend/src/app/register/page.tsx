@@ -8,6 +8,7 @@ export default function RegisterPage() {
         name: '',
         email: '',
         password: '',
+        age: '',
         role: 'CLIENT' as 'CLIENT' | 'PARENT',
     });
     const [loading, setLoading] = useState(false);
@@ -20,10 +21,14 @@ export default function RegisterPage() {
         setError('');
 
         try {
+            const payload = {
+                ...formData,
+                age: formData.age ? parseInt(formData.age, 10) : undefined
+            };
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
             const data = await res.json();
@@ -121,6 +126,19 @@ export default function RegisterPage() {
                                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Age (Years)</label>
+                                <input
+                                    type="number"
+                                    placeholder="e.g. 18"
+                                    min="1"
+                                    max="120"
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 transition-all"
+                                    value={formData.age}
+                                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                                 />
                             </div>
                         </div>

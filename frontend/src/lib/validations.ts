@@ -5,6 +5,7 @@ export const registerSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
   name: z.string().min(1, 'Name is required'),
   role: z.enum(['CLIENT', 'PARENT', 'ADMIN', 'EXPERT']).default('CLIENT'),
+  age: z.preprocess((val) => (val === '' || val === undefined ? undefined : Number(val)), z.number().int().min(1, 'Age must be positive').optional()),
   parentId: z.string().optional()
 })
 

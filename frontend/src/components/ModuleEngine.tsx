@@ -10,6 +10,7 @@ const ColorTest = lazy(() => import('./test-modules/ColorTest'));
 const SubjectMatterTest = lazy(() => import('./test-modules/SubjectMatterTest'));
 const ParentsMeetingForm = lazy(() => import('./test-modules/ParentsMeetingForm'));
 const SelfDiscoveryTest = lazy(() => import('./test-modules/SelfDiscoveryTest'));
+const JobFunctionsTest = lazy(() => import('./test-modules/JobFunctionsTest'));
 
 const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     '16PF': PersonalityFactorsTest,
@@ -19,6 +20,7 @@ const TEST_TYPE_COMPONENTS: Record<string, React.ComponentType<any>> = {
     'SMI': SubjectMatterTest,
     'PARENTS_MEETING': ParentsMeetingForm,
     'SELF_DISCOVERY': SelfDiscoveryTest,
+    'JOB_FUNCTIONS': JobFunctionsTest,
 };
 
 const TRAIT_MAP: Record<string, string> = {

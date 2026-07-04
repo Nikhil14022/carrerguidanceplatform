@@ -1426,6 +1426,18 @@ export const modules = [
         questions: []
       },
       defaultOrder: 18
+    },
+    // ─────────────────────────────────────────────────────────────
+    // MODULE 19 — IDENTIFY YOUR JOB FUNCTIONS (Specialized Test Component)
+    // ─────────────────────────────────────────────────────────────
+    {
+      title: 'Module 19: Identify Your Job Functions',
+      description: 'Rate the functions that come naturally to you or express what you do best across People, Info, and Thing-oriented tasks.',
+      schema: {
+        testType: 'JOB_FUNCTIONS',
+        questions: []
+      },
+      defaultOrder: 19
     }
 
   ]

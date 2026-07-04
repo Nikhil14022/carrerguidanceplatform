@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         password: hashedPassword,
         name: validatedData.name,
         role: validatedData.role,
+        age: validatedData.age,
         ...(validatedData.role === 'CLIENT' && {
           clientProfile: {
             create: {
@@ -39,12 +40,20 @@ export async function POST(request: Request) {
               journeyStatus: 'Started',
               ...(validatedData.parentId && { parentId: validatedData.parentId }),
               modules: {
-                create: modules.map((mod, index) => ({
-                  moduleId: mod.id,
-                  status: index < 3 ? 'UNLOCKED' : 'LOCKED',
-                  order: index + 1,
-                  filledBy: 'CLIENT'
-                }))
+                create: modules
+                  .filter(mod => {
+                    // Skip Module 19: Identify Your Job Functions if user's age is <= 17
+                    if (mod.title.includes('Identify Your Job Functions') || mod.title.includes('Module 19')) {
+                      return validatedData.age !== undefined && validatedData.age > 17;
+                    }
+                    return true;
+                  })
+                  .map((mod, index) => ({
+                    moduleId: mod.id,
+                    status: index < 3 ? 'UNLOCKED' : 'LOCKED',
+                    order: index + 1,
+                    filledBy: 'CLIENT'
+                  }))
               }
             }
           }
