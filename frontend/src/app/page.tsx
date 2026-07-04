@@ -1,14 +1,10 @@
-import { Navbar, Hero, Features, Experts, ClientFlow, Services } from '@/components/LandingPage';
+import { Navbar, Hero } from '@/components/LandingPage';
 
 export default function Home() {
   return (
     <main className="min-h-screen mesh-gradient selection:bg-amber-500/20">
       <Navbar />
       <Hero />
-      <Features />
-      <Experts />
-      <ClientFlow />
-      <Services />
 
       {/* Footer */}
       <footer className="py-20 px-6 border-t border-white/5 mt-20 bg-slate-950/40">

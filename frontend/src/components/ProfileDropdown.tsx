@@ -72,9 +72,10 @@ export default function ProfileDropdown() {
                     </div>
                     <div className="p-2 border-t border-slate-700">
                         <button
-                            onClick={() => {
+                            onClick={async () => {
                                 setIsOpen(false);
-                                signOut({ callbackUrl: '/' });
+                                await signOut({ redirect: false });
+                                window.location.href = '/';
                             }}
                             className="w-full text-left block px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                         >
