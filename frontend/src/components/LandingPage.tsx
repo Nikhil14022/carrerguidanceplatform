@@ -64,10 +64,8 @@ export const Hero = () => {
         <section className="relative pt-44 pb-32 px-6 max-w-6xl mx-auto flex flex-col items-center">
             {/* Top Hero Callout */}
             <div className="text-center space-y-6 max-w-3xl mx-auto mb-16 relative z-10">
-                <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-950 via-slate-850 to-slate-700">
-                        Welcome to
-                    </span>
+                <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-none flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
+                    <span>Welcome to</span>
                     <img 
                         src="/holistree-logo-1.png" 
                         alt="Holistree" 
