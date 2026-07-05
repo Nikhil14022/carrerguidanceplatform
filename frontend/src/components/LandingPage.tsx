@@ -61,62 +61,73 @@ export const Hero = () => {
     };
 
     return (
-        <section className="relative pt-44 pb-20 px-6 max-w-4xl mx-auto flex flex-col items-center">
-            <div className="glass rounded-3xl p-8 md:p-12 space-y-8 border border-white/10 shadow-2xl relative z-10 text-center bg-slate-900/50">
-                <h1 className="text-3xl md:text-5xl font-black text-slate-100 tracking-tight text-gradient">
+        <section className="relative pt-44 pb-32 px-6 max-w-6xl mx-auto flex flex-col items-center">
+            {/* Top Hero Callout */}
+            <div className="text-center space-y-6 max-w-3xl mx-auto mb-16 relative z-10">
+                <h1 className="text-4xl md:text-6xl font-black text-slate-100 tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-[var(--color-brand-yellow)]">
                     Welcome to Holistree
                 </h1>
                 
-                <div className="text-slate-350 text-sm md:text-base leading-relaxed text-justify space-y-6 max-w-3xl mx-auto font-medium">
-                    <p className="text-center font-bold text-slate-200">
-                        We're delighted to welcome you to Holistree.
-                    </p>
-                    <p>
+                <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                    A guided journey of self-discovery, exploration, and career design.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <a href={getJourneyLink()} className="btn-primary w-full sm:w-auto text-center font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:-translate-y-0.5 transition-all duration-200">
+                        {session ? 'Go to Dashboard' : 'Start Your Journey'}
+                    </a>
+                    <button
+                        onClick={() => window.location.href = '/sample-report'}
+                        className="btn-secondary w-full sm:w-auto font-bold px-8 py-3.5 rounded-xl border border-white/10 hover:bg-white/5 hover:-translate-y-0.5 transition-all duration-200"
+                    >
+                        View Sample Report
+                    </button>
+                </div>
+            </div>
+
+            {/* Editorial Content Grid */}
+            <div className="grid md:grid-cols-12 gap-8 md:gap-12 text-slate-350 text-sm md:text-base leading-relaxed text-left border-t border-white/5 pt-16 w-full relative z-10">
+                {/* Left Side Highlight */}
+                <div className="md:col-span-5 space-y-6 border-l-2 border-[var(--color-brand-yellow)] pl-6 md:pl-8 py-2">
+                    <h2 className="text-xl md:text-2xl font-black text-slate-100 tracking-tight">
+                        Delighted to welcome you.
+                    </h2>
+                    <p className="text-slate-300 font-medium">
                         Thank you for placing your trust in us and choosing to begin this journey of self-discovery, exploration, and career design. It is both an honour and a responsibility for us to walk alongside you.
                     </p>
+                </div>
+
+                {/* Right Side Details */}
+                <div className="md:col-span-7 space-y-6">
                     <p>
                         At Holistree, we believe that the best career decisions begin with understanding yourself. Through guided conversations, structured assessments, reflection, and real-world exploration, you'll gain clarity about your strengths, interests, values, personality, and the opportunities that truly align with who you are.
                     </p>
                     <p>
                         Beyond self-awareness, we'll create opportunities for you to explore careers in the real world—connecting with professionals, researching industries, and experiencing different paths before making informed decisions. Our goal is to give you the confidence to choose a future based on understanding, not assumptions.
                     </p>
-                    <p>
-                        We're excited to be a part of your journey and look forward to helping you discover yourself, explore possibilities, and design a future that's truly your own.
-                    </p>
-                    <p className="text-center font-bold text-slate-200 text-lg">
-                        Welcome to Holistree. Let's begin.
+                    <p className="text-slate-205 font-bold border-t border-white/5 pt-6 flex items-center gap-2">
+                        <span>Let's begin.</span>
+                        <span className="w-6 h-[1px] bg-[var(--color-brand-yellow)]"></span>
                     </p>
                 </div>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-white/5">
-                    <a href={getJourneyLink()} className="btn-primary w-full sm:w-auto text-center font-bold">
-                        {session ? 'Go to Dashboard' : 'Start Your Journey'}
-                    </a>
-                    <button
-                        onClick={() => window.location.href = '/sample-report'}
-                        className="btn-secondary w-full sm:w-auto font-bold"
-                    >
-                        View Sample Report
-                    </button>
-                </div>
-
-                {session && (
-                    <div className="pt-4">
-                        <button
-                            onClick={async () => {
-                                await signOut({ redirect: false });
-                                window.location.href = '/';
-                            }}
-                            className="text-xs font-black text-rose-450 hover:text-rose-455 transition-colors uppercase tracking-widest cursor-pointer"
-                        >
-                            Sign Out
-                        </button>
-                    </div>
-                )}
             </div>
 
+            {session && (
+                <div className="pt-12 text-center relative z-10">
+                    <button
+                        onClick={async () => {
+                            await signOut({ redirect: false });
+                            window.location.href = '/';
+                        }}
+                        className="text-xs font-black text-rose-400 hover:text-rose-350 transition-colors uppercase tracking-widest cursor-pointer hover:underline"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+            )}
+
             {/* Background Decorations */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full -z-10 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[var(--color-brand-yellow)]/5 rounded-full blur-[128px] animate-pulse"></div>
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-600/5 rounded-full blur-[128px] animate-pulse" style={{ animationDelay: '2s' }}></div>
             </div>
