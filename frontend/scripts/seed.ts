@@ -188,7 +188,7 @@ export const modules = [
             id: 'aim_4',
             type: 'text',
             question: 'What is the out of the box career that fascinates you the most?',
-            description: 'Either something that already exists or something you would want to exist. Can be individual fields or a combo of two different fields.',
+            description: 'Either something that already exists or something you would want to exist. Can be individual fields or a combo of two different fields. \n\n**Examples:** *Musician, Streamer, Designer, Athlete, Influencer, Astronaut, etc.*',
             placeholder: 'Describe the career that excites you most...'
           },
           {
@@ -545,7 +545,9 @@ export const modules = [
             type: 'table',
             minRows: 3,
             col1Label: 'Content Genre',
-            question: 'Content genres you follow online (List them)'
+            question: 'Content genres you follow online (List them)',
+            allowFileUpload: true,
+            fileUploadLabel: 'Upload a screenshot of content genres you follow online (optional):'
           }
         ]
       },
@@ -634,7 +636,7 @@ export const modules = [
           },
           {
             id: 'friends_7b',
-            type: 'choice',
+            type: 'multiselect',
             dependsOn: { questionId: 'friends_7a', value: 'yes' },
             question: 'How did you / will you face such a situation?',
             options: [
@@ -904,6 +906,7 @@ export const modules = [
             id: 'lifestyle_9',
             type: 'text',
             question: "If you could live anyone's life for a week, who would it be & why? — Someone whose way of living/lifestyle inspires you.",
+            description: 'Someone whose way of living/lifestyle inspires you. \n\n**Examples:** *Cristiano Ronaldo, Elon Musk, etc.*',
             placeholder: 'Name the person and explain what about their lifestyle inspires you...'
           },
           {

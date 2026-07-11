@@ -580,11 +580,12 @@ export default function TestAnswersRenderer({ testType, answers }: TestAnswersRe
       const num = Number(val);
       if (isNaN(num)) return String(val);
       const labels: Record<number, string> = {
-        1: "Inaccurate / Strongly Disagree (1)",
-        2: "Mostly Inaccurate / Disagree (2)",
-        3: "Neutral (3)",
-        4: "Mostly Accurate / Agree (4)",
-        5: "Accurate / Strongly Agree (5)",
+        1: "Strongly Disagree (1)",
+        2: "Disagree (2)",
+        3: "Slightly Disagree (3)",
+        4: "Slightly Agree (4)",
+        5: "Agree (5)",
+        6: "Strongly Agree (6)",
       };
       return labels[num] || `Rating: ${num}`;
     };
@@ -612,8 +613,8 @@ export default function TestAnswersRenderer({ testType, answers }: TestAnswersRe
                       <span className="w-1/2 text-left">{q.left}</span>
                       <span className="w-1/2 text-right">{q.right}</span>
                     </div>
-                    <div className="font-bold text-indigo-450 text-center bg-indigo-500/5 py-1 rounded">
-                      Selected rating: {val} (Preference: {val <= 2 ? `Left` : val >= 4 ? `Right` : `Neutral`})
+                    <div className="font-bold text-indigo-400 text-center bg-indigo-500/5 py-1 rounded">
+                      Selected rating: {val} (Preference: {val <= 3 ? `Left` : `Right`})
                     </div>
                   </>
                 )}

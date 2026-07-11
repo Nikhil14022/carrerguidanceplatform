@@ -59,12 +59,11 @@ export default function MentorLayout({ children }: { children: React.ReactNode }
             <div className="flex-1 flex flex-col">
                 <div className={`p-6 ${isMinimized ? 'flex justify-center' : ''}`}>
                     <div className="flex items-center justify-between w-full">
-                        <Link href="/mentor" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
-                            <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md shrink-0" />
-                            {!isMinimized && (
-                                <span className="text-lg font-extrabold text-slate-100 leading-none">
-                                    Career <span className="text-[var(--color-brand-yellow)]">Explore</span> Journey
-                                </span>
+                        <Link href="/mentor" className="hover:opacity-85 transition-opacity cursor-pointer block">
+                            {isMinimized ? (
+                                <img src="/logo.jpg" alt="Logo" className="w-8 h-8 object-contain rounded-md shrink-0 mx-auto" />
+                            ) : (
+                                <img src="/holistree-logo-1.png" alt="Holistree Logo" className="h-8 w-auto object-contain" />
                             )}
                         </Link>
                     </div>

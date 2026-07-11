@@ -153,7 +153,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isDraggingFile, setIsDraggingFile] = useState(false);
 
-    const isReadOnly = module ? ['APPROVED'].includes(module.status) : false;
+    const isReadOnly = module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false;
 
     const setAnswers = (val: any) => {
         if (isReadOnly) return;
@@ -165,6 +165,131 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState('');
     const [uploadingState, setUploadingState] = useState<Record<string, boolean>>({});
+
+    const renderFileUpload = (q: any) => {
+        const fileKey = `${q.id}_files`;
+        const files = Array.isArray(answers[fileKey]) ? answers[fileKey] : [];
+        const isUploading = uploadingState[fileKey] || false;
+        
+        const handleDragOver = (e: React.DragEvent) => {
+            e.preventDefault();
+            if (!isReadOnly) setIsDraggingFile(true);
+        };
+        const handleDragLeave = (e: React.DragEvent) => {
+            e.preventDefault();
+            setIsDraggingFile(false);
+        };
+        const handleDrop = async (e: React.DragEvent) => {
+            e.preventDefault();
+            setIsDraggingFile(false);
+            if (isReadOnly || !e.dataTransfer.files?.length) return;
+            
+            const droppedFiles = Array.from(e.dataTransfer.files);
+            const allowedExtensions = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'];
+            const validFiles = droppedFiles.filter(file => {
+                const name = file.name.toLowerCase();
+                return allowedExtensions.some(ext => name.endsWith(ext));
+            });
+            
+            if (validFiles.length === 0) {
+                alert("Invalid file type. Only PDF, Word Documents, and Images are allowed.");
+                return;
+            }
+            
+            setUploadingState(prev => ({ ...prev, [fileKey]: true }));
+            const formData = new FormData();
+            validFiles.forEach(f => formData.append('files', f));
+            
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setAnswers({ ...answers, [fileKey]: [...files, ...data.files] });
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setUploadingState(prev => ({ ...prev, [fileKey]: false }));
+            }
+        };
+
+        return (
+            <div className="space-y-4 mt-4 w-full">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.fileUploadLabel || "Upload files:"}</p>
+                <label 
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`block w-full border-2 border-dashed rounded-2xl p-6 cursor-pointer transition-colors text-center group
+                        ${isDraggingFile 
+                            ? 'border-indigo-500 bg-indigo-500/10' 
+                            : 'border-slate-700 bg-slate-900/50 hover:bg-slate-800/50'}`}
+                >
+                    <input 
+                        type="file" 
+                        className="hidden" 
+                        multiple
+                        accept=".pdf,.doc,.docx,image/*"
+                        onChange={async (e) => {
+                            if (!e.target.files?.length) return;
+                            setUploadingState(prev => ({ ...prev, [fileKey]: true }));
+                            const formData = new FormData();
+                            Array.from(e.target.files).forEach(f => formData.append('files', f));
+                            
+                            try {
+                                const res = await fetch('/api/upload', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                    setAnswers({ ...answers, [fileKey]: [...files, ...data.files] });
+                                }
+                            } catch (err) {
+                                console.error(err);
+                            } finally {
+                                setUploadingState(prev => ({ ...prev, [fileKey]: false }));
+                            }
+                        }}
+                    />
+                    <div className="flex flex-col items-center gap-3">
+                        {isUploading ? (
+                            <div className="w-8 h-8 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                            <svg className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        )}
+                        <div className="text-xs text-slate-400">
+                            <span className="text-indigo-400 font-bold">Click to upload</span> or drag and drop files
+                        </div>
+                    </div>
+                </label>
+                {files.map((filepath: string, i: number) => (
+                    <div key={i} className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 text-xs flex justify-between items-center group">
+                        <a href={filepath} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                            {filepath.split('/').pop()}
+                        </a>
+                        <button 
+                            type="button"
+                            onClick={() => {
+                                const newFiles = [...files];
+                                newFiles.splice(i, 1);
+                                setAnswers({...answers, [fileKey]: newFiles});
+                            }}
+                            className="text-slate-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     const handleAddComment = () => {
         if (!newComment.trim()) return;
@@ -358,6 +483,40 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const testType = module.schema?.testType;
     const TestComponent = testType ? TEST_TYPE_COMPONENTS[testType] : null;
 
+    if (TestComponent && isReadOnly) {
+        return (
+            <div className="max-w-xl mx-auto py-16 text-center">
+                <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 shadow-2xl relative overflow-hidden group">
+                    <div className="absolute -top-24 -left-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700" />
+                    <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all duration-700" />
+                    
+                    <div className="w-20 h-20 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+                        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+
+                    <h2 className="text-2xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+                        Assessment Submitted
+                    </h2>
+                    <p className="text-slate-300 leading-relaxed text-sm mb-8 text-center mx-auto max-w-sm">
+                        Thank you! Your responses for <strong className="text-slate-100">"{module.title}"</strong> have been successfully locked and submitted. Your mentor will review the results and discuss them with you during your next session.
+                    </p>
+
+                    <a 
+                        href="/dashboard"
+                        className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-400 hover:to-purple-400 text-white font-bold rounded-xl transition-all duration-300 transform active:scale-95 shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:-translate-y-0.5"
+                    >
+                        Return to Dashboard
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        );
+    }
+
     if (TestComponent) {
         return (
             <div className="relative">
@@ -546,78 +705,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-lg"
                                             onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                                         />
-                                        {q.allowFileUpload && (
-                                            <div className="space-y-4 mt-4">
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.fileUploadLabel || "Upload files:"}</p>
-                                                <label 
-                                                    onDragOver={handleDragOver}
-                                                    onDragLeave={handleDragLeave}
-                                                    onDrop={handleDrop}
-                                                    className={`block w-full border-2 border-dashed rounded-2xl p-6 cursor-pointer transition-colors text-center group
-                                                        ${isDraggingFile 
-                                                            ? 'border-indigo-500 bg-indigo-500/10' 
-                                                            : 'border-slate-700 bg-slate-900/50 hover:bg-slate-800/50'}`}
-                                                >
-                                                    <input 
-                                                        type="file" 
-                                                        className="hidden" 
-                                                        multiple
-                                                        accept=".pdf,.doc,.docx,image/*"
-                                                        onChange={async (e) => {
-                                                            if (!e.target.files?.length) return;
-                                                            setUploadingState(prev => ({ ...prev, [fileKey]: true }));
-                                                            const formData = new FormData();
-                                                            Array.from(e.target.files).forEach(f => formData.append('files', f));
-                                                            
-                                                            try {
-                                                                const res = await fetch('/api/upload', {
-                                                                    method: 'POST',
-                                                                    body: formData
-                                                                });
-                                                                const data = await res.json();
-                                                                if (data.success) {
-                                                                    setAnswers({ ...answers, [fileKey]: [...files, ...data.files] });
-                                                                }
-                                                            } catch (err) {
-                                                                console.error(err);
-                                                            } finally {
-                                                                setUploadingState(prev => ({ ...prev, [fileKey]: false }));
-                                                            }
-                                                        }}
-                                                    />
-                                                    <div className="flex flex-col items-center gap-3">
-                                                        {isUploading ? (
-                                                            <div className="w-8 h-8 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
-                                                        ) : (
-                                                            <svg className="w-8 h-8 text-slate-500 group-hover:text-indigo-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                            </svg>
-                                                        )}
-                                                        <div className="text-xs text-slate-400">
-                                                            <span className="text-indigo-400 font-bold">Click to upload</span> or drag and drop playlist image
-                                                        </div>
-                                                    </div>
-                                                </label>
-                                                {files.map((filepath: string, i: number) => (
-                                                    <div key={i} className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-300 text-xs flex justify-between items-center group">
-                                                        <a href={filepath} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-2">
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
-                                                            {filepath.split('/').pop()}
-                                                        </a>
-                                                        <button 
-                                                            onClick={() => {
-                                                                const newFiles = [...files];
-                                                                newFiles.splice(i, 1);
-                                                                setAnswers({...answers, [fileKey]: newFiles});
-                                                            }}
-                                                            className="text-slate-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition-all"
-                                                        >
-                                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                        {q.allowFileUpload && renderFileUpload(q)}
                                     </div>
                                 );
                             })()}
@@ -1040,6 +1128,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 />
                                             </div>
                                         )}
+                                        {q.allowFileUpload && renderFileUpload(q)}
                                     </div>
                                 );
                             })()}
@@ -1141,7 +1230,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                     [q.id]: [...scheduleData, { time: '', activity: '' }]
                                                 });
                                             }}
-                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center gap-2"
+                                            className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-950 text-sm font-bold rounded-xl transition-all duration-300 flex items-center gap-2 active:scale-95 shadow-lg shadow-white/5 cursor-pointer"
                                         >
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

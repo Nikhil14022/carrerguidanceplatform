@@ -184,9 +184,7 @@ export default function ColorTest({ answers, setAnswers, onSubmit, readOnly = fa
     if (currentSection < SECTIONS.length - 1) {
       setCurrentSection(currentSection + 1);
     } else if (allComplete) {
-      const finalResult = computeResult(testData);
-      updateTestData({ ...testData, result: finalResult });
-      setShowResult(true);
+      handleFinalSubmit();
     }
   };
 

@@ -107,7 +107,7 @@ export default function PersonalityFactorsTest({
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between gap-2 max-w-3xl mx-auto w-full">
                           <span className="text-sm font-medium text-red-400/80 w-24 text-right">Inaccurate</span>
-                          {[1, 2, 3, 4, 5].map((val) => (
+                          {[1, 2, 3, 4, 5, 6].map((val) => (
                             <button
                               key={val}
                               disabled={readOnly}
@@ -136,7 +136,7 @@ export default function PersonalityFactorsTest({
                     <div className="flex items-center justify-between gap-6 w-full">
                         <div className="flex-1 text-right text-lg text-slate-300 font-medium group-hover:text-purple-200 transition-colors">{q.left}</div>
                         <div className="flex gap-3 shrink-0">
-                          {[1, 2, 3, 4, 5].map((val) => (
+                          {[1, 2, 3, 4, 5, 6].map((val) => (
                             <button
                               key={val}
                               disabled={readOnly}
