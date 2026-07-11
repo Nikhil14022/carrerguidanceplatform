@@ -369,7 +369,7 @@ export default function ColorTest({ answers, setAnswers, onSubmit, readOnly = fa
                 : "bg-gray-800 text-gray-600 cursor-not-allowed"
             }`}
           >
-            {currentSection < SECTIONS.length - 1 ? "Next" : "See Result"}
+            {currentSection < SECTIONS.length - 1 ? "Next" : "Submit"}
           </button>
         </div>
 
