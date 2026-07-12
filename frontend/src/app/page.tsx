@@ -16,10 +16,16 @@ export default function Home() {
             </span>
           </div>
 
-          <div className="flex gap-10 text-sm text-slate-500">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors">Contact Support</a>
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10 text-sm text-slate-500 items-center">
+            <a href="https://holistree.in/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1.5">
+              <span>🌐</span> https://holistree.in/
+            </a>
+            <a href="tel:9833088838" className="hover:text-white transition-colors flex items-center gap-1.5">
+              <span>📞</span> 9833088838
+            </a>
+            <a href="mailto:info@holistree.in" className="hover:text-white transition-colors flex items-center gap-1.5">
+              <span>✉️</span> info@holistree.in
+            </a>
           </div>
 
           <div className="text-sm text-slate-600">

@@ -372,30 +372,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                 </div>
             </div>
 
-            {/* Unlock Next Batch CTA */}
-            {client.journeyStatus === 'Pending Mentor Meeting' && (
-                <div className="bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/30 rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
-                            <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-amber-300 text-lg">Mentor Meeting Checkpoint</h3>
-                            <p className="text-sm text-slate-400 mt-1">This client has completed their current module set. After conducting a one-on-one review meeting, unlock the next 3 modules to continue their journey.</p>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => handleReview(client.modules[0]?.id || '', 'UNLOCK_BATCH')}
-                        disabled={actionLoading}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-500 text-white font-bold text-sm uppercase tracking-widest hover:from-amber-400 hover:to-indigo-400 transition-all disabled:opacity-50 shadow-lg shadow-amber-500/20 shrink-0 flex items-center gap-2"
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                        {actionLoading ? 'Unlocking...' : 'Unlock Next 3 Modules'}
-                    </button>
-                </div>
-            )}
+
 
             <div className="grid lg:grid-cols-[1fr_400px] gap-8">
                 {/* Module Grid */}
