@@ -478,23 +478,69 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
 
                     {/* Reports */}
                     {client.reports.length > 0 && (
-                        <div className="space-y-4 pt-4">
-                            <h2 className="text-xl font-bold text-slate-100">Reports</h2>
+                        <div className="space-y-6 pt-4">
+                            <h2 className="text-xl font-bold text-slate-100">AI Generated Reports</h2>
                             {client.reports.map(report => (
-                                <a key={report.id} href={`/mentor/reports/${report.id}`} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 block hover:border-indigo-300 hover:shadow-md transition-all group">
-                                    <div className="flex justify-between items-center">
+                                <div key={report.id} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 space-y-6 relative group">
+                                    <div className="flex justify-between items-center border-b border-white/5 pb-4">
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                                                <h3 className="font-bold text-slate-100 group-hover:text-indigo-600 transition-colors">AI Career Analysis</h3>
+                                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                                                <h3 className="font-bold text-slate-100 text-lg">Career Analysis Report</h3>
                                             </div>
-                                            <div className="text-xs text-slate-500 mt-1 font-medium">Status: {report.status} · {report.careerOptions?.length || 0} career options</div>
+                                            <p className="text-xs text-slate-500 mt-1 font-medium">
+                                                Generated on {new Date(report.createdAt).toLocaleDateString()}
+                                            </p>
                                         </div>
-                                        <svg className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`px-2.5 py-1 rounded-lg border text-[9px] font-bold uppercase tracking-widest ${
+                                                report.status === 'FINALIZED' 
+                                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                                                    : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                                            }`}>
+                                                {report.status.replace('_', ' ')}
+                                            </span>
+                                            <a 
+                                                href={`/mentor/reports/${report.id}`} 
+                                                className="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all"
+                                            >
+                                                Edit Report
+                                            </a>
+                                        </div>
                                     </div>
-                                </a>
+
+                                    {/* Report Content */}
+                                    <div className="space-y-2">
+                                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Report Content</h4>
+                                        <div className="bg-slate-950 border border-slate-850 rounded-xl p-5 text-sm text-slate-350 leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scrollbar">
+                                            {report.content || "No report content generated."}
+                                        </div>
+                                    </div>
+
+                                    {/* Suggested Career Options */}
+                                    {report.careerOptions && report.careerOptions.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Suggested Career Options</h4>
+                                            <div className="grid gap-3 sm:grid-cols-2">
+                                                {report.careerOptions.map((opt: any, idx: number) => (
+                                                    <div key={idx} className="bg-slate-950 border border-slate-850 rounded-xl p-4 space-y-2 relative overflow-hidden group/opt">
+                                                        <div className="flex justify-between items-start gap-4">
+                                                            <h5 className="font-bold text-slate-200 text-sm">{opt.title || "Untitled Career"}</h5>
+                                                            {opt.match && (
+                                                                <span className="shrink-0 text-xs font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">
+                                                                    {opt.match}% Match
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {opt.reasoning && (
+                                                            <p className="text-xs text-slate-400 leading-relaxed">{opt.reasoning}</p>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     )}
