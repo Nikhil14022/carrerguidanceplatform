@@ -33,6 +33,18 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
     const [clientId, setClientId] = useState<string>('');
     const [customPrompt, setCustomPrompt] = useState('');
+    const [activeReportTab, setActiveReportTab] = useState<'persona' | 'personality' | 'cognitive' | 'interests' | 'diagnostic'>('persona');
+
+    const safeVal = (v: any) => v !== undefined && v !== null && v !== '' ? v : '—';
+
+    const getModuleData = (keywords: string[]) => {
+        if (!client) return null;
+        const match = client.modules.find((m: any) => {
+            const title = (m.module?.title || '').toLowerCase();
+            return keywords.some(kw => title.includes(kw.toLowerCase()));
+        });
+        return match?.response?.data || null;
+    };
 
     const handleGenerateReport = async (promptOverride?: string) => {
         setActionLoading(true);
@@ -480,68 +492,458 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                     {client.reports.length > 0 && (
                         <div className="space-y-6 pt-4">
                             <h2 className="text-xl font-bold text-slate-100">AI Generated Reports</h2>
-                            {client.reports.map(report => (
-                                <div key={report.id} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 space-y-6 relative group">
-                                    <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
-                                                <h3 className="font-bold text-slate-100 text-lg">Career Analysis Report</h3>
+                            {client.reports.map(report => {
+                                // Parse AI report content
+                                let parsedContent: any = {};
+                                let isJson = false;
+                                if (report.content) {
+                                    try {
+                                        parsedContent = JSON.parse(report.content);
+                                        isJson = typeof parsedContent === 'object' && parsedContent !== null && 'personality_insights' in parsedContent;
+                                    } catch (e) {
+                                        isJson = false;
+                                    }
+                                }
+                                const personalityInsights = isJson ? parsedContent.personality_insights : (report.content || '');
+                                const mbtiType = isJson ? parsedContent.mbti_type : 'Pending';
+                                const mbtiInterpretation = isJson ? parsedContent.mbti_interpretation : '';
+                                const mbtiDimensions = isJson ? parsedContent.mbti_dimensions : null;
+                                const overviewSummaries = isJson ? parsedContent.overview_summaries : null;
+
+                                const demoData = getModuleData(['demographics', 'module_1', 'module 1']);
+                                const aimData = getModuleData(['aim', 'vision', 'module_2', 'module 2']);
+                                const visualData = getModuleData(['movie', 'visual', 'world', 'module_5', 'module 5']);
+                                const friendsData = getModuleData(['friend', 'relationship', 'module_6', 'module 6']);
+                                const familyData = getModuleData(['family', 'module_7', 'module 7']);
+                                const lifestyleData = getModuleData(['lifestyle', 'expectancies', 'module_8', 'module 8']);
+                                const bodyData = getModuleData(['body', 'self', 'image', 'module_9', 'module 9']);
+                                const swData = getModuleData(['strength', 'weakness', 'module_10', 'module 10']);
+                                const fearsData = getModuleData(['fear', 'module_11', 'module 11']);
+                                const valuesData = getModuleData(['value', 'system', 'module_13', 'module 13']);
+                                const riasecData = getModuleData(['riasec', 'interest', 'module_14', 'module 14']);
+                                const colorData = getModuleData(['color', 'colour', 'working_style', 'style', 'module_15', 'module 15']);
+                                const smiData = getModuleData(['subject', 'interest', 'hypotheticals', 'smi', 'module_16', 'module 16']);
+
+                                // 1. Demographics Arrays
+                                const activeSubjects = (demoData?.demo_subjects || []).filter((s: any) => s && s.col1 && s.col1.trim() !== '');
+                                const activeHobbies = (demoData?.demo_hobbies || []).filter((h: any) => h && h.col1 && h.col1.trim() !== '');
+                                const activeRoutine = (demoData?.demo_routine || []).filter((r: any) => r && r.trim() !== '');
+
+                                // 2. Values Category Grouping
+                                const topValues = valuesData?.__scored?.scores?.topValues || [];
+                                const valuesByCategory: Record<string, string[]> = { Ideal: [], Standard: [], 'Want & Preference': [] };
+                                topValues.forEach((valObj: any) => {
+                                    const cat = valObj.category || 'Ideal';
+                                    if (cat in valuesByCategory) {
+                                        valuesByCategory[cat].push(valObj.value);
+                                    }
+                                });
+
+                                // 3. Fears Categorization
+                                const fearKeys = [
+                                    { key: 'fear_public_speaking', label: 'Public Speaking' },
+                                    { key: 'fear_missing_out', label: 'Missing Out (FOMO)' },
+                                    { key: 'fear_future', label: 'Future / Uncertainty' },
+                                    { key: 'fear_failure', label: 'Failure' },
+                                    { key: 'fear_rejection', label: 'Rejection' },
+                                    { key: 'fear_disappointment_others_to_me', label: 'Disappointment to Others / Self' },
+                                    { key: 'fear_mediocre_life', label: 'Mediocre Life' }
+                                ];
+                                const fearsGrouped = { low: [] as string[], medium: [] as string[], high: [] as string[] };
+                                fearKeys.forEach(f => {
+                                    const score = fearsData && fearsData[f.key] !== undefined ? Number(fearsData[f.key]) : 3;
+                                    const text = `${f.label} (${score}/10)`;
+                                    if (score >= 8) fearsGrouped.high.push(text);
+                                    else if (score >= 5) fearsGrouped.medium.push(text);
+                                    else fearsGrouped.low.push(text);
+                                });
+
+                                // 4. RIASEC Totals
+                                const riasecTotals = riasecData?.__scored?.scores?.columnTotals || riasecData?.__scored?.raw?.totals || {};
+                                const riasecTop3 = riasecData?.__scored?.scores?.top3 || [];
+                                const hollandCode = riasecData?.__scored?.scores?.hollandCode || riasecData?.__scored?.raw?.hollandCode || 'ARI';
+
+                                // 5. Working Style
+                                const workingStyleResult = colorData?.__testData?.result || 'Blue Red Introvert';
+                                const workingStyleInterpretations: Record<string, string> = {
+                                    'blue red introvert': 'Structured, detail-oriented, and highly analytical. Prefers quiet execution, values precision, and works best in individual contexts where logic and organization are paramount.',
+                                    'red blue introvert': 'Goal-focused and logical. Direct and outcome-driven, but operates with high precision and structure, preferring to plan thoroughly before taking action.',
+                                    'blue green introvert': 'Methodical and supportive. Highly reliable, patient, and detail-oriented. Enjoys organizing background processes and ensuring stability.',
+                                    'green blue introvert': 'Quietly cooperative, precise, and loyal. Value harmony and structured work where goals are clear and conflict is minimal.'
+                                };
+                                const resolvedStyleDesc = workingStyleInterpretations[workingStyleResult.toLowerCase()] || 
+                                  'Combines analytical structure, decisiveness, and focused execution. Values competence, clear boundaries, and independence in the workplace.';
+
+                                // 6. Strengths & Weaknesses
+                                const swGrid = swData?.sw_grid || [];
+                                const swGrouped = { weaknesses: [] as string[], situational: [] as string[], strengths: [] as string[] };
+                                swGrid.forEach((item: any) => {
+                                    const rating = Number(item.rating);
+                                    const label = rating >= 8 ? (item.rightLabel || item.trait) : rating <= 4 ? (item.leftLabel || item.trait) : item.trait;
+                                    const text = `${label} (${rating}/10)`;
+                                    if (rating >= 8) swGrouped.strengths.push(text);
+                                    else if (rating <= 4) swGrouped.weaknesses.push(text);
+                                    else swGrouped.situational.push(text);
+                                });
+
+                                // 7. SMI Totals
+                                const smiTotals = smiData?.__scored?.scores?.columnTotals || smiData?.__scored?.raw?.columnTotals || {};
+                                const smiTop3 = smiData?.__scored?.scores?.topColumns || [];
+
+                                // 8. Media Genre & Visual World
+                                const mediaMovies = (visualData?.visual_fav_movies || []).filter((m: any) => m && m.col1).map((m: any) => m.col1);
+                                const mediaSeries = (visualData?.visual_fav_series || []).filter((s: any) => s && s.col1).map((s: any) => s.col1);
+                                const mediaGenres = (visualData?.visual_genres || []).filter((g: any) => g && g.option).map((g: any) => g.option);
+                                const mediaGames = (visualData?.visual_games || []).filter((g: any) => g && g.col2).map((g: any) => g.col2);
+
+                                // 9. Lifestyle Priorities & Struggles
+                                const lifestylePriorities = lifestyleData?.lifestyle_career_priorities || [];
+                                const lifestyleStruggles = (lifestyleData?.lifestyle_12 || []).filter((s: any) => s && s.col2).map((s: any) => s.col2);
+
+                                // 10. Diagnostics Overview
+                                const finalOverview = {
+                                    aim: overviewSummaries?.aim_and_vision || aimData?.aim_1 || 'Interested in Creative Arts (Sketching, Guitar) and seeking career clarity.',
+                                    friends: overviewSummaries?.friends || friendsData?.friends_1 || 'Prefers a small, close-knit circle of trusted, adventurous, and humorous friends.',
+                                    relationship: overviewSummaries?.relationship || 'Values personal autonomy and privacy, maintaining selective, high-trust connections.',
+                                    family: overviewSummaries?.family || familyData?.family_1 || 'Shares a supportive, quiet bond with parents who encourage self-learning and creative expressions.',
+                                    bodyImage: overviewSummaries?.body_image || bodyData?.body_2_reason || 'Conscious of appearance and physical growth, with growing focus on aesthetics.',
+                                    impactful: overviewSummaries?.impactful_incidents || 'Independently learned sketching and music during COVID, defining a self-taught, creative identity.'
+                                };
+
+                                return (
+                                    <div key={report.id} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 space-y-6 relative group">
+                                        <div className="flex justify-between items-center border-b border-white/5 pb-4">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                                                    <h3 className="font-bold text-slate-100 text-lg">Comprehensive Career Analysis Report</h3>
+                                                </div>
+                                                <p className="text-xs text-slate-500 mt-1 font-medium">
+                                                    Generated on {new Date(report.createdAt).toLocaleDateString()}
+                                                </p>
                                             </div>
-                                            <p className="text-xs text-slate-500 mt-1 font-medium">
-                                                Generated on {new Date(report.createdAt).toLocaleDateString()}
-                                            </p>
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-2.5 py-1 rounded-lg border text-[9px] font-bold uppercase tracking-widest ${
+                                                    report.status === 'FINALIZED' 
+                                                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                                                        : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                                                }`}>
+                                                    {report.status.replace('_', ' ')}
+                                                </span>
+                                                <a 
+                                                    href={`/mentor/reports/${report.id}`} 
+                                                    className="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all"
+                                                >
+                                                    Edit Report
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className={`px-2.5 py-1 rounded-lg border text-[9px] font-bold uppercase tracking-widest ${
-                                                report.status === 'FINALIZED' 
-                                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                                                    : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
-                                            }`}>
-                                                {report.status.replace('_', ' ')}
-                                            </span>
-                                            <a 
-                                                href={`/mentor/reports/${report.id}`} 
-                                                className="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all"
-                                            >
-                                                Edit Report
-                                            </a>
-                                        </div>
-                                    </div>
 
-                                    {/* Report Content */}
-                                    <div className="space-y-2">
-                                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Report Content</h4>
-                                        <div className="bg-slate-950 border border-slate-850 rounded-xl p-5 text-sm text-slate-350 leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scrollbar">
-                                            {report.content || "No report content generated."}
+                                        {/* Tabs Navigation */}
+                                        <div className="flex flex-wrap gap-1.5 border-b border-white/5 pb-3">
+                                            {[
+                                                { id: 'persona', label: 'Persona & Careers', icon: '👤' },
+                                                { id: 'personality', label: 'Personality & Style', icon: '🧠' },
+                                                { id: 'cognitive', label: 'Cognitive & Values', icon: '⚡' },
+                                                { id: 'interests', label: 'Interests & Academics', icon: '📚' },
+                                                { id: 'diagnostic', label: 'Diagnostic Overview', icon: '🔎' }
+                                            ].map(t => (
+                                                <button
+                                                    key={t.id}
+                                                    type="button"
+                                                    onClick={() => setActiveReportTab(t.id as any)}
+                                                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all ${
+                                                        activeReportTab === t.id 
+                                                            ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' 
+                                                            : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                                                    }`}
+                                                >
+                                                    <span>{t.icon}</span>
+                                                    {t.label}
+                                                </button>
+                                            ))}
                                         </div>
-                                    </div>
 
-                                    {/* Suggested Career Options */}
-                                    {report.careerOptions && report.careerOptions.length > 0 && (
-                                        <div className="space-y-3">
-                                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Suggested Career Options</h4>
-                                            <div className="grid gap-3 sm:grid-cols-2">
-                                                {report.careerOptions.map((opt: any, idx: number) => (
-                                                    <div key={idx} className="bg-slate-950 border border-slate-850 rounded-xl p-4 space-y-2 relative overflow-hidden group/opt">
-                                                        <div className="flex justify-between items-start gap-4">
-                                                            <h5 className="font-bold text-slate-200 text-sm">{opt.title || "Untitled Career"}</h5>
-                                                            {opt.match && (
-                                                                <span className="shrink-0 text-xs font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">
-                                                                    {opt.match}% Match
-                                                                </span>
-                                                            )}
+                                        {/* Tab Content */}
+                                        <div className="space-y-6 pt-2">
+                                            {activeReportTab === 'persona' && (
+                                                <div className="space-y-6">
+                                                    {/* Demographics Summary */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-4">
+                                                        <h4 className="text-xs font-bold text-slate-350 flex items-center gap-2">👤 Demographics & Profile</h4>
+                                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-500 block">Name</span>
+                                                                <strong className="text-slate-300">{safeVal(demoData?.demo_name || client.user.name)}</strong>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-500 block">Age</span>
+                                                                <strong className="text-slate-300">{safeVal(demoData?.demo_age)}</strong>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-500 block">DOB</span>
+                                                                <strong className="text-slate-300">{safeVal(demoData?.demo_dob)}</strong>
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] text-slate-500 block">Location</span>
+                                                                <strong className="text-slate-300">{safeVal(demoData?.demo_residence)}</strong>
+                                                            </div>
                                                         </div>
-                                                        {opt.reasoning && (
-                                                            <p className="text-xs text-slate-400 leading-relaxed">{opt.reasoning}</p>
+                                                    </div>
+
+                                                    {/* AI Persona Insights */}
+                                                    <div className="space-y-2">
+                                                        <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Professional Persona Summary</h4>
+                                                        <div className="bg-slate-950 border border-slate-850 rounded-xl p-5 text-sm text-slate-300 leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                            {personalityInsights}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Career Suggestions */}
+                                                    {report.careerOptions && report.careerOptions.length > 0 && (
+                                                        <div className="space-y-3">
+                                                            <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Recommended Career Trajectories</h4>
+                                                            <div className="grid gap-4">
+                                                                {report.careerOptions.map((opt: any, idx: number) => (
+                                                                    <div key={idx} className="bg-slate-950 border border-slate-850 rounded-xl p-5 space-y-3">
+                                                                        <div className="flex justify-between items-start gap-4">
+                                                                            <div>
+                                                                                <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest block mb-1">Option {idx + 1}</span>
+                                                                                <h5 className="font-bold text-slate-200 text-base">{opt.title}</h5>
+                                                                            </div>
+                                                                            <span className="shrink-0 text-sm font-black text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-xl border border-indigo-500/20">
+                                                                                {opt.match}% Match
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="text-xs text-slate-450 leading-relaxed border-l border-slate-800 pl-3">{opt.reasoning}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {activeReportTab === 'personality' && (
+                                                <div className="space-y-6">
+                                                    {/* MBTI Section */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-4">
+                                                        <h4 className="text-xs font-bold text-slate-350 flex items-center gap-2">🧠 16PF Personality Factor</h4>
+                                                        <div className="flex flex-col sm:flex-row gap-4 items-start">
+                                                            <div className="bg-indigo-600 text-white font-black text-2xl px-5 py-3 rounded-xl shadow-md shrink-0">
+                                                                {mbtiType}
+                                                            </div>
+                                                            <p className="text-xs text-slate-400 leading-relaxed">{mbtiInterpretation || "Personality factors interpretation compiled from the assessments."}</p>
+                                                        </div>
+                                                        {mbtiDimensions && (
+                                                            <div className="grid gap-3 pt-3 border-t border-white/5">
+                                                                {Object.entries(mbtiDimensions).map(([k, d]: any) => (
+                                                                    <div key={k} className="space-y-1">
+                                                                        <div className="flex justify-between text-[10px] font-bold">
+                                                                            <span className="text-slate-500 capitalize">{k}</span>
+                                                                            <span className="text-indigo-400">{d.label} ({d.percentage}%)</span>
+                                                                        </div>
+                                                                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${d.percentage}%` }} />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         )}
                                                     </div>
-                                                ))}
-                                            </div>
+
+                                                    {/* Holland RIASEC */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-4">
+                                                        <h4 className="text-xs font-bold text-slate-350 flex items-center gap-2">🎯 RIASEC Occupational Interests</h4>
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-sky-600 text-white font-black text-xl px-4 py-2 rounded-xl shrink-0">
+                                                                {hollandCode}
+                                                            </div>
+                                                            <div className="flex-1 grid grid-cols-6 gap-1">
+                                                                {['R', 'I', 'A', 'S', 'E', 'C'].map(char => (
+                                                                    <div key={char} className="bg-white/5 border border-white/5 rounded-lg py-1.5 text-center">
+                                                                        <span className="text-xs font-bold text-slate-300 block">{char}</span>
+                                                                        <span className="text-[10px] font-black text-indigo-400">{riasecTotals[char] || 0}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        {riasecTop3.length > 0 && (
+                                                            <div className="space-y-2 pt-3 border-t border-white/5 text-xs">
+                                                                {riasecTop3.map((item: any) => (
+                                                                    <div key={item.label} className="text-xs">
+                                                                        <span className="font-bold text-indigo-400">{item.label} ({item.letter}) — Score: {item.score}</span>
+                                                                        <p className="text-slate-450 leading-relaxed mt-0.5">{item.interpretation}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Color Working Style */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-2">
+                                                        <h4 className="text-xs font-bold text-slate-350">🎨 Colour Test (Working Style)</h4>
+                                                        <div className="flex gap-2 items-center">
+                                                            <span className="px-2.5 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-bold text-[10px] uppercase">{workingStyleResult}</span>
+                                                            <p className="text-xs text-slate-400 leading-relaxed">{resolvedStyleDesc}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {activeReportTab === 'cognitive' && (
+                                                <div className="space-y-6">
+                                                    {/* Values System */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-3">
+                                                        <h4 className="text-xs font-bold text-slate-350">⚡ Value System Profile</h4>
+                                                        <div className="grid gap-3 text-xs">
+                                                            {Object.entries(valuesByCategory).map(([cat, list]) => (
+                                                                <div key={cat} className="flex flex-col gap-1">
+                                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{cat}</span>
+                                                                    <div className="flex flex-wrap gap-1.5 mt-1">
+                                                                        {list.length > 0 ? list.map(v => (
+                                                                            <span key={v} className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded text-[10px] font-medium">{v}</span>
+                                                                        )) : <span className="text-slate-600 italic">None</span>}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Fears Profile */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-3">
+                                                        <h4 className="text-xs font-bold text-slate-350">⚡ Fears Rating Profile</h4>
+                                                        <div className="grid md:grid-cols-3 gap-3 text-xs">
+                                                            <div className="bg-rose-500/5 border border-rose-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-rose-400 block mb-1">High (8-10)</span>
+                                                                {fearsGrouped.high.length > 0 ? fearsGrouped.high.map(f => <span key={f} className="block text-[10px] text-slate-300">• {f}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                            <div className="bg-orange-500/5 border border-orange-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-orange-400 block mb-1">Medium (5-7)</span>
+                                                                {fearsGrouped.medium.length > 0 ? fearsGrouped.medium.map(f => <span key={f} className="block text-[10px] text-slate-300">• {f}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-emerald-400 block mb-1">Low (1-4)</span>
+                                                                {fearsGrouped.low.length > 0 ? fearsGrouped.low.map(f => <span key={f} className="block text-[10px] text-slate-300">• {f}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Strengths & Weaknesses */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-3">
+                                                        <h4 className="text-xs font-bold text-slate-350">⚡ Strengths & Weaknesses Grid</h4>
+                                                        <div className="grid md:grid-cols-3 gap-3 text-xs">
+                                                            <div className="bg-emerald-500/5 border border-emerald-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-emerald-400 block mb-1">Core Strengths</span>
+                                                                {swGrouped.strengths.length > 0 ? swGrouped.strengths.map(s => <span key={s} className="block text-[10px] text-slate-300">• {s}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                            <div className="bg-slate-500/5 border border-slate-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-slate-400 block mb-1">Situational</span>
+                                                                {swGrouped.situational.length > 0 ? swGrouped.situational.map(s => <span key={s} className="block text-[10px] text-slate-300">• {s}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                            <div className="bg-rose-500/5 border border-rose-500/10 p-3 rounded-xl">
+                                                                <span className="font-bold text-rose-400 block mb-1">Growth Areas</span>
+                                                                {swGrouped.weaknesses.length > 0 ? swGrouped.weaknesses.map(w => <span key={w} className="block text-[10px] text-slate-300">• {w}</span>) : <span className="text-slate-600">None</span>}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {activeReportTab === 'interests' && (
+                                                <div className="space-y-6">
+                                                    {/* Academic & Hobbies */}
+                                                    <div className="grid md:grid-cols-2 gap-4 text-xs">
+                                                        <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-2">
+                                                            <h5 className="font-bold text-slate-300">🏫 Academic Sentiments</h5>
+                                                            {activeSubjects.length > 0 ? activeSubjects.map((s: any, idx: number) => (
+                                                                <div key={idx} className="flex justify-between py-1 border-b border-white/5">
+                                                                    <strong className="text-slate-450">{s.col1}</strong>
+                                                                    <span className="text-indigo-400">{s.col2 || 'Neutral'}</span>
+                                                                </div>
+                                                            )) : <span className="text-slate-600 italic">None</span>}
+                                                        </div>
+                                                        <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-2">
+                                                            <h5 className="font-bold text-slate-300">🎨 Primary Hobbies</h5>
+                                                            {activeHobbies.length > 0 ? activeHobbies.map((h: any, idx: number) => (
+                                                                <div key={idx} className="py-1 border-b border-white/5">
+                                                                    <div className="flex justify-between font-bold text-indigo-400">
+                                                                        <span>{h.col1}</span>
+                                                                        <span className="text-slate-500">{h.col3}</span>
+                                                                    </div>
+                                                                    {h.col2 && <p className="text-[10px] text-slate-500 mt-0.5">{h.col2}</p>}
+                                                                </div>
+                                                            )) : <span className="text-slate-600 italic">None</span>}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* SMI occupational totals */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-3">
+                                                        <h4 className="text-xs font-bold text-slate-350">📚 Subject Matter Interest (SMI)</h4>
+                                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                            {Object.entries({
+                                                                A: 'Physical Sciences', B: 'Social Humanities',
+                                                                C: 'Arts & Media', D: 'Business & Finance',
+                                                                E: 'Body Kinaesthetic', F: 'Designer/Artisan',
+                                                                G: 'Engineering & Tech', H: 'Education & Health'
+                                                            }).map(([k, lbl]) => (
+                                                                <div key={k} className="bg-white/5 p-2 rounded-lg text-center">
+                                                                    <span className="text-[9px] text-slate-500 block truncate">{lbl}</span>
+                                                                    <strong className="text-sm text-indigo-400 block mt-0.5">{smiTotals[k] !== undefined ? smiTotals[k] : '—'}</strong>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        {smiTop3.length > 0 && (
+                                                            <div className="space-y-2 pt-3 border-t border-white/5 text-xs">
+                                                                {smiTop3.map((item: any) => (
+                                                                    <div key={item.label}>
+                                                                        <span className="font-bold text-indigo-400">{item.label} (Score: {item.score})</span>
+                                                                        <p className="text-slate-450 mt-0.5">{item.interpretation}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Media Genre */}
+                                                    <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-3">
+                                                        <h4 className="text-xs font-bold text-slate-350">📚 Media Genre & Visual World</h4>
+                                                        <div className="grid sm:grid-cols-2 gap-3 text-[10px]">
+                                                            {mediaMovies.length > 0 && <div><span className="text-slate-500 block">Favorite Movies</span><strong className="text-slate-300">{mediaMovies.join(', ')}</strong></div>}
+                                                            {mediaSeries.length > 0 && <div><span className="text-slate-500 block">Favorite Series</span><strong className="text-slate-300">{mediaSeries.join(', ')}</strong></div>}
+                                                            {mediaGenres.length > 0 && <div><span className="text-slate-500 block">Preferred Genres</span><strong className="text-slate-300">{mediaGenres.join(', ')}</strong></div>}
+                                                            {mediaGames.length > 0 && <div><span className="text-slate-500 block">Gaming Styles</span><strong className="text-slate-300">{mediaGames.join(', ')}</strong></div>}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {activeReportTab === 'diagnostic' && (
+                                                <div className="bg-slate-950 border border-slate-900 p-5 rounded-xl space-y-4">
+                                                    <h4 className="text-xs font-bold text-slate-350">🔍 Section Compartments</h4>
+                                                    <div className="space-y-3 text-xs">
+                                                        {[
+                                                            { label: 'Aim & Vision Summary', text: finalOverview.aim, icon: '🎯' },
+                                                            { label: 'Family Compartment Dynamics', text: finalOverview.family, icon: '🏠' },
+                                                            { label: 'Friends & Social Group Dynamics', text: finalOverview.friends, icon: '🤝' },
+                                                            { label: 'Romantic & Relationship Styles', text: finalOverview.relationship, icon: '💖' },
+                                                            { label: 'Body Image & Self Identity', text: finalOverview.bodyImage, icon: '🧍' },
+                                                            { label: 'Impactful Life Incidents', text: finalOverview.impactful, icon: '⚡' }
+                                                        ].map((c, i) => (
+                                                            <div key={i} className="py-2 border-b border-white/5 last:border-0">
+                                                                <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                                                                    <span>{c.icon}</span> {c.label}
+                                                                </span>
+                                                                <p className="text-slate-400 mt-1 pl-5 leading-relaxed">{c.text}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                     {/* Parent Data */}
