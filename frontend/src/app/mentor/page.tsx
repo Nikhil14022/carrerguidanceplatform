@@ -21,6 +21,7 @@ interface Client {
 
 export default function MentorDashboardPage() {
     const [clients, setClients] = useState<Client[]>([]);
+    const [meetings, setMeetings] = useState<any[]>([]);
     const [role, setRole] = useState('');
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -36,6 +37,7 @@ export default function MentorDashboardPage() {
             if (res.ok) {
                 const data = await res.json();
                 setClients(data.clients);
+                setMeetings(data.meetings || []);
                 setRole(data.role);
             }
         } catch (e) { console.error(e); }
@@ -128,60 +130,108 @@ export default function MentorDashboardPage() {
                 ))}
             </div>
 
-            {/* Client Table */}
-            {filtered.length === 0 ? (
-                <div className="bg-white/5 rounded-2xl border border-white/10 border-dashed p-16 text-center space-y-3 shadow-sm">
-                    <div className="text-slate-400 text-lg font-bold">No clients found</div>
-                    <p className="text-slate-500 text-sm">Adjust your filters or assignments.</p>
-                </div>
-            ) : (
-                <div className="bg-white/5 rounded-2xl border border-white/10 shadow-sm overflow-hidden">
-                    <table className="w-full text-left bg-white/5">
-                        <thead>
-                            <tr className="border-b border-white/10 bg-white/5">
-                                <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Client</th>
-                                <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Modules Status</th>
-                                <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Status</th>
-                                <th className="py-4 px-6 text-right text-[10px] font-bold uppercase tracking-widest text-slate-500">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filtered.map(client => {
-                                const completedModules = client.modules.filter(m => m.status === 'APPROVED').length;
-                                const pending = client.modules.filter(m => m.status === 'SUBMITTED' || m.status === 'UNDER_REVIEW').length;
-
-                                return (
-                                    <tr key={client.id} className="border-b border-white/10 hover:bg-white/5 transition-colors group">
-                                        <td className="py-4 px-6">
-                                            <div className="font-bold text-sm text-slate-100">{client.user.name || 'Unnamed'}</div>
-                                            <div className="text-xs text-slate-500 mt-1">{client.user.email}</div>
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <div className="flex flex-col gap-1">
-                                                <div className="text-xs font-medium text-slate-400">{completedModules} / {client.modules.length} modules completed</div>
-                                                {pending > 0 && <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest mt-1">⚠ {pending} Pending Review</span>}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <span className={`px-3 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest ${statusColor(client.journeyStatus)}`}>
-                                                {client.journeyStatus}
-                                            </span>
-                                        </td>
-                                        <td className="py-4 px-6 text-right">
-                                            <a
-                                                href={`/mentor/clients/${client.id}`}
-                                                className="px-4 py-2 rounded-lg bg-indigo-500/10 text-indigo-600 text-[10px] font-bold uppercase tracking-widest border border-indigo-100 hover:bg-indigo-100 transition-colors inline-block"
-                                            >
-                                                Mentor view
-                                            </a>
-                                        </td>
+            {/* Grid Layout: Client List & Schedule */}
+            <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+                {/* Left Column: Client list */}
+                <div className="space-y-4">
+                    {filtered.length === 0 ? (
+                        <div className="bg-white/5 rounded-2xl border border-white/10 border-dashed p-16 text-center space-y-3 shadow-sm">
+                            <div className="text-slate-400 text-lg font-bold">No clients found</div>
+                            <p className="text-slate-500 text-sm">Adjust your filters or assignments.</p>
+                        </div>
+                    ) : (
+                        <div className="bg-white/5 rounded-2xl border border-white/10 shadow-sm overflow-hidden">
+                            <table className="w-full text-left bg-white/5">
+                                <thead>
+                                    <tr className="border-b border-white/10 bg-white/5">
+                                        <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Client</th>
+                                        <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Modules Status</th>
+                                        <th className="py-4 px-6 text-[10px] font-bold uppercase tracking-widest text-slate-500">Status</th>
+                                        <th className="py-4 px-6 text-right text-[10px] font-bold uppercase tracking-widest text-slate-500">Actions</th>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                </thead>
+                                <tbody>
+                                    {filtered.map(client => {
+                                        const completedModules = client.modules.filter(m => m.status === 'APPROVED').length;
+                                        const pending = client.modules.filter(m => m.status === 'SUBMITTED' || m.status === 'UNDER_REVIEW').length;
+
+                                        return (
+                                            <tr key={client.id} className="border-b border-white/10 hover:bg-white/5 transition-colors group">
+                                                <td className="py-4 px-6">
+                                                    <div className="font-bold text-sm text-slate-100">{client.user.name || 'Unnamed'}</div>
+                                                    <div className="text-xs text-slate-500 mt-1">{client.user.email}</div>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <div className="flex flex-col gap-1">
+                                                        <div className="text-xs font-medium text-slate-400">{completedModules} / {client.modules.length} modules completed</div>
+                                                        {pending > 0 && <span className="text-[10px] text-amber-600 font-bold uppercase tracking-widest mt-1">⚠ {pending} Pending Review</span>}
+                                                    </div>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <span className={`px-3 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest ${statusColor(client.journeyStatus)}`}>
+                                                        {client.journeyStatus}
+                                                    </span>
+                                                </td>
+                                                <td className="py-4 px-6 text-right">
+                                                    <a
+                                                        href={`/mentor/clients/${client.id}`}
+                                                        className="px-4 py-2 rounded-lg bg-indigo-500/10 text-indigo-600 text-[10px] font-bold uppercase tracking-widest border border-indigo-100 hover:bg-indigo-100 transition-colors inline-block"
+                                                    >
+                                                        Mentor view
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
-            )}
+
+                {/* Right Column: Schedule / Meetings */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-xl font-bold text-slate-100">My Schedule</h2>
+                    </div>
+                    {meetings.length === 0 ? (
+                        <div className="bg-white/5 rounded-2xl border border-white/10 border-dashed p-8 text-center text-slate-500 text-sm">
+                            No scheduled meetings found.
+                        </div>
+                    ) : (
+                        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            {meetings.map((meet: any) => (
+                                <div key={meet.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3 hover:border-indigo-500/30 transition-all group">
+                                    <div>
+                                        <div className="flex justify-between items-start mb-1">
+                                            <span className="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors text-xs line-clamp-1">
+                                                {meet.notes || 'Guidance Session'}
+                                            </span>
+                                            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold uppercase tracking-wider">
+                                                {meet.status}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] text-indigo-400/80 font-semibold">Client: {meet.clientName}</p>
+                                    </div>
+                                    <div className="text-[11px] text-slate-400 space-y-2 pt-2 border-t border-white/5">
+                                        <p className="flex items-center gap-2">
+                                            <span>🕒</span> {new Date(meet.startTime).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                                        </p>
+                                        {meet.meetingLink && (
+                                            <p className="flex items-center gap-2">
+                                                <span>🔗</span> 
+                                                <a href={meet.meetingLink} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 font-semibold underline decoration-indigo-500/30 hover:decoration-indigo-400 transition-all">
+                                                    Join Google Meet
+                                                </a>
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

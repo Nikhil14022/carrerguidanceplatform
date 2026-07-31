@@ -70,7 +70,7 @@ function DashboardContent() {
         );
     }
 
-    const { stats, profile, currentModule } = data || {};
+    const { stats, profile, currentModule, upcomingMeetings } = data || {};
 
     return (
         <div className="space-y-8 animate-fade-in text-slate-200">
@@ -166,6 +166,46 @@ function DashboardContent() {
                     </div>
                 </div>
             </section>
+
+            {/* Upcoming Appointments */}
+            {upcomingMeetings && upcomingMeetings.length > 0 && (
+                <section className="bg-white/5 border border-indigo-500/20 shadow-sm rounded-2xl p-8 space-y-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-[64px] -mr-16 -mt-16 pointer-events-none"></div>
+                    
+                    <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2.5 relative z-10">
+                        <span className="text-indigo-400">📅</span> Upcoming Scheduled Meetings
+                    </h3>
+                    
+                    <div className="grid gap-6 md:grid-cols-2 relative z-10">
+                        {upcomingMeetings.map((meet: any) => (
+                            <div key={meet.id} className="p-5 bg-slate-950/40 rounded-2xl border border-white/5 space-y-3 hover:border-indigo-500/30 transition-all group">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="font-bold text-slate-200 group-hover:text-indigo-400 transition-colors">{meet.notes || 'Mentor Guidance Session'}</p>
+                                        <p className="text-xs text-indigo-400/80 font-semibold mt-0.5">with {meet.expert.name}</p>
+                                    </div>
+                                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] uppercase font-bold tracking-widest">
+                                        Confirmed
+                                    </span>
+                                </div>
+                                <div className="text-xs text-slate-400 space-y-2 pt-1 border-t border-white/5">
+                                    <p className="flex items-center gap-2">
+                                        <span>🕒</span> {new Date(meet.startTime).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                                    </p>
+                                    {meet.meetingLink && (
+                                        <p className="flex items-center gap-2">
+                                            <span>🔗</span> 
+                                            <a href={meet.meetingLink} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 font-semibold underline decoration-indigo-500/30 hover:decoration-indigo-400 transition-all">
+                                                Join Google Meet
+                                            </a>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
 
 

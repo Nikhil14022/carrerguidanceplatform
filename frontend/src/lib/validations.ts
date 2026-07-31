@@ -19,7 +19,7 @@ export const moduleResponseSchema = z.object({
 })
 
 export const moduleReviewSchema = z.object({
-  action: z.enum(['APPROVE', 'REJECT', 'SAVE_NOTES', 'UNLOCK', 'UNLOCK_BATCH', 'EDIT_RESPONSE']),
+  action: z.enum(['APPROVE', 'REJECT', 'SAVE_NOTES', 'UNLOCK', 'UNLOCK_BATCH', 'EDIT_RESPONSE', 'LOCK']),
   notes: z.string().optional(),
   data: z.record(z.string(), z.any()).optional()
 })

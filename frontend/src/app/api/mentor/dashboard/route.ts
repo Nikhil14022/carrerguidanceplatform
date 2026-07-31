@@ -14,9 +14,11 @@ export async function GET() {
 
         const mentorProfileId = session.user.mentorProfileId;
 
+        let clients: any[] = [];
+        
         // Super Admin / legacy Admin sees all clients
         if (['SUPER_ADMIN', 'ADMIN'].includes(session.user.role)) {
-            const clients = await prisma.clientProfile.findMany({
+            clients = await prisma.clientProfile.findMany({
                 include: {
                     user: { select: { name: true, email: true } },
                     modules: {
@@ -28,45 +30,82 @@ export async function GET() {
                     reports: { select: { id: true, status: true } }
                 }
             });
-            return NextResponse.json({ clients, role: session.user.role });
-        }
+        } else {
+            // Mentors see only assigned clients
+            if (mentorProfileId) {
+                const assignments = await (prisma as any).mentorAssignment.findMany({
+                    where: { mentorProfileId, isActive: true }
+                });
 
-        // Mentors see only assigned clients
-        if (!mentorProfileId) {
-            return NextResponse.json({ clients: [], role: session.user.role });
-        }
+                const clientIds = assignments.map((a: any) => a.clientProfileId);
 
-        const assignments = await (prisma as any).mentorAssignment.findMany({
-            where: { mentorProfileId, isActive: true }
-        });
-
-        const clientIds = assignments.map((a: any) => a.clientProfileId);
-
-        const clients = await prisma.clientProfile.findMany({
-            where: { id: { in: clientIds } },
-            include: {
-                user: { select: { name: true, email: true } },
-                modules: {
+                const rawClients = await prisma.clientProfile.findMany({
+                    where: { id: { in: clientIds } },
                     include: {
-                        module: { select: { title: true, schema: true } },
-                        response: { select: { data: true, submittedAt: true } }
+                        user: { select: { name: true, email: true } },
+                        modules: {
+                            include: {
+                                module: { select: { title: true, schema: true } },
+                                response: { select: { data: true, submittedAt: true } }
+                            }
+                        },
+                        reports: { select: { id: true, status: true } }
                     }
-                },
-                reports: { select: { id: true, status: true } }
+                });
+
+                // Enrich with permissions
+                clients = rawClients.map(c => {
+                    const assignment = assignments.find((a: any) => a.clientProfileId === c.id);
+                    return {
+                        ...c,
+                        permissions: assignment?.permissions || [],
+                        assignedAt: assignment?.assignedAt
+                    };
+                });
             }
+        }
+
+        // Fetch appointments scheduled for this mentor's expertId (or all if admin)
+        const slotQuery: any = {};
+        if (!['SUPER_ADMIN', 'ADMIN'].includes(session.user.role)) {
+            slotQuery.expertId = session.user.id;
+        }
+        
+        const mentorSlots = await prisma.appointmentSlot.findMany({
+            where: slotQuery
+        });
+        const slotIds = mentorSlots.map(s => s.id);
+
+        const rawBookings = await prisma.appointmentBooking.findMany({
+            where: {
+                slotId: { in: slotIds }
+            },
+            include: {
+                clientProfile: {
+                    include: {
+                        user: { select: { name: true, email: true } }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
         });
 
-        // Enrich with permissions
-        const enrichedClients = clients.map(c => {
-            const assignment = assignments.find((a: any) => a.clientProfileId === c.id);
+        const meetings = rawBookings.map(bk => {
+            const slot = mentorSlots.find(s => s.id === bk.slotId);
             return {
-                ...c,
-                permissions: assignment?.permissions || [],
-                assignedAt: assignment?.assignedAt
+                id: bk.id,
+                startTime: slot?.startTime || bk.createdAt,
+                endTime: slot?.endTime,
+                status: bk.status,
+                type: bk.type,
+                meetingLink: bk.meetingLink,
+                notes: bk.notes,
+                clientName: bk.clientProfile.user.name || 'Unnamed Client',
+                clientEmail: bk.clientProfile.user.email
             };
         });
 
-        return NextResponse.json({ clients: enrichedClients, role: session.user.role });
+        return NextResponse.json({ clients, role: session.user.role, meetings });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

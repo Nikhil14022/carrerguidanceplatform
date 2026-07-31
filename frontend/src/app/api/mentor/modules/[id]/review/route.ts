@@ -77,6 +77,16 @@ export async function POST(
       return NextResponse.json({ success: true, action: 'UNLOCK' })
     }
 
+    if (action === 'LOCK') {
+      await prisma.clientModule.update({
+        where: { id },
+        data: {
+          status: 'LOCKED'
+        }
+      })
+      return NextResponse.json({ success: true, action: 'LOCK' })
+    }
+
     if (action === 'UNLOCK_BATCH') {
       // Find the client profile for this module
       const clientProfileId = clientModule.clientProfileId

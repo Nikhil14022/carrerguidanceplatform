@@ -39,7 +39,37 @@ export async function GET(
       return NextResponse.json({ error: 'Client not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ client: clientProfile })
+    // Fetch client appointments
+    const rawBookings = await prisma.appointmentBooking.findMany({
+      where: { clientProfileId: id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const appointments = await Promise.all(rawBookings.map(async (bk) => {
+      const slot = await prisma.appointmentSlot.findUnique({ where: { id: bk.slotId } });
+      let expertName = 'Expert Advisor';
+      if (slot && slot.expertId) {
+        const expertUser = await prisma.user.findUnique({ where: { id: slot.expertId } });
+        if (expertUser) expertName = expertUser.name || 'Expert Advisor';
+      }
+      return {
+        id: bk.id,
+        startTime: slot?.startTime || bk.createdAt,
+        endTime: slot?.endTime,
+        status: bk.status,
+        type: bk.type,
+        meetingLink: bk.meetingLink,
+        notes: bk.notes,
+        expert: { name: expertName }
+      };
+    }));
+
+    return NextResponse.json({ 
+      client: {
+        ...clientProfile,
+        appointments
+      }
+    })
   } catch (error) {
     console.error('Admin client detail error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

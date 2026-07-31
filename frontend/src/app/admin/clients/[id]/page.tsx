@@ -22,6 +22,7 @@ interface ClientData {
     user: { id: string; email: string; name: string | null; createdAt: string };
     modules: ModuleData[];
     reports: any[];
+    appointments?: any[];
 }
 
 export default function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -102,18 +103,18 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
         }
     };
 
-    const handleReview = async (moduleId: string, action: 'APPROVE' | 'REJECT' | 'SAVE_NOTES', notes?: string) => {
+    const handleReview = async (moduleId: string, action: 'APPROVE' | 'REJECT' | 'SAVE_NOTES' | 'UNLOCK' | 'LOCK', notes?: string) => {
         setActionLoading(true);
         const finalNotes = notes !== undefined ? notes : mentorNotesInput;
         try {
-            const res = await fetch(`/api/admin/modules/${moduleId}/review`, {
+            const res = await fetch(`/api/mentor/modules/${moduleId}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action, notes: finalNotes })
             });
             const data = await res.json();
             if (data.success) {
-                setNotification({ type: 'success', msg: `Module ${action === 'APPROVE' ? 'approved' : action === 'REJECT' ? 'rejected' : 'notes saved'} successfully` });
+                setNotification({ type: 'success', msg: `Module ${action === 'APPROVE' ? 'approved' : action === 'REJECT' ? 'rejected' : action === 'UNLOCK' ? 'unlocked' : action === 'LOCK' ? 'locked' : 'notes saved'} successfully` });
                 if (action !== 'SAVE_NOTES') {
                     setSelectedModule(null);
                 }
@@ -236,6 +237,29 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                             <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${row.rating >= 7 ? 'bg-emerald-500/20 text-emerald-400' : row.rating <= 3 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
                                 {row.rating}/10
                             </span>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        // New Multi-Schedule Format
+        if (Array.isArray(value) && value.length > 0 && typeof value[0] === 'object' && value[0] !== null && 'days' in value[0] && 'slots' in value[0]) {
+            return (
+                <div className="space-y-4">
+                    {value.map((sched: any, idx: number) => (
+                        <div key={idx} className="p-4 bg-slate-900 border border-slate-800 rounded-xl space-y-2">
+                            <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">
+                                Days: {Array.isArray(sched.days) ? sched.days.join(', ') : String(sched.days || '')}
+                            </div>
+                            <div className="space-y-1.5 pl-2 border-l border-indigo-500/20">
+                                {Array.isArray(sched.slots) && sched.slots.map((slot: any, sIdx: number) => (
+                                    <div key={sIdx} className="flex gap-4 text-xs">
+                                        <span className="text-indigo-400 font-bold w-20 flex-shrink-0">{slot.time || '—'}</span>
+                                        <span className="text-slate-350">{slot.activity || '—'}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -505,6 +529,35 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                     />
                 </div>
             </div>
+
+            {/* Scheduled Meetings */}
+            {client.appointments && client.appointments.length > 0 && (
+                <div className="glass-card p-6 space-y-4">
+                    <h3 className="text-sm font-bold flex items-center gap-2 text-indigo-400">
+                        <span>📅 Scheduled Google Calendar Meetings</span>
+                    </h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {client.appointments.map((meet: any) => (
+                            <div key={meet.id} className="p-4 bg-slate-950/45 rounded-xl border border-white/5 text-xs space-y-1 hover:border-indigo-500/30 transition-all">
+                                <div className="flex justify-between items-start mb-1">
+                                    <span className="font-bold text-slate-200">{meet.notes || 'Mentor Session'}</span>
+                                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-bold uppercase tracking-wider">
+                                        {meet.status}
+                                    </span>
+                                </div>
+                                <p className="text-slate-400">🕒 {new Date(meet.startTime).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                                {meet.meetingLink && (
+                                    <p className="truncate text-indigo-400 mt-1">
+                                        🔗 <a href={meet.meetingLink} target="_blank" rel="noopener noreferrer" className="hover:underline text-indigo-400 font-semibold">
+                                            Join Google Meet
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="grid lg:grid-cols-[1fr_400px] gap-8">
                 {/* Module Grid */}
@@ -856,6 +909,23 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                             {/* Module Management */}
                             <div className="pt-4 border-t border-white/5 space-y-3">
                                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Module Controls</h4>
+                                {selectedModule.status === 'LOCKED' ? (
+                                    <button
+                                        onClick={() => handleReview(selectedModule.id, 'UNLOCK')}
+                                        disabled={actionLoading}
+                                        className="w-full py-2 rounded-lg bg-indigo-600/20 text-indigo-400 text-xs font-bold uppercase tracking-widest hover:bg-indigo-600/30 transition-all border border-indigo-500/20"
+                                    >
+                                        Unlock This Module
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => handleReview(selectedModule.id, 'LOCK')}
+                                        disabled={actionLoading}
+                                        className="w-full py-2 rounded-lg bg-red-600/20 text-red-400 text-xs font-bold uppercase tracking-widest hover:bg-red-600/30 transition-all border border-red-500/20"
+                                    >
+                                        Lock This Module
+                                    </button>
+                                )}
                                 {selectedModule.status !== 'APPROVED' && (
                                     <button
                                         onClick={() => handleManage('SKIP', selectedModule.id)}

@@ -52,7 +52,7 @@ export async function GET() {
               clientProfileId: clientProfile.id,
               moduleId: template.id,
               order: template.defaultOrder,
-              status: template.defaultOrder <= 3 ? 'UNLOCKED' : 'LOCKED',
+              status: 'LOCKED',
               filledBy: 'CLIENT'
             },
             include: { module: true, response: true }
@@ -95,6 +95,33 @@ export async function GET() {
       (m: any) => m.status === 'UNLOCKED' || m.status === 'IN_PROGRESS'
     )
 
+    // Fetch client appointments
+    const rawBookings = await prisma.appointmentBooking.findMany({
+      where: { clientProfileId: clientProfile.id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const appointments = await Promise.all(rawBookings.map(async (bk) => {
+      const slot = await prisma.appointmentSlot.findUnique({ where: { id: bk.slotId } });
+      let expertName = 'Expert Advisor';
+      if (slot && slot.expertId) {
+        const expertUser = await prisma.user.findUnique({ where: { id: slot.expertId } });
+        if (expertUser) expertName = expertUser.name || 'Expert Advisor';
+      }
+      return {
+        id: bk.id,
+        startTime: slot?.startTime || bk.createdAt,
+        endTime: slot?.endTime,
+        status: bk.status,
+        type: bk.type,
+        meetingLink: bk.meetingLink,
+        notes: bk.notes,
+        expert: { name: expertName }
+      };
+    }));
+
+    const upcomingMeetings = appointments.filter(appt => new Date(appt.startTime) > new Date());
+
     return NextResponse.json({
       profile: clientProfile,
       stats: {
@@ -110,7 +137,8 @@ export async function GET() {
         title: currentModule.module.title,
         status: currentModule.status
       } : null,
-      reports: clientProfile.reports
+      reports: clientProfile.reports,
+      upcomingMeetings
     })
   } catch (error) {
     console.error('Dashboard error:', error)

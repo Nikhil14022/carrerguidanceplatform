@@ -21,6 +21,7 @@ interface ClientData {
     modules: ModuleData[];
     reports: any[];
     parentData?: any[];
+    appointments?: any[];
 }
 
 export default function MentorClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -90,7 +91,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
         }
     };
 
-    const handleReview = async (moduleId: string, action: 'APPROVE' | 'REJECT' | 'SAVE_NOTES' | 'UNLOCK' | 'UNLOCK_BATCH') => {
+    const handleReview = async (moduleId: string, action: 'APPROVE' | 'REJECT' | 'SAVE_NOTES' | 'UNLOCK' | 'UNLOCK_BATCH' | 'LOCK') => {
         setActionLoading(true);
         try {
             const res = await fetch(`/api/mentor/modules/${moduleId}/review`, {
@@ -100,7 +101,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
             });
             const data = await res.json();
             if (data.success) {
-                setNotification({ type: 'success', msg: `${action === 'UNLOCK_BATCH' ? `Next ${data.unlockedCount || 3} modules unlocked` : `Module ${action === 'APPROVE' ? 'approved' : action === 'REJECT' ? 'rejected' : action === 'UNLOCK' ? 'unlocked' : 'notes saved'}`} successfully` });
+                setNotification({ type: 'success', msg: `${action === 'UNLOCK_BATCH' ? `Next ${data.unlockedCount || 3} modules unlocked` : `Module ${action === 'APPROVE' ? 'approved' : action === 'REJECT' ? 'rejected' : action === 'UNLOCK' ? 'unlocked' : action === 'LOCK' ? 'locked' : 'notes saved'}`} successfully` });
                 if (action !== 'SAVE_NOTES') {
                     setSelectedModule(null);
                     setMentorNotes('');
@@ -371,6 +372,35 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                     />
                 </div>
             </div>
+
+            {/* Scheduled Meetings */}
+            {client.appointments && client.appointments.length > 0 && (
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 shadow-sm space-y-4">
+                    <h3 className="text-sm font-bold text-slate-300 flex items-center gap-2">
+                        <span>📅 Scheduled Google Calendar Meetings</span>
+                    </h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {client.appointments.map((meet: any) => (
+                            <div key={meet.id} className="p-4 bg-slate-950/40 rounded-xl border border-white/5 text-xs space-y-1 hover:border-indigo-500/30 transition-all">
+                                <div className="flex justify-between items-start mb-1">
+                                    <span className="font-bold text-slate-200">{meet.notes || 'Mentor Session'}</span>
+                                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-bold uppercase tracking-wider">
+                                        {meet.status}
+                                    </span>
+                                </div>
+                                <p className="text-slate-400">🕒 {new Date(meet.startTime).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</p>
+                                {meet.meetingLink && (
+                                    <p className="truncate text-indigo-400 mt-1">
+                                        🔗 <a href={meet.meetingLink} target="_blank" rel="noopener noreferrer" className="hover:underline text-indigo-400 font-semibold">
+                                            Join Google Meet
+                                        </a>
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
 
 
@@ -1068,7 +1098,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                             </div>
                                         </div>
                                     )}
-                                    {selectedModule.status === 'LOCKED' && (
+                                    {selectedModule.status === 'LOCKED' ? (
                                         <div className="pt-4 border-t border-white/5 mt-4 flex justify-end">
                                             <button
                                                 onClick={() => handleReview(selectedModule.id, 'UNLOCK')}
@@ -1078,12 +1108,22 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                 {actionLoading ? '...' : '🔓 Unlock Module'}
                                             </button>
                                         </div>
+                                    ) : (
+                                        <div className="pt-4 border-t border-white/5 mt-4 flex justify-end">
+                                            <button
+                                                onClick={() => handleReview(selectedModule.id, 'LOCK')}
+                                                disabled={actionLoading}
+                                                className="px-6 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all disabled:opacity-50"
+                                            >
+                                                {actionLoading ? '...' : '🔒 Lock Module'}
+                                            </button>
+                                        </div>
                                     )}
                                 </>
                             ) : (
                                 <div className="text-center py-12 text-slate-500 bg-white/5 rounded-xl border border-white/5 border-dashed space-y-4">
                                     <p className="text-sm font-medium">No response submitted yet</p>
-                                    {selectedModule.status === 'LOCKED' && (
+                                    {selectedModule.status === 'LOCKED' ? (
                                         <div>
                                             <button
                                                 onClick={() => handleReview(selectedModule.id, 'UNLOCK')}
@@ -1092,6 +1132,17 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                             >
                                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
                                                 {actionLoading ? '...' : 'Unlock This Module'}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <button
+                                                onClick={() => handleReview(selectedModule.id, 'LOCK')}
+                                                disabled={actionLoading}
+                                                className="px-6 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-50 inline-flex items-center gap-2"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                                {actionLoading ? '...' : 'Lock This Module'}
                                             </button>
                                         </div>
                                     )}
