@@ -154,6 +154,10 @@ export async function generateCareerReport(clientProfileId: string, customInstru
         data: {
           mother_desc: data.q1_mother_description,
           father_desc: data.q1_father_description,
+          described_words: data.q1_described_words,
+          free_time: data.q6_free_time,
+          free_time_activities: data.q6_free_time_activities,
+          social_media_usage: data.q6_social_media_usage,
           hated_subjects: data.q3_hated_subject,
           hidden_talents: data.q14_hidden_talents
         }

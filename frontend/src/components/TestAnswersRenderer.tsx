@@ -848,8 +848,14 @@ export default function TestAnswersRenderer({ testType, answers }: TestAnswersRe
           {/* Q1 */}
           <div className="p-4 bg-white/5 border border-white/5 rounded-2xl space-y-3">
             <h5 className="text-xs font-bold text-indigo-300 uppercase tracking-wider border-b border-white/5 pb-1">Q1. Describe the Child</h5>
-            {renderParentField("Mother's Description", testData.q1_mother_description)}
-            {renderParentField("Father's Description", testData.q1_father_description)}
+            {Array.isArray(testData.q1_described_words) && testData.q1_described_words.length > 0 ? (
+              renderParentField("Selected Personality Descriptors", testData.q1_described_words.join(", "))
+            ) : (
+              <>
+                {renderParentField("Mother's Description", testData.q1_mother_description)}
+                {renderParentField("Father's Description", testData.q1_father_description)}
+              </>
+            )}
           </div>
 
           {/* Q2 */}
@@ -922,7 +928,14 @@ export default function TestAnswersRenderer({ testType, answers }: TestAnswersRe
           {/* Q6 */}
           <div className="p-4 bg-white/5 border border-white/5 rounded-2xl space-y-2">
             <h5 className="text-xs font-bold text-indigo-300 uppercase tracking-wider border-b border-white/5 pb-1">Q6. Free Time Utilization</h5>
-            {renderParentField("Activities", testData.q6_free_time)}
+            {Array.isArray(testData.q6_free_time_activities) && testData.q6_free_time_activities.length > 0 ? (
+              <>
+                {renderParentField("Selected Free Time Activities", testData.q6_free_time_activities.join(", "))}
+                {testData.q6_social_media_usage && renderParentField("Social Media Usage", testData.q6_social_media_usage)}
+              </>
+            ) : (
+              renderParentField("Activities", testData.q6_free_time)
+            )}
           </div>
 
           {/* Q7 */}

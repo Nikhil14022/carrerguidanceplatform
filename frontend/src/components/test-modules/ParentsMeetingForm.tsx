@@ -19,6 +19,7 @@ interface TestData {
   // Q1
   q1_mother_description: string;
   q1_father_description: string;
+  q1_described_words: string[];
   // Q2
   q2_dad_relationship: string;
   q2_mom_relationship: string;
@@ -58,6 +59,8 @@ interface TestData {
   q5_giving_back_explanation: string;
   // Q6
   q6_free_time: string;
+  q6_free_time_activities: string[];
+  q6_social_media_usage: string;
   // Q7
   q7_comfort_close_family: string;
   q7_comfort_friends: string;
@@ -128,6 +131,219 @@ interface TestData {
 
 const TOTAL_QUESTIONS = 14;
 
+const Q1_CATEGORIES = [
+  {
+    title: "Personality & Temperament",
+    words: [
+      "Curious", "Imaginative", "Creative", "Practical", "Logical", "Analytical", 
+      "Thoughtful", "Reflective", "Calm", "Cheerful", "Energetic", "Enthusiastic", 
+      "Optimistic", "Serious", "Mature", "Playful", "Sensitive", "Independent", 
+      "Adaptable", "Flexible"
+    ]
+  },
+  {
+    title: "Learning & Thinking",
+    words: [
+      "Quick Learner", "Inquisitive", "Observant", "Intelligent", "Knowledge-Seeking", 
+      "Research-Oriented", "Innovative", "Experimental", "Detail-Oriented", 
+      "Big-Picture Thinker", "Strategic", "Visionary", "Hands-on", "Conceptual", 
+      "Curious About How Things Work"
+    ]
+  },
+  {
+    title: "Work & Discipline",
+    words: [
+      "Responsible", "Organised", "Disciplined", "Hardworking", "Dedicated", 
+      "Consistent", "Persistent", "Goal-Oriented", "Self-Motivated", "Reliable", 
+      "Punctual", "Focused", "Efficient", "Patient", "Resilient"
+    ]
+  },
+  {
+    title: "Leadership & Initiative",
+    words: [
+      "Confident", "Courageous", "Assertive", "Influential", "Inspiring", "Leader", 
+      "Takes Initiative", "Decision-Maker", "Independent Thinker", "Competitive", 
+      "Ambitious", "Vision-Driven"
+    ]
+  },
+  {
+    title: "Social & Relationships",
+    words: [
+      "Friendly", "Kind", "Caring", "Compassionate", "Helpful", "Cooperative", 
+      "Respectful", "Trustworthy", "Honest", "Loyal", "Empathetic", "Good Listener", 
+      "Team Player", "Approachable", "Social", "Extroverted", "Introverted", "Reserved"
+    ]
+  },
+  {
+    title: "Communication",
+    words: [
+      "Expressive", "Articulate", "Persuasive", "Clear Communicator", "Good Storyteller", 
+      "Good Presenter", "Quiet", "Soft-Spoken", "Opinionated", "Diplomatic"
+    ]
+  },
+  {
+    title: "Creativity & Expression",
+    words: [
+      "Artistic", "Musical", "Expressive", "Innovative", "Original", "Design-Oriented", 
+      "Aesthetic", "Inventive"
+    ]
+  },
+  {
+    title: "Emotional Traits",
+    words: [
+      "Emotionally Aware", "Self-Aware", "Emotionally Sensitive", "Emotionally Strong", 
+      "Calm Under Pressure", "Positive", "Grateful", "Humble", "Forgiving", "Compassionate"
+    ]
+  },
+  {
+    title: "Areas Parents May Observe (Developmental)",
+    words: [
+      "Easily Distracted", "Impatient", "Shy", "Hesitant", "Overthinks", "Perfectionist", 
+      "Stubborn", "Restless", "Emotional", "Easily Influenced", "Procrastinates", 
+      "Disorganised", "Short-Tempered", "Avoids Risk", "Seeks Approval", 
+      "Self-Critical", "Sensitive to Criticism", "Needs Encouragement"
+    ]
+  },
+  {
+    title: "Interests & Orientation",
+    words: [
+      "Nature Lover", "Tech-Savvy", "Entrepreneurial", "Sports-Oriented", 
+      "Academically Inclined", "People-Oriented", "Service-Oriented", "Curious Explorer", 
+      "Adventurous", "Problem Solver", "Builder", "Creator", "Researcher", 
+      "Performer", "Mentor"
+    ]
+  }
+];
+
+const Q6_CATEGORIES = [
+  {
+    title: "Creative & Expressive",
+    activities: [
+      "Drawing or painting",
+      "Music (listening, singing, or playing an instrument)",
+      "Dancing",
+      "Photography or videography",
+      "Writing stories, poems, or journals",
+      "Crafting or DIY projects",
+      "Content creation (YouTube, Instagram, etc.)",
+      "Designing (graphics, fashion, interiors, etc.)"
+    ]
+  },
+  {
+    title: "Learning & Exploration",
+    activities: [
+      "Reading books",
+      "Watching educational videos or documentaries",
+      "Learning new skills online",
+      "Researching topics of interest",
+      "Solving puzzles or brain games",
+      "Conducting experiments or building things",
+      "Asking questions and exploring ideas"
+    ]
+  },
+  {
+    title: "Technology & Gaming",
+    activities: [
+      "Playing video games",
+      "Coding or programming",
+      "Building apps, websites, or digital projects",
+      "Exploring AI or new technology",
+      "Watching technology-related content",
+      "Spending time on social media"
+    ]
+  },
+  {
+    title: "Physical Activities",
+    activities: [
+      "Playing outdoor sports",
+      "Going to the gym or exercising",
+      "Cycling",
+      "Swimming",
+      "Trekking or hiking",
+      "Yoga or meditation",
+      "Walking or spending time outdoors"
+    ]
+  },
+  {
+    title: "Social Activities",
+    activities: [
+      "Spending time with friends",
+      "Spending time with family",
+      "Meeting new people",
+      "Participating in clubs or communities",
+      "Volunteering or helping others",
+      "Organising events or activities"
+    ]
+  },
+  {
+    title: "Nature & Animals",
+    activities: [
+      "Gardening",
+      "Spending time in nature",
+      "Caring for pets or animals",
+      "Bird watching or wildlife exploration"
+    ]
+  },
+  {
+    title: "Thinking & Reflection",
+    activities: [
+      "Daydreaming or imagining future possibilities",
+      "Reflecting or journaling",
+      "Planning future goals",
+      "Observing people and situations",
+      "Enjoying quiet time alone"
+    ]
+  },
+  {
+    title: "Entertainment",
+    activities: [
+      "Watching movies or web series",
+      "Watching sports",
+      "Listening to music or podcasts",
+      "Shopping or browsing online",
+      "Travelling or exploring new places",
+      "Trying new food or cafés"
+    ]
+  },
+  {
+    title: "Responsibility & Practical Activities",
+    activities: [
+      "Helping with household responsibilities",
+      "Managing personal projects",
+      "Learning about finance or business",
+      "Fixing or assembling things",
+      "Cooking or baking"
+    ]
+  },
+  {
+    title: "Digital Consumption",
+    activities: [
+      "Scrolling on Instagram",
+      "Scrolling on YouTube Shorts",
+      "Watching YouTube videos",
+      "Scrolling on Facebook",
+      "Scrolling on Snapchat",
+      "Scrolling on X (Twitter)",
+      "Browsing Reddit",
+      "Watching OTT platforms (Netflix, Prime Video, etc.)",
+      "Watching TV",
+      "Watching gaming streams or esports",
+      "Listening to podcasts",
+      "Listening to music",
+      "Browsing the internet without a specific purpose",
+      "Online shopping or browsing products"
+    ]
+  },
+  {
+    title: "Other",
+    activities: [
+      "Mostly rests or relaxes",
+      "Frequently switches between many activities",
+      "Other: Specify in notes"
+    ]
+  }
+];
+
 const RELATIONSHIP_OPTIONS = [
   "Very Connected",
   "Friendly Bond",
@@ -148,6 +364,7 @@ function getDefaultData(): TestData {
   return {
     q1_mother_description: "",
     q1_father_description: "",
+    q1_described_words: [],
     q2_dad_relationship: "",
     q2_mom_relationship: "",
     q3_favourite_subject: "",
@@ -182,6 +399,8 @@ function getDefaultData(): TestData {
     q5_giving_back_rating: 5,
     q5_giving_back_explanation: "",
     q6_free_time: "",
+    q6_free_time_activities: [],
+    q6_social_media_usage: "",
     q7_comfort_close_family: "",
     q7_comfort_friends: "",
     q7_comfort_authority: "",
@@ -434,32 +653,66 @@ export default function ParentsMeetingForm({
   function renderQuestion() {
     switch (page) {
       /* ---- Q1 ---- */
-      case 0:
+      case 0: {
+        const selectedWords = testData.q1_described_words ?? [];
+        const toggleWord = (word: string) => {
+          if (readOnly) return;
+          let next;
+          if (selectedWords.includes(word)) {
+            next = selectedWords.filter((w) => w !== word);
+          } else {
+            if (selectedWords.length >= 15) {
+              alert("You can select up to 15 words.");
+              return;
+            }
+            next = [...selectedWords, word];
+          }
+          update("q1_described_words", next);
+        };
+
         return (
-          <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
-              Q1. Describe your child
-            </h3>
+          <div className="space-y-6">
             <div>
-              <Label>Mother&apos;s Description</Label>
-              <Textarea
-                value={testData.q1_mother_description}
-                onChange={(v) => update("q1_mother_description", v)}
-                placeholder="How would the mother describe the child..."
-                rows={4}
-              />
+              <h3 className="text-lg font-semibold text-white">
+                Q1. Which words best describe your child today?
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Select up to 15 words that most accurately describe your child&apos;s personality, behaviour, strengths, and areas for growth. (Selected: {selectedWords.length}/15)
+              </p>
             </div>
-            <div>
-              <Label>Father&apos;s Description</Label>
-              <Textarea
-                value={testData.q1_father_description}
-                onChange={(v) => update("q1_father_description", v)}
-                placeholder="How would the father describe the child..."
-                rows={4}
-              />
+            
+            <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              {Q1_CATEGORIES.map((cat) => (
+                <div key={cat.title} className="space-y-2.5">
+                  <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800 pb-1">
+                    {cat.title}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.words.map((word) => {
+                      const isSelected = selectedWords.includes(word);
+                      return (
+                        <button
+                          key={word}
+                          type="button"
+                          disabled={readOnly}
+                          onClick={() => toggleWord(word)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                            isSelected
+                              ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
+                              : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
+                          } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
+                        >
+                          {word}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         );
+      }
 
       /* ---- Q2 ---- */
       case 1:
@@ -615,20 +868,94 @@ export default function ParentsMeetingForm({
         );
 
       /* ---- Q6 ---- */
-      case 5:
+      case 5: {
+        const selectedActivities = testData.q6_free_time_activities ?? [];
+        const toggleActivity = (activity: string) => {
+          if (readOnly) return;
+          const next = selectedActivities.includes(activity)
+            ? selectedActivities.filter((a) => a !== activity)
+            : [...selectedActivities, activity];
+          update("q6_free_time_activities", next);
+        };
+
+        const socialMediaOptions = [
+          "Mostly for learning and education",
+          "Mostly for entertainment",
+          "Mostly to connect with friends",
+          "Mostly for creating content",
+          "Mostly for following influencers or celebrities",
+          "Mostly for news and current affairs",
+          "A balanced mix of different purposes",
+          "Unsure"
+        ];
+
         return (
-          <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
-              Q6. What does your child do in their free time?
-            </h3>
-            <Textarea
-              value={testData.q6_free_time}
-              onChange={(v) => update("q6_free_time", v)}
-              placeholder="Describe what your child does when they have free time..."
-              rows={6}
-            />
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Q6. How does your child usually spend their free time?
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Select all options that regularly apply.
+              </p>
+            </div>
+
+            <div className="space-y-6 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+              {Q6_CATEGORIES.map((cat) => (
+                <div key={cat.title} className="space-y-2.5">
+                  <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest border-b border-slate-800 pb-1">
+                    {cat.title}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.activities.map((act) => {
+                      const isSelected = selectedActivities.includes(act);
+                      return (
+                        <button
+                          key={act}
+                          type="button"
+                          disabled={readOnly}
+                          onClick={() => toggleActivity(act)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                            isSelected
+                              ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
+                              : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
+                          } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
+                        >
+                          {act}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-slate-800 space-y-3">
+              <Label>How would you describe your child&apos;s use of social media?</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {socialMediaOptions.map((opt) => {
+                  const isSelected = testData.q6_social_media_usage === opt;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      disabled={readOnly}
+                      onClick={() => !readOnly && update("q6_social_media_usage", opt)}
+                      className={`px-4 py-2.5 rounded-xl text-left text-xs font-semibold border transition-all ${
+                        isSelected
+                          ? "bg-indigo-600/20 border-indigo-500 text-indigo-300"
+                          : "bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700"
+                      } ${readOnly ? "cursor-not-allowed opacity-60" : ""}`}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         );
+      }
 
       /* ---- Q7 ---- */
       case 6: {
