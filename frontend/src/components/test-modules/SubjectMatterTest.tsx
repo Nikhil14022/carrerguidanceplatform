@@ -214,6 +214,11 @@ function computeColumnTotals(
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
+const isStaffView = () => {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname.includes('/mentor') || window.location.pathname.includes('/admin');
+};
+
 export default function SubjectMatterTest({
   answers,
   setAnswers,
@@ -749,6 +754,35 @@ export default function SubjectMatterTest({
     </div>
   );
 
+  const renderThankYou = () => (
+    <div style={{ textAlign: "center", padding: "40px 20px" }}>
+      <div 
+        style={{
+          width: 64,
+          height: 64,
+          background: "rgba(16, 185, 129, 0.1)",
+          border: "1px solid rgba(16, 185, 129, 0.2)",
+          color: "#10b981",
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: "0 auto 20px",
+          fontSize: 32,
+          fontWeight: "bold"
+        }}
+      >
+        ✓
+      </div>
+      <h2 style={{ fontSize: 20, fontWeight: 600, color: "#f1f5f9", marginBottom: 8 }}>
+        Assessment Completed!
+      </h2>
+      <p style={{ fontSize: 14, color: "#94a3b8", maxWidth: 440, margin: "0 auto", lineHeight: "1.6" }}>
+        Thank you for completing the Subject Matter Interest & Hypotheticals assessment. Your responses have been saved and locked. Your mentor will review the results and discuss them with you during your next session.
+      </p>
+    </div>
+  );
+
   /* ---------------------------------------------------------------- */
   /*  Main render                                                      */
   /* ---------------------------------------------------------------- */
@@ -790,7 +824,7 @@ export default function SubjectMatterTest({
         >
           {step < 8 && renderScenario()}
           {step === 8 && renderTop3()}
-          {step === 9 && renderSummary()}
+          {step === 9 && (isStaffView() ? renderSummary() : renderThankYou())}
         </div>
 
         {/* Navigation */}

@@ -255,6 +255,11 @@ const emptyResponse: RIASECResponse = {
   R: [], I: [], A: [], S: [], E: [], C: [],
 };
 
+const isStaffView = () => {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname.includes('/mentor') || window.location.pathname.includes('/admin');
+};
+
 export default function RIASECTest({
   answers,
   setAnswers,
@@ -400,32 +405,34 @@ export default function RIASECTest({
       </div>
 
       {/* ---- Score summary bar ---- */}
-      <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-          Score Summary
-        </p>
-        <div className="grid grid-cols-6 gap-2">
-          {(Object.keys(emptyResponse) as SectionKey[]).map((key) => {
-            const count = countFor(key);
-            const sec = sections.find((s) => s.key === key)!;
-            const maxItems = sec.groups.reduce((s, g) => s + g.items.length, 0);
-            const pct = maxItems > 0 ? (count / maxItems) * 100 : 0;
+      {isStaffView() && (
+        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+            Score Summary
+          </p>
+          <div className="grid grid-cols-6 gap-2">
+            {(Object.keys(emptyResponse) as SectionKey[]).map((key) => {
+              const count = countFor(key);
+              const sec = sections.find((s) => s.key === key)!;
+              const maxItems = sec.groups.reduce((s, g) => s + g.items.length, 0);
+              const pct = maxItems > 0 ? (count / maxItems) * 100 : 0;
 
-            return (
-              <div key={key} className="text-center">
-                <p className={`text-xs font-bold ${barTextColors[key]}`}>{key}</p>
-                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${barColors[key]}`}
-                    style={{ width: `${pct}%` }}
-                  />
+              return (
+                <div key={key} className="text-center">
+                  <p className={`text-xs font-bold ${barTextColors[key]}`}>{key}</p>
+                  <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${barColors[key]}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-sm font-semibold text-slate-300">{count}</p>
                 </div>
-                <p className="mt-1 text-sm font-semibold text-slate-300">{count}</p>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ---- Step Navigation Buttons ---- */}
       <div className="flex justify-between gap-4 pt-4">
