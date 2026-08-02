@@ -402,6 +402,353 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
         }
 
         if (isEditing) {
+            const questions = selectedModule?.module?.schema?.questions || [];
+            if (questions.length > 0) {
+                return (
+                    <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+                        {questions.map((q: any) => {
+                            const value = editData[q.id];
+                            
+                            const handleValueChange = (newVal: any) => {
+                                setEditData({ ...editData, [q.id]: newVal });
+                            };
+
+                            const handleNotesChange = (newNotes: string) => {
+                                setEditData({ ...editData, [`${q.id}_open_text`]: newNotes });
+                            };
+
+                            return (
+                                <div key={q.id} className="space-y-2 border-b border-white/5 pb-4 last:border-0">
+                                    <label className="text-xs font-bold text-slate-300 block">{q.question}</label>
+                                    {q.description && <p className="text-[10px] text-slate-500">{q.description}</p>}
+                                    
+                                    {/* Main Field Editor */}
+                                    {q.options ? (
+                                        <div className="flex flex-wrap gap-1.5 pt-1">
+                                            {q.options.map((opt: any) => {
+                                                const isSelected = q.type === 'multiselect'
+                                                    ? (Array.isArray(value) && value.includes(opt.id))
+                                                    : (value === opt.id || (Array.isArray(value) && value[0] === opt.id));
+                                                
+                                                const handleToggle = () => {
+                                                    if (q.type === 'multiselect') {
+                                                        const current = Array.isArray(value) ? value : [];
+                                                        const next = current.includes(opt.id)
+                                                            ? current.filter(id => id !== opt.id)
+                                                            : [...current, opt.id];
+                                                        handleValueChange(next);
+                                                    } else {
+                                                        handleValueChange(opt.id);
+                                                    }
+                                                };
+
+                                                return (
+                                                    <button 
+                                                        key={opt.id} 
+                                                        type="button"
+                                                        onClick={handleToggle}
+                                                        className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+                                                            isSelected
+                                                                ? 'bg-orange-500/20 border-orange-500 text-orange-300'
+                                                                : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-350'
+                                                        }`}
+                                                    >
+                                                        {opt.text}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : q.type === 'scale' ? (
+                                        <select
+                                            value={Number(value) || 5}
+                                            onChange={e => handleValueChange(Number(e.target.value))}
+                                            className="bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                        >
+                                            {Array.from({ length: (q.max || 10) - (q.min || 1) + 1 }, (_, i) => (q.min || 1) + i).map(num => (
+                                                <option key={num} value={num}>{num}</option>
+                                            ))}
+                                        </select>
+                                    ) : q.type === 'table' ? (() => {
+                                        const numCols = q.col4Label ? 4 : (q.col3Label ? 3 : (q.col2Label ? 2 : 1));
+                                        const colSpanClass = numCols === 4 ? 'grid-cols-4' : (numCols === 3 ? 'grid-cols-3' : (numCols === 2 ? 'grid-cols-2' : 'grid-cols-1'));
+                                        const tableRows = Array.isArray(value) ? value : [];
+                                        
+                                        return (
+                                            <div className="space-y-4 bg-slate-950 p-3 border border-slate-850 rounded-xl">
+                                                {/* Headers */}
+                                                <div className={`grid ${colSpanClass} gap-3 border-b border-slate-800 pb-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest`}>
+                                                    <div>{q.col1Label || 'Item'}</div>
+                                                    {numCols >= 2 && <div>{q.col2Label || 'Details'}</div>}
+                                                    {numCols >= 3 && <div>{q.col3Label}</div>}
+                                                    {numCols >= 4 && <div>{q.col4Label}</div>}
+                                                </div>
+
+                                                {/* Rows */}
+                                                <div className="space-y-2">
+                                                    {tableRows.map((row: any, rIdx: number) => {
+                                                        const handleCellChange = (colKey: string, cellVal: any) => {
+                                                            const next = [...tableRows];
+                                                            next[rIdx] = { ...next[rIdx], [colKey]: cellVal };
+                                                            handleValueChange(next);
+                                                        };
+
+                                                        return (
+                                                            <div key={rIdx} className={`grid ${colSpanClass} gap-2 items-center`}>
+                                                                <input 
+                                                                    type="text"
+                                                                    value={row.col1 ?? ''}
+                                                                    disabled={Array.isArray(q.prefilledRows) && rIdx < q.prefilledRows.length}
+                                                                    placeholder={q.col1Placeholder || '...'}
+                                                                    onChange={e => handleCellChange('col1', e.target.value)}
+                                                                    className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500 disabled:opacity-50"
+                                                                />
+
+                                                                {numCols >= 2 && (
+                                                                    q.col2Options ? (
+                                                                        <select
+                                                                            value={row.col2 ?? ''}
+                                                                            onChange={e => handleCellChange('col2', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        >
+                                                                            <option value="">Select...</option>
+                                                                            {q.col2Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                                                        </select>
+                                                                    ) : (
+                                                                        <input 
+                                                                            type="text"
+                                                                            value={row.col2 ?? ''}
+                                                                            placeholder={q.col2Placeholder || '...'}
+                                                                            onChange={e => handleCellChange('col2', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        />
+                                                                    )
+                                                                )}
+
+                                                                {numCols >= 3 && (
+                                                                    q.col3Options ? (
+                                                                        <select
+                                                                            value={row.col3 ?? ''}
+                                                                            onChange={e => handleCellChange('col3', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        >
+                                                                            <option value="">Select...</option>
+                                                                            {q.col3Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                                                        </select>
+                                                                    ) : (
+                                                                        <input 
+                                                                            type="text"
+                                                                            value={row.col3 ?? ''}
+                                                                            placeholder={q.col3Placeholder || '...'}
+                                                                            onChange={e => handleCellChange('col3', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        />
+                                                                    )
+                                                                )}
+
+                                                                {numCols >= 4 && (
+                                                                    q.col4Options ? (
+                                                                        <select
+                                                                            value={row.col4 ?? ''}
+                                                                            onChange={e => handleCellChange('col4', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        >
+                                                                            <option value="">Select...</option>
+                                                                            {q.col4Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                                                        </select>
+                                                                    ) : (
+                                                                        <input 
+                                                                            type="text"
+                                                                            value={row.col4 ?? ''}
+                                                                            placeholder={q.col4Placeholder || '...'}
+                                                                            onChange={e => handleCellChange('col4', e.target.value)}
+                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200 focus:outline-none"
+                                                                        />
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                {(!q.prefilledRows || q.prefilledRows.length === 0) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleValueChange([...tableRows, { col1: '', col2: '', col3: '', col4: '' }])}
+                                                        className="px-2 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                                                    >
+                                                        + Add Row
+                                                    </button>
+                                                )}
+                                            </div>
+                                        );
+                                    })() : q.type === 'schedule' ? (() => {
+                                        if (Array.isArray(value)) {
+                                            return (
+                                                <div className="space-y-3 bg-slate-950 p-3 border border-slate-850 rounded-xl">
+                                                    {value.map((sched: any, sIdx: number) => (
+                                                        <div key={sIdx} className="space-y-2 border-b border-slate-800 pb-3 last:border-0 last:pb-0">
+                                                            <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                                                Days: {Array.isArray(sched.days) ? sched.days.join(', ') : 'All Days'}
+                                                            </div>
+                                                            <div className="space-y-1.5">
+                                                                {(sched.slots || []).map((slot: any, slotIdx: number) => {
+                                                                    const handleSlotChange = (field: 'time' | 'activity', val: string) => {
+                                                                        const nextVal = [...value];
+                                                                        const nextSlots = [...nextVal[sIdx].slots];
+                                                                        nextSlots[slotIdx] = { ...nextSlots[slotIdx], [field]: val };
+                                                                        nextVal[sIdx] = { ...nextVal[sIdx], slots: nextSlots };
+                                                                        handleValueChange(nextVal);
+                                                                    };
+                                                                    const handleRemoveSlot = () => {
+                                                                        const nextVal = [...value];
+                                                                        nextVal[sIdx] = {
+                                                                            ...nextVal[sIdx],
+                                                                            slots: nextVal[sIdx].slots.filter((_: any, idx: number) => idx !== slotIdx)
+                                                                        };
+                                                                        handleValueChange(nextVal);
+                                                                    };
+                                                                    return (
+                                                                        <div key={slotIdx} className="flex gap-2 items-center">
+                                                                            <input 
+                                                                                type="text"
+                                                                                value={slot.time ?? ''}
+                                                                                placeholder="Time"
+                                                                                onChange={e => handleSlotChange('time', e.target.value)}
+                                                                                className="w-24 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200"
+                                                                            />
+                                                                            <input 
+                                                                                type="text"
+                                                                                value={slot.activity ?? ''}
+                                                                                placeholder="Activity"
+                                                                                onChange={e => handleSlotChange('activity', e.target.value)}
+                                                                                className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200"
+                                                                            />
+                                                                            <button type="button" onClick={handleRemoveSlot} className="text-red-500 font-bold px-1 text-xs">✕</button>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const nextVal = [...value];
+                                                                    nextVal[sIdx] = {
+                                                                        ...nextVal[sIdx],
+                                                                        slots: [...(nextVal[sIdx].slots || []), { time: '', activity: '' }]
+                                                                    };
+                                                                    handleValueChange(nextVal);
+                                                                }}
+                                                                className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-bold text-slate-350"
+                                                            >
+                                                                + Add Slot
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        } else {
+                                            const obj = typeof value === 'object' && value !== null ? value : {};
+                                            const entries = Object.entries(obj);
+                                            return (
+                                                <div className="space-y-2 bg-slate-950 p-3 border border-slate-850 rounded-xl">
+                                                    <div className="space-y-1.5">
+                                                        {entries.map(([time, activity], rIdx) => {
+                                                            const handleKeyChange = (newTime: string) => {
+                                                                const nextVal = { ...obj };
+                                                                delete nextVal[time];
+                                                                nextVal[newTime] = activity;
+                                                                handleValueChange(nextVal);
+                                                            };
+                                                            const handleValChange = (newActivity: string) => {
+                                                                const nextVal = { ...obj, [time]: newActivity };
+                                                                handleValueChange(nextVal);
+                                                            };
+                                                            const handleRemoveRow = () => {
+                                                                const nextVal = { ...obj };
+                                                                delete nextVal[time];
+                                                                handleValueChange(nextVal);
+                                                            };
+                                                            return (
+                                                                <div key={rIdx} className="flex gap-2 items-center">
+                                                                    <input 
+                                                                        type="text"
+                                                                        value={time}
+                                                                        placeholder="Time"
+                                                                        onChange={e => handleKeyChange(e.target.value)}
+                                                                        className="w-24 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200"
+                                                                    />
+                                                                    <input 
+                                                                        type="text"
+                                                                        value={String(activity)}
+                                                                        placeholder="Activity"
+                                                                        onChange={e => handleValChange(e.target.value)}
+                                                                        className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-200"
+                                                                    />
+                                                                    <button type="button" onClick={handleRemoveRow} className="text-red-500 font-bold px-1 text-xs">✕</button>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleValueChange({ ...obj, "": "" })}
+                                                        className="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-bold text-slate-350"
+                                                    >
+                                                        + Add Slot
+                                                    </button>
+                                                </div>
+                                            );
+                                        }
+                                    })() : (
+                                        <textarea
+                                            value={typeof value === 'object' ? JSON.stringify(value, null, 2) : (value ?? '')}
+                                            onChange={e => {
+                                                try {
+                                                    handleValueChange(JSON.parse(e.target.value));
+                                                } catch {
+                                                    handleValueChange(e.target.value);
+                                                }
+                                            }}
+                                            rows={2}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                        />
+                                    )}
+
+                                    {/* Notes / Comments Editor */}
+                                    {(q.type === 'choice' || q.type === 'multiselect') && (
+                                        <div className="space-y-1 mt-1.5">
+                                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block font-medium">Notes / Comments</span>
+                                            <textarea
+                                                value={editData[`${q.id}_open_text`] ?? ''}
+                                                onChange={e => handleNotesChange(e.target.value)}
+                                                rows={2}
+                                                placeholder="Client notes..."
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        <div className="flex gap-2 pt-2 sticky bottom-0 bg-slate-900/90 py-2">
+                            <button
+                                onClick={() => handleManage('EDIT_RESPONSE', selectedModule?.id, undefined, editData)}
+                                className="flex-1 py-2 rounded-lg bg-orange-500 text-white text-[10px] font-bold uppercase tracking-widest"
+                            >
+                                Save Changes
+                            </button>
+                            <button
+                                onClick={() => setIsEditing(false)}
+                                className="flex-1 py-2 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
             return (
                 <div className="space-y-4">
                     {Object.keys(selectedModule?.module.schema.properties || data).map((key) => (

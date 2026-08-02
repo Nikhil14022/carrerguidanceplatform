@@ -15,6 +15,14 @@ interface QuestionSchema {
     col2Label?: string;
     col3Label?: string;
     col4Label?: string;
+    col1Placeholder?: string;
+    col2Placeholder?: string;
+    col3Placeholder?: string;
+    col4Placeholder?: string;
+    col2Options?: string[];
+    col3Options?: string[];
+    col4Options?: string[];
+    prefilledRows?: any[];
     rows?: number;
     traits?: { trait: string; leftLabel: string; rightLabel: string }[];
     dependsOn?: { questionId: string; value: string };
@@ -44,6 +52,7 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
     const [moduleId, setModuleId] = useState('');
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<any>(null);
+    const [editNotesValue, setEditNotesValue] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
     const [notesEditing, setNotesEditing] = useState(false);
@@ -83,11 +92,14 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
         }
     };
 
-    const handleSave = async (questionId: string, newValue: any) => {
+    const handleSave = async (questionId: string, newValue: any, openTextValue?: string) => {
         if (!mod) return;
         setSaving(true);
         try {
             const updatedData = { ...(mod.response?.data || {}), [questionId]: newValue };
+            if (openTextValue !== undefined) {
+                updatedData[`${questionId}_open_text`] = openTextValue;
+            }
             const res = await fetch(`/api/mentor/modules/${mod.id}/review`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -369,16 +381,31 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
         // For choice questions, show options as selectable buttons
         if ((question.type === 'choice') && question.options) {
             return (
-                <div className="flex flex-wrap gap-2">
-                    {question.options.map(opt => (
-                        <button key={opt.id} onClick={() => setEditValue([opt.id])}
-                            className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
-                                (Array.isArray(editValue) ? editValue.includes(opt.id) : editValue === opt.id)
-                                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                                    : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
-                            }`}
-                        >{opt.text}</button>
-                    ))}
+                <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                        {question.options.map(opt => {
+                            const isSelected = Array.isArray(editValue) ? editValue.includes(opt.id) : editValue === opt.id;
+                            return (
+                                <button key={opt.id} onClick={() => setEditValue(opt.id)}
+                                    className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
+                                        isSelected
+                                            ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                                            : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
+                                    }`}
+                                >{opt.text}</button>
+                            );
+                        })}
+                    </div>
+                    <div className="space-y-1 mt-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block font-medium">Notes / Comments</span>
+                        <textarea
+                            value={editNotesValue}
+                            onChange={(e) => setEditNotesValue(e.target.value)}
+                            rows={2}
+                            placeholder="Add notes..."
+                            className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-xs text-slate-350 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20"
+                        />
+                    </div>
                 </div>
             );
         }
@@ -387,23 +414,306 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
         if ((question.type === 'multiselect' || question.type === 'dropdown_multi') && question.options) {
             const selected = Array.isArray(editValue) ? editValue : [];
             return (
-                <div className="flex flex-wrap gap-2">
-                    {question.options.map(opt => (
-                        <button key={opt.id} onClick={() => {
-                            setEditValue(selected.includes(opt.id)
-                                ? selected.filter((v: string) => v !== opt.id)
-                                : [...selected, opt.id]
-                            );
-                        }}
-                            className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
-                                selected.includes(opt.id)
-                                    ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                                    : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
-                            }`}
-                        >{opt.text}</button>
-                    ))}
+                <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                        {question.options.map(opt => (
+                            <button key={opt.id} onClick={() => {
+                                setEditValue(selected.includes(opt.id)
+                                    ? selected.filter((v: string) => v !== opt.id)
+                                    : [...selected, opt.id]
+                                );
+                            }}
+                                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${
+                                    selected.includes(opt.id)
+                                        ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                                        : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/20'
+                                }`}
+                            >{opt.text}</button>
+                        ))}
+                    </div>
+                    <div className="space-y-1 mt-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block font-medium">Notes / Comments</span>
+                        <textarea
+                            value={editNotesValue}
+                            onChange={(e) => setEditNotesValue(e.target.value)}
+                            rows={2}
+                            placeholder="Add notes..."
+                            className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-xs text-slate-355 focus:outline-none"
+                        />
+                    </div>
                 </div>
             );
+        }
+
+        if (question.type === 'scale') {
+            return (
+                <select
+                    value={Number(editValue) || 5}
+                    onChange={e => setEditValue(Number(e.target.value))}
+                    className="bg-slate-950 border border-white/10 rounded-xl p-3 text-sm text-slate-350 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20"
+                >
+                    {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
+                        <option key={num} value={num}>{num}</option>
+                    ))}
+                </select>
+            );
+        }
+
+        if (question.type === 'table') {
+            const numCols = question.col4Label ? 4 : (question.col3Label ? 3 : (question.col2Label ? 2 : 1));
+            const colSpanClass = numCols === 4 ? 'grid-cols-4' : (numCols === 3 ? 'grid-cols-3' : (numCols === 2 ? 'grid-cols-2' : 'grid-cols-1'));
+            const tableRows = Array.isArray(editValue) ? editValue : [];
+            return (
+                <div className="space-y-4 bg-slate-950 p-4 border border-white/10 rounded-xl">
+                    {/* Headers */}
+                    <div className={`grid ${colSpanClass} gap-3 border-b border-white/10 pb-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest`}>
+                        <div>{question.col1Label || 'Item'}</div>
+                        {numCols >= 2 && <div>{question.col2Label || 'Details'}</div>}
+                        {numCols >= 3 && <div>{question.col3Label}</div>}
+                        {numCols >= 4 && <div>{question.col4Label}</div>}
+                    </div>
+
+                    {/* Rows */}
+                    <div className="space-y-2">
+                        {tableRows.map((row: any, rIdx: number) => {
+                            const handleCellChange = (colKey: string, cellVal: any) => {
+                                const next = [...tableRows];
+                                next[rIdx] = { ...next[rIdx], [colKey]: cellVal };
+                                setEditValue(next);
+                            };
+
+                            return (
+                                <div key={rIdx} className={`grid ${colSpanClass} gap-2 items-center`}>
+                                    {/* Col 1 */}
+                                    <input 
+                                        type="text"
+                                        value={row.col1 ?? ''}
+                                        disabled={Array.isArray(question.prefilledRows) && rIdx < question.prefilledRows.length}
+                                        placeholder={question.col1Placeholder || '...'}
+                                        onChange={e => handleCellChange('col1', e.target.value)}
+                                        className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                                    />
+
+                                    {/* Col 2 */}
+                                    {numCols >= 2 && (
+                                        question.col2Options ? (
+                                            <select
+                                                value={row.col2 ?? ''}
+                                                onChange={e => handleCellChange('col2', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            >
+                                                <option value="">Select...</option>
+                                                {question.col2Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        ) : (
+                                            <input 
+                                                type="text"
+                                                value={row.col2 ?? ''}
+                                                placeholder={question.col2Placeholder || '...'}
+                                                onChange={e => handleCellChange('col2', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            />
+                                        )
+                                    )}
+
+                                    {/* Col 3 */}
+                                    {numCols >= 3 && (
+                                        question.col3Options ? (
+                                            <select
+                                                value={row.col3 ?? ''}
+                                                onChange={e => handleCellChange('col3', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            >
+                                                <option value="">Select...</option>
+                                                {question.col3Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        ) : (
+                                            <input 
+                                                type="text"
+                                                value={row.col3 ?? ''}
+                                                placeholder={question.col3Placeholder || '...'}
+                                                onChange={e => handleCellChange('col3', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            />
+                                        )
+                                    )}
+
+                                    {/* Col 4 */}
+                                    {numCols >= 4 && (
+                                        question.col4Options ? (
+                                            <select
+                                                value={row.col4 ?? ''}
+                                                onChange={e => handleCellChange('col4', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            >
+                                                <option value="">Select...</option>
+                                                {question.col4Options.map((opt: any) => <option key={opt} value={opt}>{opt}</option>)}
+                                            </select>
+                                        ) : (
+                                            <input 
+                                                type="text"
+                                                value={row.col4 ?? ''}
+                                                placeholder={question.col4Placeholder || '...'}
+                                                onChange={e => handleCellChange('col4', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none"
+                                            />
+                                        )
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Add Row Button */}
+                    {(!question.prefilledRows || question.prefilledRows.length === 0) && (
+                        <button
+                            type="button"
+                            onClick={() => setEditValue([...tableRows, { col1: '', col2: '', col3: '', col4: '' }])}
+                            className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[9px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                        >
+                            + Add Row
+                        </button>
+                    )}
+                </div>
+            );
+        }
+
+        if (question.type === 'schedule') {
+            if (Array.isArray(editValue)) {
+                return (
+                    <div className="space-y-4 bg-slate-950 p-4 border border-white/10 rounded-xl">
+                        {editValue.map((sched: any, sIdx: number) => (
+                            <div key={sIdx} className="space-y-3 border-b border-white/10 pb-4 last:border-0">
+                                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                    Days: {Array.isArray(sched.days) ? sched.days.join(', ') : 'All Days'}
+                                </div>
+                                <div className="space-y-2">
+                                    {(sched.slots || []).map((slot: any, slotIdx: number) => {
+                                        const handleSlotChange = (field: 'time' | 'activity', val: string) => {
+                                            const nextVal = [...editValue];
+                                            const nextSlots = [...nextVal[sIdx].slots];
+                                            nextSlots[slotIdx] = { ...nextSlots[slotIdx], [field]: val };
+                                            nextVal[sIdx] = { ...nextVal[sIdx], slots: nextSlots };
+                                            setEditValue(nextVal);
+                                        };
+                                        
+                                        const handleRemoveSlot = () => {
+                                            const nextVal = [...editValue];
+                                            nextVal[sIdx] = {
+                                                ...nextVal[sIdx],
+                                                slots: nextVal[sIdx].slots.filter((_: any, idx: number) => idx !== slotIdx)
+                                            };
+                                            setEditValue(nextVal);
+                                        };
+
+                                        return (
+                                            <div key={slotIdx} className="flex gap-3 items-center">
+                                                <input 
+                                                    type="text"
+                                                    value={slot.time ?? ''}
+                                                    placeholder="Time"
+                                                    onChange={e => handleSlotChange('time', e.target.value)}
+                                                    className="w-36 bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                />
+                                                <input 
+                                                    type="text"
+                                                    value={slot.activity ?? ''}
+                                                    placeholder="Activity"
+                                                    onChange={e => handleSlotChange('activity', e.target.value)}
+                                                    className="flex-1 bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRemoveSlot}
+                                                    className="text-xs text-red-500 hover:text-red-400 font-bold px-1"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const nextVal = [...editValue];
+                                        nextVal[sIdx] = {
+                                            ...nextVal[sIdx],
+                                            slots: [...(nextVal[sIdx].slots || []), { time: '', activity: '' }]
+                                        };
+                                        setEditValue(nextVal);
+                                    }}
+                                    className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-355 transition-all uppercase tracking-wider"
+                                >
+                                    + Add Slot
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                );
+            } else {
+                const obj = typeof editValue === 'object' && editValue !== null ? editValue : {};
+                const entries = Object.entries(obj);
+                
+                return (
+                    <div className="space-y-4 bg-slate-950 p-4 border border-white/10 rounded-xl">
+                        <div className="space-y-3">
+                            {entries.map(([time, activity], rIdx) => {
+                                const handleKeyChange = (newTime: string) => {
+                                    const nextVal = { ...obj };
+                                    delete nextVal[time];
+                                    nextVal[newTime] = activity;
+                                    setEditValue(nextVal);
+                                };
+                                
+                                const handleValChange = (newActivity: string) => {
+                                    const nextVal = { ...obj, [time]: newActivity };
+                                    setEditValue(nextVal);
+                                };
+                                
+                                const handleRemoveRow = () => {
+                                    const nextVal = { ...obj };
+                                    delete nextVal[time];
+                                    setEditValue(nextVal);
+                                };
+
+                                return (
+                                    <div key={rIdx} className="flex gap-3 items-center">
+                                        <input 
+                                            type="text"
+                                            value={time}
+                                            placeholder="Time"
+                                            onChange={e => handleKeyChange(e.target.value)}
+                                            className="w-36 bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                        />
+                                        <input 
+                                            type="text"
+                                            value={String(activity)}
+                                            placeholder="Activity"
+                                            onChange={e => handleValChange(e.target.value)}
+                                            className="flex-1 bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveRow}
+                                            className="text-xs text-red-500 hover:text-red-400 font-bold px-1"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setEditValue({ ...obj, "": "" })}
+                            className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                        >
+                            + Add Slot
+                        </button>
+                    </div>
+                );
+            }
         }
 
         // For all other types, use textarea with JSON for complex values
@@ -522,14 +832,14 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                                         {renderEditField(q, value)}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => handleSave(q.id, editValue)}
+                                                onClick={() => handleSave(q.id, editValue, (q.type === 'choice' || q.type === 'multiselect') ? editNotesValue : undefined)}
                                                 disabled={saving}
                                                 className="px-4 py-2 rounded-xl bg-indigo-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-600 transition-all disabled:opacity-50"
                                             >
                                                 {saving ? 'Saving...' : 'Save'}
                                             </button>
                                             <button
-                                                onClick={() => { setEditingKey(null); setEditValue(null); }}
+                                                onClick={() => { setEditingKey(null); setEditValue(null); setEditNotesValue(''); }}
                                                 className="px-4 py-2 rounded-xl bg-white/5 text-slate-400 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
                                             >
                                                 Cancel
@@ -548,7 +858,7 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
                                              )}
                                          </div>
                                         <button
-                                            onClick={() => { setEditingKey(q.id); setEditValue(value); }}
+                                            onClick={() => { setEditingKey(q.id); setEditValue(value); setEditNotesValue(answers[`${q.id}_open_text`] || ''); }}
                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 uppercase tracking-widest transition-all flex-shrink-0 border border-transparent hover:border-indigo-500/20"
                                             title="Edit this answer"
                                         >

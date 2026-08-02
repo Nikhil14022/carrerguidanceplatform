@@ -653,6 +653,142 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                                 )}
                                                                             </div>
                                                                         );
+                                                                    })() : q.type === 'schedule' ? (() => {
+                                                                        if (Array.isArray(editingValue)) {
+                                                                            return (
+                                                                                <div className="space-y-4 bg-slate-950 p-4 border border-slate-850 rounded-2xl max-w-4xl">
+                                                                                    {editingValue.map((sched: any, sIdx: number) => (
+                                                                                        <div key={sIdx} className="space-y-3 border-b border-slate-800 pb-4 last:border-0">
+                                                                                            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                                                                                Days: {Array.isArray(sched.days) ? sched.days.join(', ') : 'All Days'}
+                                                                                            </div>
+                                                                                            <div className="space-y-2">
+                                                                                                {(sched.slots || []).map((slot: any, slotIdx: number) => {
+                                                                                                    const handleSlotChange = (field: 'time' | 'activity', val: string) => {
+                                                                                                        const nextVal = [...editingValue];
+                                                                                                        const nextSlots = [...nextVal[sIdx].slots];
+                                                                                                        nextSlots[slotIdx] = { ...nextSlots[slotIdx], [field]: val };
+                                                                                                        nextVal[sIdx] = { ...nextVal[sIdx], slots: nextSlots };
+                                                                                                        setEditingValue(nextVal);
+                                                                                                    };
+                                                                                                    
+                                                                                                    const handleRemoveSlot = () => {
+                                                                                                        const nextVal = [...editingValue];
+                                                                                                        nextVal[sIdx] = {
+                                                                                                            ...nextVal[sIdx],
+                                                                                                            slots: nextVal[sIdx].slots.filter((_: any, idx: number) => idx !== slotIdx)
+                                                                                                        };
+                                                                                                        setEditingValue(nextVal);
+                                                                                                    };
+
+                                                                                                    return (
+                                                                                                        <div key={slotIdx} className="flex gap-3 items-center">
+                                                                                                            <input 
+                                                                                                                type="text"
+                                                                                                                value={slot.time ?? ''}
+                                                                                                                placeholder="Time"
+                                                                                                                onChange={e => handleSlotChange('time', e.target.value)}
+                                                                                                                className="w-36 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                                                                                            />
+                                                                                                            <input 
+                                                                                                                type="text"
+                                                                                                                value={slot.activity ?? ''}
+                                                                                                                placeholder="Activity"
+                                                                                                                onChange={e => handleSlotChange('activity', e.target.value)}
+                                                                                                                className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                                                                                            />
+                                                                                                            <button
+                                                                                                                type="button"
+                                                                                                                onClick={handleRemoveSlot}
+                                                                                                                className="text-xs text-red-500 hover:text-red-400 font-bold px-1"
+                                                                                                            >
+                                                                                                                ✕
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                    );
+                                                                                                })}
+                                                                                            </div>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                onClick={() => {
+                                                                                                    const nextVal = [...editingValue];
+                                                                                                    nextVal[sIdx] = {
+                                                                                                        ...nextVal[sIdx],
+                                                                                                        slots: [...(nextVal[sIdx].slots || []), { time: '', activity: '' }]
+                                                                                                    };
+                                                                                                    setEditingValue(nextVal);
+                                                                                                }}
+                                                                                                className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                                                                                            >
+                                                                                                + Add Slot
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            );
+                                                                        } else {
+                                                                            const obj = typeof editingValue === 'object' && editingValue !== null ? editingValue : {};
+                                                                            const entries = Object.entries(obj);
+                                                                            
+                                                                            return (
+                                                                                <div className="space-y-4 bg-slate-950 p-4 border border-slate-850 rounded-2xl max-w-4xl">
+                                                                                    <div className="space-y-3">
+                                                                                        {entries.map(([time, activity], rIdx) => {
+                                                                                            const handleKeyChange = (newTime: string) => {
+                                                                                                const nextVal = { ...obj };
+                                                                                                delete nextVal[time];
+                                                                                                nextVal[newTime] = activity;
+                                                                                                setEditingValue(nextVal);
+                                                                                            };
+                                                                                            
+                                                                                            const handleValChange = (newActivity: string) => {
+                                                                                                const nextVal = { ...obj, [time]: newActivity };
+                                                                                                setEditingValue(nextVal);
+                                                                                            };
+                                                                                            
+                                                                                            const handleRemoveRow = () => {
+                                                                                                const nextVal = { ...obj };
+                                                                                                delete nextVal[time];
+                                                                                                setEditingValue(nextVal);
+                                                                                            };
+
+                                                                                            return (
+                                                                                                <div key={rIdx} className="flex gap-3 items-center">
+                                                                                                    <input 
+                                                                                                        type="text"
+                                                                                                        value={time}
+                                                                                                        placeholder="Time"
+                                                                                                        onChange={e => handleKeyChange(e.target.value)}
+                                                                                                        className="w-36 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                                                                                    />
+                                                                                                    <input 
+                                                                                                        type="text"
+                                                                                                        value={String(activity)}
+                                                                                                        placeholder="Activity"
+                                                                                                        onChange={e => handleValChange(e.target.value)}
+                                                                                                        className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                                                                                    />
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        onClick={handleRemoveRow}
+                                                                                                        className="text-xs text-red-500 hover:text-red-400 font-bold px-1"
+                                                                                                    >
+                                                                                                        ✕
+                                                                                                    </button>
+                                                                                                </div>
+                                                                                            );
+                                                                                        })}
+                                                                                    </div>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => setEditingValue({ ...obj, "": "" })}
+                                                                                        className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                                                                                    >
+                                                                                        + Add Slot
+                                                                                    </button>
+                                                                                </div>
+                                                                            );
+                                                                        }
                                                                     })() : (
                                                                         <textarea
                                                                             value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
@@ -754,12 +890,30 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                                 );
                                                                             })}
                                                                         </div>
-                                                                    ) : value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).some(k => k.includes('AM') || k.includes('PM')) ? (
+                                                                    ) : q.type === 'schedule' && Array.isArray(value) ? (
+                                                                        <div className="space-y-4 mt-1">
+                                                                            {value.map((sched: any, sIdx: number) => (
+                                                                                <div key={sIdx} className="p-3 bg-slate-950/80 rounded-xl border border-slate-850 space-y-2">
+                                                                                    <div className="text-[10px] font-bold text-orange-400 uppercase tracking-widest">
+                                                                                        Days: {Array.isArray(sched.days) ? sched.days.join(', ') : 'All Days'}
+                                                                                    </div>
+                                                                                    <div className="grid grid-cols-2 gap-1.5">
+                                                                                        {(sched.slots || []).map((slot: any, sKey: number) => (
+                                                                                            <div key={sKey} className="flex gap-3 p-2 bg-slate-900/50 rounded-lg text-xs border border-slate-800/60">
+                                                                                                <span className="text-orange-400 font-bold w-20 shrink-0">{slot.time || '—'}</span>
+                                                                                                <span className="text-slate-300">{slot.activity || '—'}</span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    ) : (q.type === 'schedule' || (value && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).some(k => k.includes('AM') || k.includes('PM')))) ? (
                                                                         <div className="grid grid-cols-2 gap-1.5 mt-1">
-                                                                            {Object.entries(value).map(([time, activity]) => (
-                                                                                <div key={time} className="flex gap-3 p-2 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                            {Object.entries(value || {}).map(([time, activity]) => (
+                                                                                <div key={time} className="flex gap-3 p-2 bg-slate-950/80 rounded-lg text-xs text-slate-350 border border-slate-850">
                                                                                     <span className="text-orange-400 font-bold w-20 flex-shrink-0">{time}</span>
-                                                                                    <span className="text-slate-350">{String(activity) || '—'}</span>
+                                                                                    <span className="text-slate-300">{String(activity) || '—'}</span>
                                                                                 </div>
                                                                             ))}
                                                                         </div>
