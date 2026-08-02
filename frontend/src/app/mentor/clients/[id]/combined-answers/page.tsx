@@ -10,6 +10,8 @@ interface QuestionSchema {
     question: string;
     description?: string;
     options?: { id: string; text: string }[];
+    min?: number;
+    max?: number;
 }
 
 interface ModuleData {
@@ -91,6 +93,7 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
     const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editingValue, setEditingValue] = useState<any>(null);
+    const [editingNotes, setEditingNotes] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
 
@@ -117,14 +120,18 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
         }
     };
 
-    const handleSaveAnswer = async (moduleId: string, questionId: string, newValue: any) => {
+    const handleSaveAnswer = async (moduleId: string, questionId: string, newValue: any, newNotes?: string) => {
         const targetModule = client?.modules.find(m => m.id === moduleId);
         if (!targetModule) return;
 
         setSaving(true);
         try {
             const currentData = targetModule.response?.data || {};
-            const updatedData = { ...currentData, [questionId]: newValue };
+            const updatedData = { 
+                ...currentData, 
+                [questionId]: newValue,
+                ...(newNotes !== undefined ? { [`${questionId}_open_text`]: newNotes } : {})
+            };
 
             const res = await fetch(`/api/mentor/modules/${moduleId}/review`, {
                 method: 'POST',
@@ -459,6 +466,7 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                             setEditingModuleId(m.id);
                                                                             setEditingKey(q.id);
                                                                             setEditingValue(value);
+                                                                            setEditingNotes(answers[`${q.id}_open_text`] ?? '');
                                                                         }}
                                                                         className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-400 hover:underline transition-colors uppercase tracking-wider shrink-0 mt-0.5 print:hidden"
                                                                     >
@@ -468,21 +476,53 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                             </div>
 
                                                             {isEditingThis ? (
-                                                                <div className="space-y-2 pt-2">
-                                                                    {q.type === 'choice' && q.options ? (
+                                                                <div className="space-y-3 pt-2">
+                                                                    {/* Main Field Editor */}
+                                                                    {q.options ? (
                                                                         <div className="flex flex-wrap gap-2">
-                                                                            {q.options.map(opt => (
-                                                                                <button 
-                                                                                    key={opt.id} 
-                                                                                    onClick={() => setEditingValue([opt.id])}
-                                                                                    className={`px-3 py-1.5 rounded-lg border text-xs font-semibold uppercase tracking-wider transition-all ${
-                                                                                        (Array.isArray(editingValue) ? editingValue.includes(opt.id) : editingValue === opt.id)
-                                                                                            ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
-                                                                                            : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'
-                                                                                    }`}
-                                                                                >{opt.text}</button>
-                                                                            ))}
+                                                                            {q.options.map(opt => {
+                                                                                const isSelected = q.type === 'multiselect'
+                                                                                    ? (Array.isArray(editingValue) && editingValue.includes(opt.id))
+                                                                                    : (editingValue === opt.id || (Array.isArray(editingValue) && editingValue[0] === opt.id));
+                                                                                
+                                                                                const handleToggle = () => {
+                                                                                    if (q.type === 'multiselect') {
+                                                                                        const current = Array.isArray(editingValue) ? editingValue : [];
+                                                                                        const next = current.includes(opt.id)
+                                                                                            ? current.filter(id => id !== opt.id)
+                                                                                            : [...current, opt.id];
+                                                                                        setEditingValue(next);
+                                                                                    } else {
+                                                                                        setEditingValue(opt.id);
+                                                                                    }
+                                                                                };
+
+                                                                                return (
+                                                                                    <button 
+                                                                                        key={opt.id} 
+                                                                                        type="button"
+                                                                                        onClick={handleToggle}
+                                                                                        className={`px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
+                                                                                            isSelected
+                                                                                                ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
+                                                                                                : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-350'
+                                                                                        }`}
+                                                                                    >
+                                                                                        {opt.text}
+                                                                                    </button>
+                                                                                );
+                                                                            })}
                                                                         </div>
+                                                                    ) : q.type === 'scale' ? (
+                                                                        <select
+                                                                            value={Number(editingValue) || 5}
+                                                                            onChange={e => setEditingValue(Number(e.target.value))}
+                                                                            className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                        >
+                                                                            {Array.from({ length: (q.max || 10) - (q.min || 1) + 1 }, (_, i) => (q.min || 1) + i).map(num => (
+                                                                                <option key={num} value={num}>{num}</option>
+                                                                            ))}
+                                                                        </select>
                                                                     ) : (
                                                                         <textarea
                                                                             value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
@@ -497,16 +537,31 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                             className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
                                                                         />
                                                                     )}
-                                                                    <div className="flex gap-2">
+
+                                                                    {/* Notes / Comments Editor */}
+                                                                    {(q.type === 'choice' || q.type === 'multiselect') && (
+                                                                        <div className="space-y-1 mt-2">
+                                                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Notes / Comments</span>
+                                                                            <textarea
+                                                                                value={editingNotes ?? ''}
+                                                                                onChange={e => setEditingNotes(e.target.value)}
+                                                                                rows={2}
+                                                                                placeholder="Client notes..."
+                                                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                            />
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="flex gap-2 pt-1">
                                                                         <button
-                                                                            onClick={() => handleSaveAnswer(m.id, q.id, editingValue)}
+                                                                            onClick={() => handleSaveAnswer(m.id, q.id, editingValue, editingNotes ?? undefined)}
                                                                             disabled={saving}
-                                                                            className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-600 transition-all disabled:opacity-50"
+                                                                            className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-650 transition-all disabled:opacity-50"
                                                                         >
                                                                             {saving ? 'Saving...' : 'Save'}
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => { setEditingKey(null); setEditingModuleId(null); }}
+                                                                            onClick={() => { setEditingKey(null); setEditingModuleId(null); setEditingNotes(null); }}
                                                                             className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
                                                                         >
                                                                             Cancel
@@ -592,6 +647,12 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                             }
                                                                             return String(value);
                                                                         })() || <span className="italic text-slate-600">Not answered</span>
+                                                                    )}
+                                                                    {answers[`${q.id}_open_text`] && (
+                                                                        <div className="mt-2 text-xs text-indigo-400/85 italic bg-indigo-500/5 px-3 py-2 rounded-xl border border-indigo-500/10 max-w-xl">
+                                                                            <span className="font-bold text-slate-500 not-italic">Note: </span>
+                                                                            {answers[`${q.id}_open_text`]}
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             )}

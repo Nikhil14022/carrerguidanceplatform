@@ -777,7 +777,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             );
                                         })}
                                     </div>
-                                    {q.hasOpenText && (
+                                    {q.hasOpenText ? (
                                         <div className="space-y-2 mt-4">
                                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>
                                             <textarea
@@ -786,6 +786,18 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 rows={4}
                                                 placeholder={q.openTextPlaceholder || "Type in detail here..."}
                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 mt-4">
+                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Additional Notes (Optional)</p>
+                                            <textarea
+                                                value={answers[`${q.id}_open_text`] || ''}
+                                                disabled={isReadOnly}
+                                                rows={2}
+                                                placeholder="Add something if you'd like to..."
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-xs leading-relaxed"
                                                 onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
                                             />
                                         </div>
@@ -827,7 +839,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                             );
                                         })}
                                     </div>
-                                    {q.hasOpenText && (
+                                    {q.hasOpenText ? (
                                         <div className="space-y-2 mt-4">
                                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{q.openTextLabel || "Give details below:"}</p>
                                             <textarea
@@ -836,6 +848,18 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                                                 rows={4}
                                                 placeholder={q.openTextPlaceholder || "Type in detail here..."}
                                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm leading-relaxed"
+                                                onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 mt-4">
+                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Additional Notes (Optional)</p>
+                                            <textarea
+                                                value={answers[`${q.id}_open_text`] || ''}
+                                                disabled={isReadOnly}
+                                                rows={2}
+                                                placeholder="Add something if you'd like to..."
+                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-xs leading-relaxed"
                                                 onChange={(e) => setAnswers({ ...answers, [`${q.id}_open_text`]: e.target.value })}
                                             />
                                         </div>
