@@ -12,6 +12,18 @@ interface QuestionSchema {
     options?: { id: string; text: string }[];
     min?: number;
     max?: number;
+    col1Label?: string;
+    col2Label?: string;
+    col3Label?: string;
+    col4Label?: string;
+    col1Placeholder?: string;
+    col2Placeholder?: string;
+    col3Placeholder?: string;
+    col4Placeholder?: string;
+    col2Options?: string[];
+    col3Options?: string[];
+    col4Options?: string[];
+    prefilledRows?: string[];
 }
 
 interface ModuleData {
@@ -523,7 +535,125 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                                 <option key={num} value={num}>{num}</option>
                                                                             ))}
                                                                         </select>
-                                                                    ) : (
+                                                                    ) : q.type === 'table' ? (() => {
+                                                                        const numCols = q.col4Label ? 4 : (q.col3Label ? 3 : (q.col2Label ? 2 : 1));
+                                                                        const colSpanClass = numCols === 4 ? 'grid-cols-4' : (numCols === 3 ? 'grid-cols-3' : (numCols === 2 ? 'grid-cols-2' : 'grid-cols-1'));
+                                                                        const tableRows = Array.isArray(editingValue) ? editingValue : [];
+                                                                        
+                                                                        return (
+                                                                            <div className="space-y-4 bg-slate-950 p-4 border border-slate-850 rounded-2xl max-w-4xl">
+                                                                                {/* Headers */}
+                                                                                <div className={`grid ${colSpanClass} gap-3 border-b border-slate-800 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest`}>
+                                                                                    <div>{q.col1Label || 'Item'}</div>
+                                                                                    {numCols >= 2 && <div>{q.col2Label || 'Details'}</div>}
+                                                                                    {numCols >= 3 && <div>{q.col3Label}</div>}
+                                                                                    {numCols >= 4 && <div>{q.col4Label}</div>}
+                                                                                </div>
+
+                                                                                {/* Rows */}
+                                                                                <div className="space-y-3">
+                                                                                    {tableRows.map((row: any, rIdx: number) => {
+                                                                                        const handleCellChange = (colKey: string, cellVal: any) => {
+                                                                                            const next = [...tableRows];
+                                                                                            next[rIdx] = { ...next[rIdx], [colKey]: cellVal };
+                                                                                            setEditingValue(next);
+                                                                                        };
+
+                                                                                        return (
+                                                                                            <div key={rIdx} className={`grid ${colSpanClass} gap-3 items-center`}>
+                                                                                                {/* Col 1 */}
+                                                                                                <input 
+                                                                                                    type="text"
+                                                                                                    value={row.col1 ?? ''}
+                                                                                                    disabled={Array.isArray(q.prefilledRows) && rIdx < q.prefilledRows.length}
+                                                                                                    placeholder={q.col1Placeholder || '...'}
+                                                                                                    onChange={e => handleCellChange('col1', e.target.value)}
+                                                                                                    className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 disabled:opacity-50"
+                                                                                                />
+
+                                                                                                {/* Col 2 */}
+                                                                                                {numCols >= 2 && (
+                                                                                                    q.col2Options ? (
+                                                                                                        <select
+                                                                                                            value={row.col2 ?? ''}
+                                                                                                            onChange={e => handleCellChange('col2', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        >
+                                                                                                            <option value="">Select...</option>
+                                                                                                            {q.col2Options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                                                        </select>
+                                                                                                    ) : (
+                                                                                                        <input 
+                                                                                                            type="text"
+                                                                                                            value={row.col2 ?? ''}
+                                                                                                            placeholder={q.col2Placeholder || '...'}
+                                                                                                            onChange={e => handleCellChange('col2', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        />
+                                                                                                    )
+                                                                                                )}
+
+                                                                                                {/* Col 3 */}
+                                                                                                {numCols >= 3 && (
+                                                                                                    q.col3Options ? (
+                                                                                                        <select
+                                                                                                            value={row.col3 ?? ''}
+                                                                                                            onChange={e => handleCellChange('col3', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        >
+                                                                                                            <option value="">Select...</option>
+                                                                                                            {q.col3Options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                                                        </select>
+                                                                                                    ) : (
+                                                                                                        <input 
+                                                                                                            type="text"
+                                                                                                            value={row.col3 ?? ''}
+                                                                                                            placeholder={q.col3Placeholder || '...'}
+                                                                                                            onChange={e => handleCellChange('col3', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        />
+                                                                                                    )
+                                                                                                )}
+
+                                                                                                {/* Col 4 */}
+                                                                                                {numCols >= 4 && (
+                                                                                                    q.col4Options ? (
+                                                                                                        <select
+                                                                                                            value={row.col4 ?? ''}
+                                                                                                            onChange={e => handleCellChange('col4', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        >
+                                                                                                            <option value="">Select...</option>
+                                                                                                            {q.col4Options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                                                                        </select>
+                                                                                                    ) : (
+                                                                                                        <input 
+                                                                                                            type="text"
+                                                                                                            value={row.col4 ?? ''}
+                                                                                                            placeholder={q.col4Placeholder || '...'}
+                                                                                                            onChange={e => handleCellChange('col4', e.target.value)}
+                                                                                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                                                                                        />
+                                                                                                    )
+                                                                                                )}
+                                                                                            </div>
+                                                                                        );
+                                                                                    })}
+                                                                                </div>
+
+                                                                                {/* Add Row Button */}
+                                                                                {(!q.prefilledRows || q.prefilledRows.length === 0) && (
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => setEditingValue([...tableRows, { col1: '', col2: '', col3: '', col4: '' }])}
+                                                                                        className="px-2.5 py-1 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-[10px] font-bold text-slate-350 transition-all uppercase tracking-wider"
+                                                                                    >
+                                                                                        + Add Row
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    })() : (
                                                                         <textarea
                                                                             value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
                                                                             onChange={e => {
