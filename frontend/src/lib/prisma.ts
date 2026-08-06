@@ -1,5 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = "mongodb+srv://nikhilsharma:pintusmith@cluster0.x1jscxs.mongodb.net/career_guidance?appName=Cluster0";
+}
+
 const prismaClientSingleton = () => {
   return new PrismaClient()
 }

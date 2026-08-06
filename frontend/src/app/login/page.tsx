@@ -134,12 +134,7 @@ function LoginForm() {
                     </button>
                 </form>
 
-                <div className="mt-8 pt-8 border-t border-white/5 text-center">
-                    <p className="text-sm text-slate-500">
-                        Don't have an account?
-                        <a href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium ml-2">Sign up</a>
-                    </p>
-                </div>
+
 
                 {/* Decorative elements */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl" />
