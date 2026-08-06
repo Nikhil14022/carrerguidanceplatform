@@ -620,7 +620,7 @@ You MUST return a JSON object with exactly the following keys and structure. Ret
         },
         { role: "user", content: prompt }
       ],
-      model: "llama-3.3-70b-specdec",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.7,
       response_format: { type: "json_object" },
     })

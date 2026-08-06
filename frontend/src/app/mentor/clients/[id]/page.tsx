@@ -1282,19 +1282,19 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                 </div>
             </div>
 
-                        {/* Stage Editing Modal */}
+                                                {/* Stage Editing Modal */}
             {editingStage && (
-                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl" style={{ backgroundColor: '#1e293b', color: '#f1f5f9', border: '1px solid #475569' }}>
-                        <div className="flex justify-between items-center pb-3 border-b" style={{ borderBottomColor: '#334155' }}>
+                <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #e2e8f0' }}>
+                        <div className="flex justify-between items-center pb-3 border-b" style={{ borderBottomColor: '#e2e8f0' }}>
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#ffffff' }}>Manage Stage {editingStage.stageNumber}</h3>
-                                <p className="text-xs font-bold" style={{ color: '#94a3b8' }}>{editingStage.stageName}</p>
+                                <h3 className="text-sm font-bold uppercase tracking-wider" style={{ color: '#0f172a' }}>Manage Stage {editingStage.stageNumber}</h3>
+                                <p className="text-xs font-bold" style={{ color: '#64748b' }}>{editingStage.stageName}</p>
                             </div>
                             <button
                                 onClick={() => setEditingStage(null)}
-                                className="hover:text-white text-lg font-bold cursor-pointer"
-                                style={{ color: '#cbd5e1', backgroundColor: 'transparent', border: 'none' }}
+                                className="hover:text-slate-900 text-lg font-bold cursor-pointer"
+                                style={{ color: '#64748b', backgroundColor: 'transparent', border: 'none' }}
                             >
                                 ✕
                             </button>
@@ -1302,58 +1302,58 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
 
                         {/* Status Select */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Stage Status</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Stage Status</label>
                             <select
                                 value={stageStatus}
                                 onChange={(e) => setStageStatus(e.target.value)}
                                 className="w-full rounded-xl px-4 py-2 text-xs outline-none cursor-pointer"
-                                style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                             >
-                                <option value="NOT_STARTED" className="bg-slate-900 text-slate-100">Not Started</option>
-                                <option value="IN_PROGRESS" className="bg-slate-900 text-slate-100">In Progress</option>
-                                <option value="ON_HOLD" className="bg-slate-900 text-slate-100">On Hold</option>
-                                <option value="COMPLETED" className="bg-slate-900 text-slate-100">Completed</option>
-                                <option value="NOT_APPLICABLE" className="bg-slate-900 text-slate-100">Not Applicable</option>
+                                <option value="NOT_STARTED" className="bg-white text-slate-900">Not Started</option>
+                                <option value="IN_PROGRESS" className="bg-white text-slate-900">In Progress</option>
+                                <option value="ON_HOLD" className="bg-white text-slate-900">On Hold</option>
+                                <option value="COMPLETED" className="bg-white text-slate-900">Completed</option>
+                                <option value="NOT_APPLICABLE" className="bg-white text-slate-900">Not Applicable</option>
                             </select>
                         </div>
 
                         {/* Counselor Notes */}
                         <div className="space-y-1.5">
-                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Counselor Remarks / Notes</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Counselor Remarks / Notes</label>
                             <textarea
                                 value={stageNotes}
                                 onChange={(e) => setStageNotes(e.target.value)}
                                 placeholder="Describe expectations, reminders, or general progress notes for the student..."
                                 rows={3}
                                 className="w-full rounded-xl p-3 text-xs outline-none resize-none"
-                                style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                             />
                         </div>
 
                         {/* Collaborative Outcomes (Meetings only) */}
                         {["Collaborative Meeting: Student and Parent", "Report Discussion with the Student", "Research Discussion"].includes(editingStage.stageName) && (
                             <div className="space-y-1.5">
-                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Meeting Decisions & Outcomes</label>
+                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Meeting Decisions & Outcomes</label>
                                 <textarea
                                     value={stageOutcomes}
                                     onChange={(e) => setStageOutcomes(e.target.value)}
                                     placeholder="Enter finalized key decisions, follow-up points, or agreed alignments here..."
                                     rows={3}
                                     className="w-full rounded-xl p-3 text-xs outline-none resize-none"
-                                    style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                    style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                                 />
                             </div>
                         )}
 
                         {/* Tasks Checklist Manager */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Checklist Tasks</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Checklist Tasks</label>
                             <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
                                 {stageTasks.length === 0 ? (
-                                    <p className="text-[10px] italic" style={{ color: '#cbd5e1' }}>No tasks added to this stage yet.</p>
+                                    <p className="text-[10px] italic" style={{ color: '#64748b' }}>No tasks added to this stage yet.</p>
                                 ) : (
                                     stageTasks.map((t, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-2 rounded-lg text-xs" style={{ backgroundColor: '#0f172a', border: '1px solid #334155' }}>
+                                        <div key={idx} className="flex items-center justify-between p-2 rounded-lg text-xs" style={{ backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a' }}>
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="checkbox"
@@ -1363,16 +1363,16 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                         updated[idx].completed = e.target.checked;
                                                         setStageTasks(updated);
                                                     }}
-                                                    className="w-3.5 h-3.5 rounded accent-indigo-500 cursor-pointer"
+                                                    className="w-3.5 h-3.5 rounded accent-indigo-600 cursor-pointer"
                                                 />
-                                                <span className={t.completed ? "line-through text-slate-500" : ""}>{t.text}</span>
+                                                <span className={t.completed ? "line-through text-slate-400" : ""}>{t.text}</span>
                                             </div>
                                             <button
                                                 onClick={() => {
                                                     const updated = stageTasks.filter((_, i) => i !== idx);
                                                     setStageTasks(updated);
                                                 }}
-                                                className="text-red-400 hover:text-red-300 font-bold cursor-pointer"
+                                                className="text-red-650 hover:text-red-755 font-bold cursor-pointer"
                                             >
                                                 ✕
                                             </button>
@@ -1387,7 +1387,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     value={newTaskText}
                                     onChange={(e) => setNewTaskText(e.target.value)}
                                     className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-none"
-                                    style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                    style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                                 />
                                 <button
                                     onClick={() => {
@@ -1395,8 +1395,8 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                         setStageTasks([...stageTasks, { text: newTaskText.trim(), completed: false }]);
                                         setNewTaskText('');
                                     }}
-                                    className="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer"
-                                    style={{ backgroundColor: '#eab308', color: '#000000' }}
+                                    className="px-3 py-1.5 text-xs font-bold rounded-lg transition-colors cursor-pointer text-white"
+                                    style={{ backgroundColor: '#4f46e5' }}
                                 >
                                     Add
                                 </button>
@@ -1405,16 +1405,16 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
 
                         {/* Documents Manager */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Linked Documents & Resources</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Linked Documents & Resources</label>
                             <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
                                 {stageDocs.length === 0 ? (
-                                    <p className="text-[10px] italic" style={{ color: '#cbd5e1' }}>No documents attached yet.</p>
+                                    <p className="text-[10px] italic" style={{ color: '#64748b' }}>No documents attached yet.</p>
                                 ) : (
                                     stageDocs.map((doc, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-2 rounded-lg text-xs" style={{ backgroundColor: '#0f172a', border: '1px solid #334155' }}>
+                                        <div key={idx} className="flex items-center justify-between p-2 rounded-lg text-xs" style={{ backgroundColor: '#f1f5f9', border: '1px solid #e2e8f0', color: '#0f172a' }}>
                                             <div className="flex items-center gap-1.5 truncate">
                                                 <span>📄</span>
-                                                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate" style={{ color: '#818cf8' }}>
+                                                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="hover:underline truncate text-indigo-600 font-semibold">
                                                     {doc.name}
                                                 </a>
                                             </div>
@@ -1423,7 +1423,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                     const updated = stageDocs.filter((_, i) => i !== idx);
                                                     setStageDocs(updated);
                                                 }}
-                                                className="text-red-400 hover:text-red-300 font-bold cursor-pointer"
+                                                className="text-red-650 hover:text-red-755 font-bold cursor-pointer"
                                             >
                                                 ✕
                                             </button>
@@ -1438,7 +1438,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     value={newDocName}
                                     onChange={(e) => setNewDocName(e.target.value)}
                                     className="rounded-lg px-3 py-1.5 text-xs outline-none"
-                                    style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                    style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                                 />
                                 <input
                                     type="text"
@@ -1446,7 +1446,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     value={newDocUrl}
                                     onChange={(e) => setNewDocUrl(e.target.value)}
                                     className="rounded-lg px-3 py-1.5 text-xs outline-none"
-                                    style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}
+                                    style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                                 />
                             </div>
                             <button
@@ -1456,27 +1456,27 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     setNewDocName('');
                                     setNewDocUrl('');
                                 }}
-                                className="w-full py-2 text-xs font-bold rounded-lg transition-colors text-center cursor-pointer"
-                                style={{ backgroundColor: '#eab308', color: '#000000' }}
+                                className="w-full py-2 text-xs font-bold rounded-lg transition-colors text-center cursor-pointer text-white"
+                                style={{ backgroundColor: '#4f46e5' }}
                             >
                                 + Attach Document
                             </button>
                         </div>
 
                         {/* Footer Buttons */}
-                        <div className="flex justify-end gap-3 pt-3 border-t" style={{ borderTopColor: '#334155' }}>
+                        <div className="flex justify-end gap-3 pt-3 border-t" style={{ borderTopColor: '#e2e8f0' }}>
                             <button
                                 onClick={() => setEditingStage(null)}
                                 className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
-                                style={{ backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #475569' }}
+                                style={{ backgroundColor: 'transparent', color: '#475569', border: '1px solid #cbd5e1' }}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSaveStage}
                                 disabled={updatingStage}
-                                className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-lg disabled:opacity-50"
-                                style={{ backgroundColor: '#eab308', color: '#000000' }}
+                                className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md disabled:opacity-50 text-white"
+                                style={{ backgroundColor: '#4f46e5' }}
                             >
                                 {updatingStage ? 'Saving...' : 'Save Stage Details'}
                             </button>

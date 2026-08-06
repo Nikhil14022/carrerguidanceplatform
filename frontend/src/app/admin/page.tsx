@@ -494,91 +494,91 @@ export default function AdminDashboardPage() {
                 document.body
             )}
 
-            {/* Create Client & Parent Modal */}
+                        {/* Create Client & Parent Modal */}
             {showCreateClient && mounted && createPortal(
                 <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 lg:pl-64" style={{ zIndex: 99999 }} onClick={() => setShowCreateClient(false)}>
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" />
-                    <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up" style={{ backgroundColor: '#1e293b', color: '#f1f5f9', border: '1px solid #475569' }} onClick={e => e.stopPropagation()}>
-                        <div className="p-6 border-b shrink-0" style={{ borderBottomColor: '#334155' }}>
-                            <h2 className="text-xl font-bold" style={{ color: '#ffffff' }}>Create Client & Parent Accounts</h2>
-                            <p className="text-xs font-semibold mt-1" style={{ color: '#94a3b8' }}>Registers linked student & parent profiles together and optionally assigns to a mentor.</p>
+                    <div className="absolute inset-0 bg-slate-955/40 backdrop-blur-sm" />
+                    <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }} onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b shrink-0" style={{ borderBottomColor: '#e2e8f0' }}>
+                            <h2 className="text-xl font-bold" style={{ color: '#0f172a' }}>Create Client & Parent Accounts</h2>
+                            <p className="text-xs font-semibold mt-1" style={{ color: '#64748b' }}>Registers linked student & parent profiles together and optionally assigns to a mentor.</p>
                         </div>
                         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                             {/* Client (Student) Details */}
                             <div className="space-y-4">
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#eab308', borderBottomColor: '#334155' }}>Client (Student) Details</h3>
+                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Client (Student) Details</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Student Name</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Name</label>
                                         <input type="text" value={clientForm.clientName} onChange={e => setClientForm({ ...clientForm, clientName: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="John Doe" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="John Doe" />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Student Age</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Age</label>
                                         <input type="number" value={clientForm.clientAge} onChange={e => setClientForm({ ...clientForm, clientAge: parseInt(e.target.value) || 16 })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="16" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="16" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Student Email</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Email</label>
                                         <input type="email" value={clientForm.clientEmail} onChange={e => setClientForm({ ...clientForm, clientEmail: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="student@example.com" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="student@example.com" />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Student Password</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Password</label>
                                         <input type="password" value={clientForm.clientPassword} onChange={e => setClientForm({ ...clientForm, clientPassword: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="••••••••" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Parent Details */}
-                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#334155' }}>
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#eab308', borderBottomColor: '#334155' }}>Parent Details</h3>
+                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
+                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Parent Details</h3>
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Parent Name</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Name</label>
                                     <input type="text" value={clientForm.parentName} onChange={e => setClientForm({ ...clientForm, parentName: e.target.value })}
-                                        className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="Jane Doe" />
+                                        className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="Jane Doe" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Parent Email</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Email</label>
                                         <input type="email" value={clientForm.parentEmail} onChange={e => setClientForm({ ...clientForm, parentEmail: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="parent@example.com" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="parent@example.com" />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Parent Password</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Password</label>
                                         <input type="password" value={clientForm.parentPassword} onChange={e => setClientForm({ ...clientForm, parentPassword: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }} placeholder="••••••••" />
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Direct Assignment */}
-                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#334155' }}>
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#eab308', borderBottomColor: '#334155' }}>Assign to Mentor (Optional)</h3>
+                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
+                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Assign to Mentor (Optional)</h3>
                                 <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#cbd5e1' }}>Select Mentor</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Select Mentor</label>
                                     <div className="relative">
                                         <select value={clientForm.mentorProfileId} onChange={e => setClientForm({ ...clientForm, mentorProfileId: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none" style={{ backgroundColor: '#0f172a', color: '#ffffff', border: '1px solid #475569' }}>
-                                            <option value="" className="bg-slate-900 text-slate-400">-- Do not assign yet --</option>
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
+                                            <option value="" className="bg-white text-slate-500">-- Do not assign yet --</option>
                                             {mentors.map(m => (
-                                                <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-slate-900 text-slate-200">
+                                                <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-white text-slate-900">
                                                     {m.name} ({m.email})
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">▼</div>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="p-6 shrink-0 flex gap-3 border-t" style={{ borderTopColor: '#334155', backgroundColor: '#1e293b' }}>
-                            <button onClick={() => setShowCreateClient(false)} className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer" style={{ backgroundColor: 'transparent', color: '#cbd5e1', border: '1px solid #475569' }}>Cancel</button>
+                        <div className="p-6 shrink-0 flex gap-3 border-t" style={{ borderTopColor: '#e2e8f0', backgroundColor: '#ffffff' }}>
+                            <button onClick={() => setShowCreateClient(false)} className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer" style={{ backgroundColor: 'transparent', color: '#475569', border: '1px solid #cbd5e1' }}>Cancel</button>
                             <button onClick={createClientAndParent} disabled={actionLoading || !clientForm.clientName || !clientForm.clientEmail || !clientForm.clientPassword || !clientForm.parentName || !clientForm.parentEmail || !clientForm.parentPassword}
-                                className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer" style={{ backgroundColor: '#eab308', color: '#000000' }}>{actionLoading ? 'Creating...' : 'Create Client & Parent'}</button>
+                                className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer text-white" style={{ backgroundColor: '#4f46e5' }}>{actionLoading ? 'Creating...' : 'Create Client & Parent'}</button>
                         </div>
                     </div>
                 </div>,

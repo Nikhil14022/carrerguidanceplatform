@@ -75,11 +75,11 @@ export default function AIResearchPage() {
                         </svg>
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">AI Profession Research Lab</h1>
-                        <p className="text-xs text-indigo-650 font-bold uppercase tracking-wider">Instant structured intelligence reports</p>
+                        <h1 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: '#0f172a' }}>AI Profession Research Lab</h1>
+                        <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">Instant structured intelligence reports</p>
                     </div>
                 </div>
-                <p className="text-slate-600 text-sm mb-8">Enter the name of any profession to instantly generate a detailed, structured two-stage overview.</p>
+                <p className="text-sm mb-8 text-slate-650" style={{ color: '#475569' }}>Enter the name of any profession to instantly generate a detailed, structured two-stage overview.</p>
 
                 <form onSubmit={handleSearch} className="mb-8">
                     <div className="relative">
@@ -88,7 +88,8 @@ export default function AIResearchPage() {
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
                             placeholder="Enter profession (e.g. Aerospace Engineer, Product Manager, Marine Biologist)"
-                            className="w-full pl-6 pr-32 py-4 bg-slate-50 border border-slate-350 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-base text-slate-900 placeholder-slate-450"
+                            className="w-full pl-6 pr-32 py-4 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-base"
+                            style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                         />
                         <button
                             type="submit"
