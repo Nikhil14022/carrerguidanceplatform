@@ -100,29 +100,8 @@ function DashboardContent() {
                             You've completed {stats?.completed || 0} of {stats?.total || 7} assessment checkpoints.
                             {currentModule ? " Continue your progress to unlock personalized insights." : " Great job! You've completed all modules."}
                         </p>
-                        {stats?.journeyStatus === 'Pending Mentor Meeting' && (
-                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
-                                <svg className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                <div>
-                                    <p className="text-sm font-bold text-amber-300">Mentor Meeting Required</p>
-                                    <p className="text-xs text-amber-400/70 mt-1">You've completed a set of modules! Schedule a one-on-one with your mentor to review your progress and unlock the next set of assessments.</p>
-                                </div>
-                            </div>
-                        )}
                         <div className="flex gap-4 pt-4">
-                            {stats?.journeyStatus === 'Pending Mentor Meeting' ? (
-                                <button
-                                    onClick={() => router.push('/dashboard/appointments')}
-                                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-3 animate-pulse hover:animate-none"
-                                >
-                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    Book Mentor Appointment
-                                </button>
-                            ) : currentModule ? (
+                            {currentModule ? (
                                 <button
                                     onClick={() => router.push(`/dashboard/modules/${currentModule.id}`)}
                                     className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition"

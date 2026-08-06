@@ -109,15 +109,10 @@ export async function POST(
     }
 
     if (nextModule) {
-      if (clientModule.order % 3 === 0) {
-        // Halt automatic progression after every 3 modules
-        updateData.journeyStatus = "Pending Mentor Meeting"
-      } else {
-        await prisma.clientModule.update({
-          where: { id: nextModule.id },
-          data: { status: 'UNLOCKED' }
-        })
-      }
+      await prisma.clientModule.update({
+        where: { id: nextModule.id },
+        data: { status: 'UNLOCKED' }
+      })
     } else {
       // If no more modules, mark journey as "In Review" or "Completed"
       updateData.journeyStatus = "Analysis in Progress"

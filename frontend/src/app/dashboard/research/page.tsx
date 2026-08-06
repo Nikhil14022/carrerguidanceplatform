@@ -66,20 +66,20 @@ export default function AIResearchPage() {
     };
 
     return (
-        <div className="space-y-8 animate-fade-in text-slate-200 pb-16">
-            <div className="bg-white/5 border border-white/10 shadow-sm rounded-2xl p-6 md:p-8">
+        <div className="space-y-8 animate-fade-in pb-16 text-slate-800">
+            <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 md:p-8">
                 <div className="flex items-center gap-4 mb-2">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                         </svg>
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-100">AI Profession Research Lab</h1>
-                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Instant structured intelligence reports</p>
+                        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-900">AI Profession Research Lab</h1>
+                        <p className="text-xs text-indigo-650 font-bold uppercase tracking-wider">Instant structured intelligence reports</p>
                     </div>
                 </div>
-                <p className="text-slate-400 text-sm mb-8">Enter the name of any profession to instantly generate a detailed, structured two-stage overview.</p>
+                <p className="text-slate-600 text-sm mb-8">Enter the name of any profession to instantly generate a detailed, structured two-stage overview.</p>
 
                 <form onSubmit={handleSearch} className="mb-8">
                     <div className="relative">
@@ -88,7 +88,7 @@ export default function AIResearchPage() {
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
                             placeholder="Enter profession (e.g. Aerospace Engineer, Product Manager, Marine Biologist)"
-                            className="w-full pl-6 pr-32 py-4 bg-slate-955 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-base text-white bg-slate-950"
+                            className="w-full pl-6 pr-32 py-4 bg-slate-50 border border-slate-350 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-base text-slate-900 placeholder-slate-450"
                         />
                         <button
                             type="submit"
@@ -106,7 +106,7 @@ export default function AIResearchPage() {
                 </form>
 
                 {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl mb-8 text-xs font-semibold">
+                    <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl mb-8 text-xs font-semibold">
                         {error}
                     </div>
                 )}
@@ -114,16 +114,16 @@ export default function AIResearchPage() {
                 {result && (
                     <div className="space-y-6">
                         {/* Tab Headers */}
-                        <div className="flex border-b border-white/10 gap-2 shrink-0">
+                        <div className="flex border-b border-slate-200 gap-2 shrink-0">
                             <button
                                 onClick={() => setActiveTab('basic')}
-                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer ${activeTab === 'basic' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-350'}`}
+                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer ${activeTab === 'basic' ? 'border-indigo-600 text-indigo-650' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                             >
                                 1. Basic Understanding
                             </button>
                             <button
                                 onClick={() => setActiveTab('advanced')}
-                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'advanced' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-350'}`}
+                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'advanced' ? 'border-indigo-600 text-indigo-650' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
                             >
                                 2. Advanced Understanding
                                 {!advancedUnlocked && <span className="text-[10px]">🔒</span>}
@@ -134,12 +134,12 @@ export default function AIResearchPage() {
                         {activeTab === 'basic' && (
                             <div className="grid gap-6 md:grid-cols-2 animate-fade-in">
                                 {basicQuestions.map((q) => (
-                                    <div key={q.key} className="p-5 bg-white/5 rounded-xl border border-white/5 space-y-2 hover:border-white/10 transition-all">
+                                    <div key={q.key} className="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 hover:border-slate-350 transition-all">
                                         <div className="flex items-center gap-2">
-                                            <span className="w-5 h-5 rounded-md bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-[10px] font-bold text-indigo-400">{q.num}</span>
-                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">{q.title}</h3>
+                                            <span className="w-5 h-5 rounded-md bg-indigo-50 border border-indigo-150 flex items-center justify-center text-[10px] font-bold text-indigo-650">{q.num}</span>
+                                            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{q.title}</h3>
                                         </div>
-                                        <p className="text-slate-300 text-xs leading-relaxed">{result.basic?.[q.key] || 'Generating information...'}</p>
+                                        <p className="text-slate-700 text-xs leading-relaxed font-medium">{result.basic?.[q.key] || 'Generating information...'}</p>
                                     </div>
                                 ))}
                             </div>
@@ -149,10 +149,10 @@ export default function AIResearchPage() {
                         {activeTab === 'advanced' && (
                             <div className="space-y-8 animate-fade-in">
                                 {!advancedUnlocked ? (
-                                    <div className="p-8 bg-slate-955/60 border border-white/10 rounded-2xl text-center space-y-4 max-w-lg mx-auto my-12 bg-slate-950">
-                                        <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mx-auto text-lg">🔒</div>
-                                        <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Locked Section</h3>
-                                        <p className="text-xs text-slate-550 leading-relaxed text-slate-400">
+                                    <div className="p-8 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-4 max-w-lg mx-auto my-12 shadow-sm">
+                                        <div className="w-12 h-12 bg-white border border-slate-300 rounded-xl flex items-center justify-center mx-auto text-lg shadow-sm">🔒</div>
+                                        <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Locked Section</h3>
+                                        <p className="text-xs text-slate-600 leading-relaxed">
                                             This advanced specialisation and personalized fit overview should be opened together with your counselor during your review meeting.
                                         </p>
                                         <button
@@ -163,43 +163,43 @@ export default function AIResearchPage() {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="space-y-8">
+                                    <div className="space-y-8 text-slate-800">
                                         {/* Personalized Guidance Header Callouts */}
                                         <div className="grid gap-6 md:grid-cols-2">
                                             {/* Circular Fit Score */}
-                                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex flex-col items-center text-center justify-center space-y-3">
-                                                <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">AI Profile Fit Score</div>
+                                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200/50 flex flex-col items-center text-center justify-center space-y-3 shadow-sm">
+                                                <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">AI Profile Fit Score</div>
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-5xl font-black text-white">{result.advanced?.q15?.score || '—'}</span>
+                                                    <span className="text-5xl font-black text-slate-900">{result.advanced?.q15?.score || '—'}</span>
                                                     <span className="text-sm text-slate-500 font-bold">/10</span>
                                                 </div>
-                                                <div className="text-xs font-semibold text-slate-300 max-w-xs">{result.advanced?.q15?.recommendation}</div>
-                                                <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[8px] font-black uppercase tracking-widest">Personalized Match</span>
+                                                <div className="text-xs font-semibold text-slate-700 max-w-xs">{result.advanced?.q15?.recommendation}</div>
+                                                <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[8px] font-black uppercase tracking-widest border border-indigo-200">Personalized Match</span>
                                             </div>
 
                                             {/* Personal Fit Strengths & Gaps */}
-                                            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-amber-500/5 border border-white/5 space-y-4">
-                                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-white/5 pb-2">🎯 Quick Diagnostic</h4>
+                                            <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-4 shadow-sm">
+                                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-100 pb-2">🎯 Quick Diagnostic</h4>
                                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                                     <div className="space-y-1">
-                                                        <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Use Your Strengths</span>
-                                                        <p className="text-slate-400 leading-relaxed text-[11px]">{result.advanced?.q14?.strengths}</p>
+                                                        <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-wider block">Use Your Strengths</span>
+                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{result.advanced?.q14?.strengths}</p>
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Address Your Gaps</span>
-                                                        <p className="text-slate-400 leading-relaxed text-[11px]">{result.advanced?.q14?.gaps}</p>
+                                                        <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider block">Address Your Gaps</span>
+                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{result.advanced?.q14?.gaps}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Table of Pathways (q2) */}
-                                        <div className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4">
-                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Detailed Pathways & Course Details</h3>
+                                        <div className="p-6 bg-white border border-slate-200 rounded-2xl space-y-4 shadow-sm">
+                                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Detailed Pathways & Course Details</h3>
                                             <div className="overflow-x-auto">
                                                 <table className="w-full text-left border-collapse text-xs">
                                                     <thead>
-                                                        <tr className="border-b border-white/10 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                                                        <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                                                             <th className="py-2.5 pr-4">Specialization</th>
                                                             <th className="py-2.5 pr-4">Degree & Duration</th>
                                                             <th className="py-2.5 pr-4">Subjects & Exam</th>
@@ -207,10 +207,10 @@ export default function AIResearchPage() {
                                                             <th className="py-2.5">Available Roles</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="divide-y divide-white/5 text-slate-300">
+                                                    <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
                                                         {(result.advanced?.q2 || []).map((path: any, idx: number) => (
-                                                            <tr key={idx} className="hover:bg-white/[0.02]">
-                                                                <td className="py-3 pr-4 font-bold text-slate-200">{path.pathwayName}</td>
+                                                            <tr key={idx} className="hover:bg-slate-50/50">
+                                                                <td className="py-3 pr-4 font-bold text-slate-900">{path.pathwayName}</td>
                                                                 <td className="py-3 pr-4">{path.degreeName} ({path.duration})</td>
                                                                 <td className="py-3 pr-4">
                                                                     <div>{path.subjects}</div>
@@ -218,7 +218,7 @@ export default function AIResearchPage() {
                                                                 </td>
                                                                 <td className="py-3 pr-4">
                                                                     <div>{path.colleges}</div>
-                                                                    <div className="text-[10px] text-indigo-400">{path.fees}</div>
+                                                                    <div className="text-[10px] text-indigo-650 font-bold">{path.fees}</div>
                                                                 </td>
                                                                 <td className="py-3">{path.roles}</td>
                                                             </tr>
@@ -229,8 +229,8 @@ export default function AIResearchPage() {
                                         </div>
 
                                         {/* Responsibilities & Salaries Timeline (q4, q5, q6) */}
-                                        <div className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4">
-                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Experience Level Progression</h3>
+                                        <div className="p-6 bg-white border border-slate-200 rounded-2xl space-y-4 shadow-sm">
+                                            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Experience Level Progression</h3>
                                             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                                                 {[
                                                     { key: 'y0_3', label: '0–3 Years' },
@@ -238,21 +238,21 @@ export default function AIResearchPage() {
                                                     { key: 'y6_10', label: '6–10 Years' },
                                                     { key: 'y10_plus', label: '10+ Years' }
                                                 ].map((exp) => (
-                                                    <div key={exp.key} className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-3">
-                                                        <div className="text-xs font-black text-indigo-400 uppercase tracking-widest">{exp.label}</div>
+                                                    <div key={exp.key} className="p-4 bg-slate-50 border border-slate-150 rounded-xl space-y-3 shadow-inner">
+                                                        <div className="text-xs font-black text-indigo-600 uppercase tracking-widest">{exp.label}</div>
                                                         <div className="space-y-2 text-xs">
                                                             <div>
                                                                 <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Role Tasks</span>
-                                                                <p className="text-slate-300 text-[11px] leading-relaxed mt-0.5">{result.advanced?.q4?.[exp.key]}</p>
+                                                                <p className="text-slate-700 text-[11px] leading-relaxed mt-0.5 font-medium">{result.advanced?.q4?.[exp.key]}</p>
                                                             </div>
-                                                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                                                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
                                                                 <div>
                                                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">India Pay</span>
-                                                                    <span className="text-white font-bold text-[10px]">{result.advanced?.q5?.[exp.key]}</span>
+                                                                    <span className="text-slate-900 font-bold text-[10px]">{result.advanced?.q5?.[exp.key]}</span>
                                                                 </div>
                                                                 <div>
                                                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Abroad Pay</span>
-                                                                    <span className="text-white font-bold text-[10px] line-clamp-2">{result.advanced?.q6?.[exp.key]}</span>
+                                                                    <span className="text-slate-900 font-bold text-[10px] line-clamp-2">{result.advanced?.q6?.[exp.key]}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -264,35 +264,35 @@ export default function AIResearchPage() {
                                         {/* Standard Advanced Questions (q1, q3, q7 - q13) */}
                                         <div className="grid gap-6 md:grid-cols-2">
                                             {advancedQuestions.map((q) => (
-                                                <div key={q.key} className="p-5 bg-white/5 border border-white/5 rounded-xl space-y-2">
-                                                    <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">{q.title}</h4>
-                                                    <p className="text-slate-300 text-xs leading-relaxed">{result.advanced?.[q.key]}</p>
+                                                <div key={q.key} className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 hover:border-slate-350 transition-all">
+                                                    <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{q.title}</h4>
+                                                    <p className="text-slate-700 text-xs leading-relaxed font-medium">{result.advanced?.[q.key]}</p>
                                                 </div>
                                             ))}
                                         </div>
 
                                         {/* Personalized Guidance Details (q14) */}
-                                        <div className="p-6 border-2 border-indigo-500/20 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/20 rounded-2xl space-y-4">
-                                            <div className="flex items-center gap-2 border-b border-white/5 pb-3">
+                                        <div className="p-6 border border-indigo-250 bg-gradient-to-br from-white to-indigo-50/30 rounded-2xl space-y-4 shadow-sm">
+                                            <div className="flex items-center gap-2 border-b border-indigo-100 pb-3">
                                                 <span className="text-base">👤</span>
                                                 <div>
-                                                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Personalized Career Alignment Report</h3>
+                                                    <h3 className="text-xs font-bold text-indigo-750 uppercase tracking-wider">Personalized Career Alignment Report</h3>
                                                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Based on completed assessments</p>
                                                 </div>
                                             </div>
 
-                                            <div className="space-y-4 text-xs">
+                                            <div className="space-y-4 text-xs font-medium text-slate-700">
                                                 <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Why this profession suits you</span>
-                                                    <p className="text-slate-300 leading-relaxed">{result.advanced?.q14?.whySuit}</p>
+                                                    <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Why this profession suits you</span>
+                                                    <p className="text-slate-800 leading-relaxed">{result.advanced?.q14?.whySuit}</p>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Habits, Skills & Routines to Build</span>
-                                                    <p className="text-slate-300 leading-relaxed">{result.advanced?.q14?.habits}</p>
+                                                    <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Habits, Skills & Routines to Build</span>
+                                                    <p className="text-slate-800 leading-relaxed">{result.advanced?.q14?.habits}</p>
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Your 12-Month Action Plan</span>
-                                                    <p className="text-slate-300 leading-relaxed whitespace-pre-line">{result.advanced?.q14?.actionPlan}</p>
+                                                    <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Your 12-Month Action Plan</span>
+                                                    <p className="text-slate-800 leading-relaxed whitespace-pre-line">{result.advanced?.q14?.actionPlan}</p>
                                                 </div>
                                             </div>
                                         </div>
