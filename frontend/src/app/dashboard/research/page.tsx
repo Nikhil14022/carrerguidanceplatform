@@ -1,11 +1,42 @@
 "use client";
 import React, { useState } from 'react';
 
+const basicQuestions = [
+    { key: 'q1', num: '1', title: 'What is this profession?', desc: 'Explanation in simple, child-friendly language.' },
+    { key: 'q2', num: '2', title: 'Daily Responsibilities', desc: 'What does a professional in this field actually do on a daily basis?' },
+    { key: 'q3', num: '3', title: 'Common Job Roles & Designations', desc: 'Typical titles and hierarchy.' },
+    { key: 'q4', num: '4', title: 'Workday in Early Career (0–3 Years)', desc: 'What to expect in the beginning.' },
+    { key: 'q5', num: '5', title: 'Top 5 Important Skills', desc: 'Core technical and soft skills.' },
+    { key: 'q6', num: '6', title: 'Personal Qualities & Habits', desc: 'Attributes that help someone succeed.' },
+    { key: 'q7', num: '7', title: 'Advantages & Challenges', desc: 'Pros and cons of this career path.' },
+    { key: 'q8', num: '8', title: 'Lifestyle & Work-Life Balance', desc: 'Working hours, pressure, travel, and flexibility.' },
+    { key: 'q9', num: '9', title: 'Academic Pathways', desc: 'How to enter after 10th, 12th, or graduation.' },
+    { key: 'q10', num: '10', title: 'Streams, Subjects & Degrees', desc: 'Best choices for secondary and higher education.' },
+    { key: 'q11', num: '11', title: 'Entrance Exams', desc: 'Standard qualifying examinations.' },
+    { key: 'q12', num: '12', title: 'Leading Colleges in India', desc: 'Top universities offering relevant courses.' },
+    { key: 'q13', num: '13', title: 'Explore & Prepare Now', desc: 'Readings, activities, and volunteer ideas for students.' },
+    { key: 'q14', num: '14', title: 'Early Advantage Boosters', desc: 'Short courses, certifications, and early internships.' }
+];
+
+const advancedQuestions = [
+    { key: 'q1', num: '1', title: 'Pathways & Specialisations', desc: 'Detailed sub-fields and domains.' },
+    { key: 'q3', num: '3', title: 'Alternative Routes', desc: 'Plan B pathways if primary entry fails.' },
+    { key: 'q7', num: '7', title: 'Success & Earning Drivers', desc: 'Key factors that influence growth and pay.' },
+    { key: 'q8', num: '8', title: 'Freelancing & Entrepreneurship', desc: 'Self-employment and private practice potential.' },
+    { key: 'q9', num: '9', title: 'Major Career Risks & Trade-offs', desc: 'Difficulties and competition levels.' },
+    { key: 'q10', num: '10', title: 'Current Demand', desc: 'Hiring outlook in India and abroad.' },
+    { key: 'q11', num: '11', title: 'Future Outlook (3-5 Years)', desc: 'Growth projections.' },
+    { key: 'q12', num: '12', title: 'Technology & AI Disruption', desc: 'How automation, regulation, or market changes will shape this role.' },
+    { key: 'q13', num: '13', title: 'Emerging Core Skills', desc: 'Skills that will be most valuable in the coming years.' }
+];
+
 export default function AIResearchPage() {
     const [topic, setTopic] = useState('');
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
     const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
+    const [advancedUnlocked, setAdvancedUnlocked] = useState(false);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -14,6 +45,8 @@ export default function AIResearchPage() {
         setLoading(true);
         setError('');
         setResult(null);
+        setAdvancedUnlocked(false);
+        setActiveTab('basic');
 
         try {
             const res = await fetch('/api/client/research/chat', {
@@ -33,17 +66,20 @@ export default function AIResearchPage() {
     };
 
     return (
-        <div className="space-y-8 animate-fade-in text-slate-200">
-            <div className="bg-white/5 border shadow-sm rounded-2xl p-8">
+        <div className="space-y-8 animate-fade-in text-slate-200 pb-16">
+            <div className="bg-white/5 border border-white/10 shadow-sm rounded-2xl p-6 md:p-8">
                 <div className="flex items-center gap-4 mb-2">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
+                        <svg className="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-100">AI Research Assistant</h1>
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-100">AI Profession Research Lab</h1>
+                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Instant structured intelligence reports</p>
+                    </div>
                 </div>
-                <p className="text-slate-400 mb-8 pl-16">Ask the AI to research any career topic, and it will provide material and useful links.</p>
+                <p className="text-slate-400 text-sm mb-8">Enter the name of any profession to instantly generate a detailed, structured two-stage overview.</p>
 
                 <form onSubmit={handleSearch} className="mb-8">
                     <div className="relative">
@@ -51,13 +87,13 @@ export default function AIResearchPage() {
                             type="text"
                             value={topic}
                             onChange={(e) => setTopic(e.target.value)}
-                            placeholder="e.g. How to become a Data Scientist in India"
-                            className="w-full pl-6 pr-32 py-4 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all shadow-inner text-lg"
+                            placeholder="Enter profession (e.g. Aerospace Engineer, Product Manager, Marine Biologist)"
+                            className="w-full pl-6 pr-32 py-4 bg-slate-955 border border-white/10 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-base text-white bg-slate-950"
                         />
                         <button
                             type="submit"
                             disabled={loading || !topic.trim()}
-                            className="absolute right-2 top-2 bottom-2 px-6 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center justify-center"
+                            className="absolute right-2 top-2 bottom-2 px-6 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-widest rounded-lg disabled:opacity-50 transition-colors flex items-center justify-center cursor-pointer"
                         >
                             {loading ? (
                                 <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -70,56 +106,200 @@ export default function AIResearchPage() {
                 </form>
 
                 {error && (
-                    <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl mb-8">
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl mb-8 text-xs font-semibold">
                         {error}
                     </div>
                 )}
 
                 {result && (
-                    <div className="space-y-6 animate-fade-in">
-                        <div className="p-6 bg-white/5 rounded-xl border border-white/5">
-                            <h2 className="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                <svg className="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                Topic Material
-                            </h2>
-                            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{result.material}</p>
+                    <div className="space-y-6">
+                        {/* Tab Headers */}
+                        <div className="flex border-b border-white/10 gap-2 shrink-0">
+                            <button
+                                onClick={() => setActiveTab('basic')}
+                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer ${activeTab === 'basic' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-350'}`}
+                            >
+                                1. Basic Understanding
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('advanced')}
+                                className={`px-4 py-2.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'advanced' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-350'}`}
+                            >
+                                2. Advanced Understanding
+                                {!advancedUnlocked && <span className="text-[10px]">🔒</span>}
+                            </button>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="p-6 bg-white/5 rounded-xl border shadow-sm">
-                                <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-                                    Helpful Links
-                                </h2>
-                                <ul className="space-y-3">
-                                    {result.topicUrls?.map((url: string, i: number) => (
-                                        <li key={i}>
-                                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 hover:underline flex items-start gap-2 break-all text-sm">
-                                                <span className="shrink-0 mt-0.5">•</span>
-                                                {url}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
+                        {/* Basic Section */}
+                        {activeTab === 'basic' && (
+                            <div className="grid gap-6 md:grid-cols-2 animate-fade-in">
+                                {basicQuestions.map((q) => (
+                                    <div key={q.key} className="p-5 bg-white/5 rounded-xl border border-white/5 space-y-2 hover:border-white/10 transition-all">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-5 h-5 rounded-md bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-[10px] font-bold text-indigo-400">{q.num}</span>
+                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">{q.title}</h3>
+                                        </div>
+                                        <p className="text-slate-300 text-xs leading-relaxed">{result.basic?.[q.key] || 'Generating information...'}</p>
+                                    </div>
+                                ))}
                             </div>
+                        )}
 
-                            <div className="p-6 bg-white/5 rounded-xl border shadow-sm">
-                                <h2 className="text-lg font-bold text-slate-200 mb-4 flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    YouTube Resources
-                                </h2>
-                                <ul className="space-y-3">
-                                    {result.youtubeUrls?.map((url: string, i: number) => (
-                                        <li key={i}>
-                                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-rose-600 hover:text-rose-800 hover:underline flex items-start gap-2 break-all text-sm">
-                                                <span className="shrink-0 mt-0.5">•</span>
-                                                {url}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
+                        {/* Advanced Section */}
+                        {activeTab === 'advanced' && (
+                            <div className="space-y-8 animate-fade-in">
+                                {!advancedUnlocked ? (
+                                    <div className="p-8 bg-slate-955/60 border border-white/10 rounded-2xl text-center space-y-4 max-w-lg mx-auto my-12 bg-slate-950">
+                                        <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mx-auto text-lg">🔒</div>
+                                        <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Locked Section</h3>
+                                        <p className="text-xs text-slate-550 leading-relaxed text-slate-400">
+                                            This advanced specialisation and personalized fit overview should be opened together with your counselor during your review meeting.
+                                        </p>
+                                        <button
+                                            onClick={() => setAdvancedUnlocked(true)}
+                                            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-md shadow-indigo-500/10 cursor-pointer"
+                                        >
+                                            Unlock Advanced Section
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-8">
+                                        {/* Personalized Guidance Header Callouts */}
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            {/* Circular Fit Score */}
+                                            <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 flex flex-col items-center text-center justify-center space-y-3">
+                                                <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">AI Profile Fit Score</div>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-5xl font-black text-white">{result.advanced?.q15?.score || '—'}</span>
+                                                    <span className="text-sm text-slate-500 font-bold">/10</span>
+                                                </div>
+                                                <div className="text-xs font-semibold text-slate-300 max-w-xs">{result.advanced?.q15?.recommendation}</div>
+                                                <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[8px] font-black uppercase tracking-widest">Personalized Match</span>
+                                            </div>
+
+                                            {/* Personal Fit Strengths & Gaps */}
+                                            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/5 to-amber-500/5 border border-white/5 space-y-4">
+                                                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 border-b border-white/5 pb-2">🎯 Quick Diagnostic</h4>
+                                                <div className="grid grid-cols-2 gap-4 text-xs">
+                                                    <div className="space-y-1">
+                                                        <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Use Your Strengths</span>
+                                                        <p className="text-slate-400 leading-relaxed text-[11px]">{result.advanced?.q14?.strengths}</p>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Address Your Gaps</span>
+                                                        <p className="text-slate-400 leading-relaxed text-[11px]">{result.advanced?.q14?.gaps}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Table of Pathways (q2) */}
+                                        <div className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4">
+                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Detailed Pathways & Course Details</h3>
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full text-left border-collapse text-xs">
+                                                    <thead>
+                                                        <tr className="border-b border-white/10 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
+                                                            <th className="py-2.5 pr-4">Specialization</th>
+                                                            <th className="py-2.5 pr-4">Degree & Duration</th>
+                                                            <th className="py-2.5 pr-4">Subjects & Exam</th>
+                                                            <th className="py-2.5 pr-4">Colleges & Fees</th>
+                                                            <th className="py-2.5">Available Roles</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-white/5 text-slate-300">
+                                                        {(result.advanced?.q2 || []).map((path: any, idx: number) => (
+                                                            <tr key={idx} className="hover:bg-white/[0.02]">
+                                                                <td className="py-3 pr-4 font-bold text-slate-200">{path.pathwayName}</td>
+                                                                <td className="py-3 pr-4">{path.degreeName} ({path.duration})</td>
+                                                                <td className="py-3 pr-4">
+                                                                    <div>{path.subjects}</div>
+                                                                    <div className="text-[10px] text-slate-500 font-semibold">{path.exam} ({path.cutoff})</div>
+                                                                </td>
+                                                                <td className="py-3 pr-4">
+                                                                    <div>{path.colleges}</div>
+                                                                    <div className="text-[10px] text-indigo-400">{path.fees}</div>
+                                                                </td>
+                                                                <td className="py-3">{path.roles}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {/* Responsibilities & Salaries Timeline (q4, q5, q6) */}
+                                        <div className="p-6 bg-white/5 border border-white/5 rounded-2xl space-y-4">
+                                            <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Experience Level Progression</h3>
+                                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                                {[
+                                                    { key: 'y0_3', label: '0–3 Years' },
+                                                    { key: 'y3_6', label: '3–6 Years' },
+                                                    { key: 'y6_10', label: '6–10 Years' },
+                                                    { key: 'y10_plus', label: '10+ Years' }
+                                                ].map((exp) => (
+                                                    <div key={exp.key} className="p-4 bg-slate-950/40 border border-white/5 rounded-xl space-y-3">
+                                                        <div className="text-xs font-black text-indigo-400 uppercase tracking-widest">{exp.label}</div>
+                                                        <div className="space-y-2 text-xs">
+                                                            <div>
+                                                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Role Tasks</span>
+                                                                <p className="text-slate-300 text-[11px] leading-relaxed mt-0.5">{result.advanced?.q4?.[exp.key]}</p>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                                                                <div>
+                                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">India Pay</span>
+                                                                    <span className="text-white font-bold text-[10px]">{result.advanced?.q5?.[exp.key]}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Abroad Pay</span>
+                                                                    <span className="text-white font-bold text-[10px] line-clamp-2">{result.advanced?.q6?.[exp.key]}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Standard Advanced Questions (q1, q3, q7 - q13) */}
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            {advancedQuestions.map((q) => (
+                                                <div key={q.key} className="p-5 bg-white/5 border border-white/5 rounded-xl space-y-2">
+                                                    <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">{q.title}</h4>
+                                                    <p className="text-slate-300 text-xs leading-relaxed">{result.advanced?.[q.key]}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Personalized Guidance Details (q14) */}
+                                        <div className="p-6 border-2 border-indigo-500/20 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/20 rounded-2xl space-y-4">
+                                            <div className="flex items-center gap-2 border-b border-white/5 pb-3">
+                                                <span className="text-base">👤</span>
+                                                <div>
+                                                    <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Personalized Career Alignment Report</h3>
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Based on completed assessments</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4 text-xs">
+                                                <div className="space-y-1">
+                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Why this profession suits you</span>
+                                                    <p className="text-slate-300 leading-relaxed">{result.advanced?.q14?.whySuit}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Habits, Skills & Routines to Build</span>
+                                                    <p className="text-slate-300 leading-relaxed">{result.advanced?.q14?.habits}</p>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <span className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider block">Your 12-Month Action Plan</span>
+                                                    <p className="text-slate-300 leading-relaxed whitespace-pre-line">{result.advanced?.q14?.actionPlan}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>

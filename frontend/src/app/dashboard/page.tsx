@@ -13,6 +13,7 @@ function DashboardContent() {
 
     const [showSuccess, setShowSuccess] = useState(false);
     const [generatingAI, setGeneratingAI] = useState(false);
+    const [expandedStage, setExpandedStage] = useState<number | null>(null);
 
     const handleGenerateReport = async () => {
         setGeneratingAI(true);
@@ -207,59 +208,195 @@ function DashboardContent() {
                 </section>
             )}
 
-
-
             {/* Journey Timeline component */}
             <section className="bg-white/5 border shadow-sm rounded-2xl p-8 space-y-8">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-slate-100">Your Workflow Timeline</h3>
-                    <div className="flex gap-4 text-xs font-medium text-slate-500">
-                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500" /> Verified</div>
-                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-500" /> In Review</div>
-                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-500" /> Active</div>
-                        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slate-200" /> Locked</div>
+                    <h3 className="text-xl font-bold text-slate-100">Journey Workflow & Stages</h3>
+                    <div className="flex flex-wrap gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500/20 border border-emerald-500/40" /> Completed</div>
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-indigo-500/20 border border-indigo-500/40" /> In Progress</div>
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-amber-500/20 border border-amber-500/40" /> On Hold</div>
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-slate-800 border border-slate-700" /> Not Started</div>
                     </div>
                 </div>
 
                 <div className="relative pt-4 pb-4">
                     {/* Vertical Connecting Line */}
-                    <div className="absolute top-10 bottom-10 left-[1.125rem] md:left-[1.625rem] w-1 bg-slate-100 rounded-full z-0" />
+                    <div className="absolute top-10 bottom-10 left-[1.125rem] md:left-[1.625rem] w-0.5 bg-white/5 z-0" />
 
-                    <div className="flex flex-col gap-6 md:gap-8 relative z-10 w-full pl-0">
-                        {profile?.modules?.map((m: any, idx: number) => {
-                            const isLocked = m.status === 'LOCKED';
-                            const isCompleted = m.status === 'APPROVED';
-                            const isReview = m.status === 'SUBMITTED' || m.status === 'UNDER_REVIEW';
-                            const isActive = m.status === 'UNLOCKED' || m.status === 'IN_PROGRESS';
+                    <div className="flex flex-col gap-6 relative z-10 w-full pl-0">
+                        {(profile?.stages || []).map((stage: any) => {
+                            const isExpanded = expandedStage === stage.stageNumber;
+                            const isCompleted = stage.status === 'COMPLETED';
+                            const isInProgress = stage.status === 'IN_PROGRESS';
+                            const isOnHold = stage.status === 'ON_HOLD';
+                            const isNotApplicable = stage.status === 'NOT_APPLICABLE';
+                            const isNotStarted = stage.status === 'NOT_STARTED';
 
-                            let statusColor = 'bg-white/5 border-white/10 text-slate-400';
-                            let icon = <span className="font-bold">{idx + 1}</span>;
+                            let badgeStyle = "bg-white/5 border-white/5 text-slate-400";
+                            let icon = <span className="font-bold text-xs">{stage.stageNumber}</span>;
+                            let circleStyle = "border-white/10 text-slate-400 bg-slate-900";
 
                             if (isCompleted) {
-                                statusColor = 'bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20';
-                                icon = <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>;
-                            } else if (isReview) {
-                                statusColor = 'bg-amber-500 border-amber-500 text-white shadow-amber-500/20';
-                                icon = <svg className="w-5 h-5 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-                            } else if (isActive) {
-                                statusColor = 'bg-white/5 border-indigo-600 text-indigo-400 shadow-indigo-500/20 border-2 scale-110';
+                                badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                                circleStyle = "bg-emerald-500 border-emerald-500 text-white shadow-emerald-500/20";
+                                icon = <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>;
+                            } else if (isInProgress) {
+                                badgeStyle = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
+                                circleStyle = "bg-slate-900 border-indigo-500 text-indigo-400 shadow-indigo-500/20 border-2 scale-110";
+                            } else if (isOnHold) {
+                                badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                                circleStyle = "bg-slate-900 border-amber-500 text-amber-400 border-2";
+                            } else if (isNotApplicable) {
+                                badgeStyle = "bg-slate-800/50 text-slate-500 border-slate-800";
+                                circleStyle = "bg-slate-900 border-slate-800 text-slate-600 line-through";
+                            }
+
+                            // Determine action button
+                            let actionButton = null;
+                            if (stage.stageNumber === 1) {
+                                actionButton = (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/modules'); }}
+                                        className="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                    >
+                                        Go to Questionnaire Modules
+                                    </button>
+                                );
+                            } else if (stage.stageNumber === 2) {
+                                actionButton = (
+                                    <div className="mt-3 text-xs text-slate-400">
+                                        Ask your parent to link their profile and complete the Parent Questionnaire.
+                                    </div>
+                                );
+                            } else if (stage.stageNumber === 3 || stage.stageNumber === 4 || stage.stageNumber === 6) {
+                                actionButton = (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/appointments'); }}
+                                        className="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                    >
+                                        Schedule Appointment
+                                    </button>
+                                );
+                            } else if (stage.stageNumber === 5) {
+                                actionButton = (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/research'); }}
+                                        className="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                    >
+                                        Open AI Research Assistant
+                                    </button>
+                                );
+                            } else if (stage.stageNumber === 8) {
+                                actionButton = (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/reports'); }}
+                                        className="mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+                                    >
+                                        View Recommended Shortlist
+                                    </button>
+                                );
+                            }
+
+                            // Parse JSON tasks & documents safely
+                            let stageTasks = [];
+                            try {
+                                stageTasks = typeof stage.tasks === 'string' ? JSON.parse(stage.tasks) : (stage.tasks || []);
+                            } catch (e) {
+                                stageTasks = [];
+                            }
+                            let stageDocs = [];
+                            try {
+                                stageDocs = typeof stage.documents === 'string' ? JSON.parse(stage.documents) : (stage.documents || []);
+                            } catch (e) {
+                                stageDocs = [];
                             }
 
                             return (
-                                <div key={m.id} className="flex flex-row items-center gap-4 md:gap-6 group cursor-pointer w-full relative" onClick={() => !isLocked && router.push(`/dashboard/modules/${m.id}`)}>
-                                    
-                                    <div className={`shrink-0 w-10 h-10 md:w-14 md:h-14 rounded-full border flex items-center justify-center transition-all duration-300 relative z-10 shadow-md ${statusColor} ${isActive ? 'bg-white/5 scale-110' : 'bg-white/5'}`}>
+                                <div
+                                    key={stage.id}
+                                    className="flex flex-row items-start gap-4 md:gap-6 group cursor-pointer w-full relative"
+                                    onClick={() => setExpandedStage(isExpanded ? null : stage.stageNumber)}
+                                >
+                                    <div className={`shrink-0 w-9 h-9 md:w-12 md:h-12 rounded-full border flex items-center justify-center transition-all duration-300 relative z-10 shadow-md ${circleStyle}`}>
                                         {icon}
-                                        {isActive && (
-                                            <div className="absolute inset-[-6px] border-2 border-indigo-500/30 rounded-full animate-ping" />
+                                        {isInProgress && (
+                                            <div className="absolute inset-[-4px] border border-indigo-500/20 rounded-full animate-ping" />
                                         )}
                                     </div>
 
-                                    <div className="flex-1 bg-white/50 group-hover:bg-white/5 border border-transparent group-hover:border-white/5 rounded-xl p-3 md:p-4 transition-all -ml-2 hover:shadow-sm">
-                                        <div className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Step {idx + 1}</div>
-                                        <div className={`text-sm md:text-base font-semibold ${isActive ? 'text-indigo-900' : isLocked ? 'text-slate-400' : 'text-slate-200'}`}>
-                                            {m.module.title}
+                                    <div className={`flex-1 bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl p-4 md:p-5 transition-all -ml-2 hover:shadow-sm ${isExpanded ? 'bg-white/[0.07] border-white/10' : ''}`}>
+                                        <div className="flex justify-between items-start gap-4">
+                                            <div>
+                                                <div className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Stage {stage.stageNumber}</div>
+                                                <div className={`text-sm md:text-base font-semibold text-slate-100`}>
+                                                    {stage.stageName}
+                                                </div>
+                                            </div>
+                                            <span className={`px-2.5 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${badgeStyle}`}>
+                                                {stage.status.replace('_', ' ')}
+                                            </span>
                                         </div>
+
+                                        {/* Collapsible content block */}
+                                        {isExpanded && (
+                                            <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs md:text-sm text-slate-300 animate-slide-down">
+                                                {stage.notes && (
+                                                    <div className="bg-slate-950/40 border border-white/5 rounded-xl p-3">
+                                                        <h4 className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Counselor Remarks</h4>
+                                                        <p className="text-slate-300 leading-relaxed text-xs">{stage.notes}</p>
+                                                    </div>
+                                                )}
+
+                                                {stageTasks.length > 0 && (
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Checklist Tasks</h4>
+                                                        <ul className="space-y-1.5">
+                                                            {stageTasks.map((t: any, idx: number) => (
+                                                                <li key={idx} className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                                                    <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${t.completed ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-white/20'}`}>
+                                                                        {t.completed && (
+                                                                            <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                                                                        )}
+                                                                    </div>
+                                                                    <span className={`text-xs ${t.completed ? 'line-through text-slate-500' : 'text-slate-300'}`}>{t.text}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                {stageDocs.length > 0 && (
+                                                    <div>
+                                                        <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Documents & Resources</h4>
+                                                        <ul className="space-y-1.5">
+                                                            {stageDocs.map((doc: any, idx: number) => (
+                                                                <li key={idx} className="flex items-center gap-2 text-xs" onClick={(e) => e.stopPropagation()}>
+                                                                    <span>📄</span>
+                                                                    <a
+                                                                        href={doc.url}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="text-indigo-400 hover:text-indigo-300 underline font-semibold transition-colors"
+                                                                    >
+                                                                        {doc.name || "Attachment File"}
+                                                                    </a>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+
+                                                {stage.meetingOutcomes && (
+                                                    <div className="bg-slate-950/40 border border-white/5 rounded-xl p-3">
+                                                        <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Meeting Decisions & Outcomes</h4>
+                                                        <p className="text-slate-300 leading-relaxed text-xs">{stage.meetingOutcomes}</p>
+                                                    </div>
+                                                )}
+
+                                                {actionButton}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             );

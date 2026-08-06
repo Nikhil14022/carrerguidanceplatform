@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
+import { hash } from 'bcryptjs'
 
 export async function GET(request: Request) {
   try {
@@ -71,5 +72,117 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Admin clients error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await auth()
+
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const {
+      clientName,
+      clientEmail,
+      clientPassword,
+      clientAge,
+      parentName,
+      parentEmail,
+      parentPassword,
+      mentorProfileId
+    } = await request.json()
+
+    if (!clientName || !clientEmail || !clientPassword || !parentName || !parentEmail || !parentPassword) {
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+    }
+
+    // Check if emails already registered
+    const existingClient = await prisma.user.findUnique({ where: { email: clientEmail } })
+    if (existingClient) {
+      return NextResponse.json({ error: `Student email ${clientEmail} is already registered.` }, { status: 400 })
+    }
+
+    const existingParent = await prisma.user.findUnique({ where: { email: parentEmail } })
+    if (existingParent) {
+      return NextResponse.json({ error: `Parent email ${parentEmail} is already registered.` }, { status: 400 })
+    }
+
+    const hashedClientPassword = await hash(clientPassword, 12)
+    const hashedParentPassword = await hash(parentPassword, 12)
+
+    const moduleTemplates = await prisma.module.findMany({
+      orderBy: { defaultOrder: 'asc' }
+    })
+
+    // Create both inside a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Create Parent
+      const parentUser = await tx.user.create({
+        data: {
+          name: parentName,
+          email: parentEmail,
+          password: hashedParentPassword,
+          role: 'PARENT'
+        }
+      })
+
+      // 2. Create Client & Profile
+      const clientUser = await tx.user.create({
+        data: {
+          name: clientName,
+          email: clientEmail,
+          password: hashedClientPassword,
+          role: 'CLIENT',
+          age: parseInt(clientAge as any) || 16,
+          clientProfile: {
+            create: {
+              currentStage: 1,
+              journeyStatus: 'Started',
+              parentId: parentUser.id,
+              modules: {
+                create: moduleTemplates.map((template, idx) => ({
+                  moduleId: template.id,
+                  status: 'LOCKED',
+                  order: idx + 1,
+                  filledBy: 'CLIENT'
+                }))
+              }
+            }
+          }
+        },
+        include: { clientProfile: true }
+      })
+
+      // 3. If mentorProfileId is provided, create Assignment
+      if (mentorProfileId && clientUser.clientProfile) {
+        await tx.mentorAssignment.create({
+          data: {
+            mentorProfileId,
+            clientProfileId: clientUser.clientProfile.id,
+            permissions: ['VIEW_MODULES', 'VIEW_REPORTS', 'CHAT'],
+            assignedBy: session.user.id,
+            isActive: true,
+            assignedAt: new Date()
+          }
+        })
+      }
+
+      return {
+        parentId: parentUser.id,
+        clientId: clientUser.id,
+        clientProfileId: clientUser.clientProfile?.id
+      }
+    })
+
+    return NextResponse.json({ success: true, ...result }, { status: 201 })
+  } catch (error: any) {
+    console.error('Error creating client & parent:', error)
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

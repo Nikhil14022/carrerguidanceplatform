@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { generateGeneralResearch } from '@/lib/ai'
+import { generateProfessionResearch } from '@/lib/ai'
 
 export async function POST(req: Request) {
     try {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Missing topic' }, { status: 400 })
         }
 
-        const research = await generateGeneralResearch(topic)
+        const research = await generateProfessionResearch(topic, session.user.id)
         return NextResponse.json(research)
     } catch (error: any) {
         console.error('API research chat error:', error)

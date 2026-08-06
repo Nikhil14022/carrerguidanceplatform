@@ -39,7 +39,6 @@ export const Navbar = () => {
                     ) : (
                         <>
                             <a href="/login" className="text-xs font-bold text-slate-350 hover:text-[var(--color-brand-yellow)] transition-colors uppercase tracking-widest">Log In</a>
-                            <a href="/register" className="btn-primary text-xs py-2.5 px-5 font-bold uppercase tracking-wider rounded-xl">Get Started</a>
                         </>
                     )}
                 </div>
@@ -52,7 +51,7 @@ export const Hero = () => {
     const { data: session } = useSession();
     
     const getJourneyLink = () => {
-        if (!session) return '/register';
+        if (!session) return '/login';
         const role = (session.user as any)?.role;
         if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/admin';
         if (role === 'EXPERT' || role?.startsWith('MENTOR')) return '/mentor';
@@ -79,7 +78,7 @@ export const Hero = () => {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                     <a href={getJourneyLink()} className="btn-primary w-full sm:w-auto text-center font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 hover:-translate-y-0.5 transition-all duration-200">
-                        {session ? 'Go to Dashboard' : 'Start Your Journey'}
+                        {session ? 'Go to Dashboard' : 'Log In to Start'}
                     </a>
                     <button
                         onClick={() => window.location.href = '/sample-report'}

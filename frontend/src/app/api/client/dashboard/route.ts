@@ -27,12 +27,57 @@ export async function GET() {
         reports: {
           where: { active: true },
           orderBy: { id: 'desc' }
+        },
+        stages: {
+          orderBy: { stageNumber: 'asc' }
         }
       }
     })
 
     if (!clientProfile) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    }
+
+    // --- JIT Initialize Workflow Stages ---
+    const defaultStageNames = [
+      "Student Questionnaire",
+      "Parent Questionnaire",
+      "Collaborative Meeting: Student and Parent",
+      "Report Discussion with the Student",
+      "Research and Knowledge Building",
+      "Research Discussion",
+      "Short Courses and Internships",
+      "Shortlisting: Colleges, Universities, and Courses",
+      "Entrance Exams"
+    ];
+
+    let stages = clientProfile.stages || [];
+    if (stages.length < 9) {
+      const existingNums = new Set(stages.map((s: any) => s.stageNumber));
+      const createdStages = [];
+
+      for (let num = 1; num <= 9; num++) {
+        if (!existingNums.has(num)) {
+          const created = await prisma.clientStage.create({
+            data: {
+              clientProfileId: clientProfile.id,
+              stageNumber: num,
+              stageName: defaultStageNames[num - 1],
+              status: "NOT_STARTED",
+              notes: "",
+              tasks: [],
+              documents: [],
+              meetingOutcomes: ""
+            }
+          });
+          createdStages.push(created);
+        }
+      }
+
+      stages = await prisma.clientStage.findMany({
+        where: { clientProfileId: clientProfile.id },
+        orderBy: { stageNumber: 'asc' }
+      });
     }
 
     // --- Just-In-Time Module Synchronization ---
@@ -87,7 +132,7 @@ export async function GET() {
     ).length
 
     const totalModules = clientProfile.modules.length
-    const progressPercentage = totalModules > 0
+    let progressPercentage = totalModules > 0
       ? Math.round((completedModules / totalModules) * 100)
       : 0
 
@@ -122,8 +167,14 @@ export async function GET() {
 
     const upcomingMeetings = appointments.filter(appt => new Date(appt.startTime) > new Date());
 
+    const completedStages = stages.filter((s: any) => s.status === 'COMPLETED').length;
+    progressPercentage = Math.round((completedStages / 9) * 100);
+
     return NextResponse.json({
-      profile: clientProfile,
+      profile: {
+        ...clientProfile,
+        stages
+      },
       stats: {
         completed: completedModules,
         total: totalModules,

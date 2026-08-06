@@ -22,6 +22,7 @@ interface ClientData {
     reports: any[];
     parentData?: any[];
     appointments?: any[];
+    stages?: any[];
 }
 
 export default function MentorClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -35,6 +36,74 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
     const [clientId, setClientId] = useState<string>('');
     const [customPrompt, setCustomPrompt] = useState('');
     const [activeReportTab, setActiveReportTab] = useState<'persona' | 'personality' | 'cognitive' | 'interests' | 'diagnostic'>('persona');
+
+    // Stage Management States
+    const [editingStage, setEditingStage] = useState<any>(null);
+    const [stageStatus, setStageStatus] = useState<string>('NOT_STARTED');
+    const [stageNotes, setStageNotes] = useState<string>('');
+    const [stageOutcomes, setStageOutcomes] = useState<string>('');
+    const [stageTasks, setStageTasks] = useState<any[]>([]);
+    const [stageDocs, setStageDocs] = useState<any[]>([]);
+    const [newTaskText, setNewTaskText] = useState<string>('');
+    const [newDocName, setNewDocName] = useState<string>('');
+    const [newDocUrl, setNewDocUrl] = useState<string>('');
+    const [updatingStage, setUpdatingStage] = useState<boolean>(false);
+
+    const handleOpenEditStage = (stage: any) => {
+        setEditingStage(stage);
+        setStageStatus(stage.status);
+        setStageNotes(stage.notes || '');
+        setStageOutcomes(stage.meetingOutcomes || '');
+        let tasks = [];
+        try {
+            tasks = typeof stage.tasks === 'string' ? JSON.parse(stage.tasks) : (stage.tasks || []);
+        } catch (e) {
+            tasks = [];
+        }
+        setStageTasks(tasks);
+        let docs = [];
+        try {
+            docs = typeof stage.documents === 'string' ? JSON.parse(stage.documents) : (stage.documents || []);
+        } catch (e) {
+            docs = [];
+        }
+        setStageDocs(docs);
+        setNewTaskText('');
+        setNewDocName('');
+        setNewDocUrl('');
+    };
+
+    const handleSaveStage = async () => {
+        if (!editingStage || !clientId) return;
+        setUpdatingStage(true);
+        try {
+            const res = await fetch(`/api/admin/clients/${clientId}/stages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    stageNumber: editingStage.stageNumber,
+                    status: stageStatus,
+                    notes: stageNotes,
+                    meetingOutcomes: stageOutcomes,
+                    tasks: stageTasks,
+                    documents: stageDocs
+                })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setNotification({ type: 'success', msg: 'Stage updated successfully!' });
+                setEditingStage(null);
+                fetchClient(clientId);
+            } else {
+                setNotification({ type: 'error', msg: data.error || 'Failed to update stage' });
+            }
+        } catch (err) {
+            setNotification({ type: 'error', msg: 'Network error occurred' });
+        } finally {
+            setUpdatingStage(false);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
 
     const safeVal = (v: any) => v !== undefined && v !== null && v !== '' ? v : '—';
 
@@ -359,17 +428,67 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                 </div>
             </div>
 
-            {/* Journey Status Bar */}
-            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 shadow-sm">
-                <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm font-bold text-slate-300">Journey Progress</span>
-                    <span className="text-xs font-medium text-slate-500">{client.journeyStatus}</span>
+            {/* Stages & Workflow Control Panel */}
+            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 shadow-sm space-y-6">
+                <div className="flex justify-between items-center pb-4 border-b border-white/5">
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-100">Client Journey Workflow & Stages</h3>
+                        <p className="text-[10px] text-slate-500 mt-0.5">Flexible progression tracking. Edit notes, tasks, docs, and outcomes manually.</p>
+                    </div>
+                    <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider">
+                        {client.journeyStatus}
+                    </span>
                 </div>
-                <div className="w-full bg-slate-100 rounded-full h-2">
-                    <div
-                        className="bg-indigo-500 h-2 rounded-full transition-all"
-                        style={{ width: `${client.modules.length > 0 ? (approvedCount / client.modules.length * 100) : 0}%` }}
-                    />
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {(client.stages || []).map((stage: any) => {
+                        const isCompleted = stage.status === 'COMPLETED';
+                        const isInProgress = stage.status === 'IN_PROGRESS';
+                        const isOnHold = stage.status === 'ON_HOLD';
+                        const isNotApplicable = stage.status === 'NOT_APPLICABLE';
+
+                        let badgeStyle = "bg-white/5 border-white/5 text-slate-400";
+                        if (isCompleted) badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                        else if (isInProgress) badgeStyle = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse";
+                        else if (isOnHold) badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                        else if (isNotApplicable) badgeStyle = "bg-slate-800/50 text-slate-500 border-slate-800";
+
+                        // Get tasks stats
+                        let tasks = [];
+                        try {
+                            tasks = typeof stage.tasks === 'string' ? JSON.parse(stage.tasks) : (stage.tasks || []);
+                        } catch (e) {
+                            tasks = [];
+                        }
+                        const completedTasks = tasks.filter((t: any) => t.completed).length;
+
+                        return (
+                            <div key={stage.id} className="p-4 bg-slate-950/40 rounded-xl border border-white/5 space-y-3 flex flex-col justify-between hover:border-white/10 transition-all">
+                                <div className="space-y-1">
+                                    <div className="flex justify-between items-start gap-2">
+                                        <span className="text-[10px] font-bold text-slate-500">Stage {stage.stageNumber}</span>
+                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${badgeStyle}`}>
+                                            {stage.status.replace('_', ' ')}
+                                        </span>
+                                    </div>
+                                    <h4 className="text-xs font-semibold text-slate-200 line-clamp-1">{stage.stageName}</h4>
+                                    {stage.notes && (
+                                        <p className="text-[10px] text-slate-500 line-clamp-1 italic">"{stage.notes}"</p>
+                                    )}
+                                    {tasks.length > 0 && (
+                                        <div className="text-[9px] text-slate-400 flex items-center gap-1">
+                                            <span>📋</span> Tasks: {completedTasks}/{tasks.length}
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => handleOpenEditStage(stage)}
+                                    className="w-full mt-2 py-1.5 bg-white/5 hover:bg-white/10 text-[9px] font-bold uppercase tracking-wider text-slate-300 rounded-lg border border-white/5 transition-all text-center"
+                                >
+                                    Manage Stage
+                                </button>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -1162,6 +1281,198 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                     )}
                 </div>
             </div>
+
+            {/* Stage Editing Modal */}
+            {editingStage && (
+                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-4 text-slate-200">
+                        <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                            <div>
+                                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Manage Stage {editingStage.stageNumber}</h3>
+                                <p className="text-xs text-slate-500 font-bold">{editingStage.stageName}</p>
+                            </div>
+                            <button
+                                onClick={() => setEditingStage(null)}
+                                className="text-slate-400 hover:text-white text-lg font-bold"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Status Select */}
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Stage Status</label>
+                            <select
+                                value={stageStatus}
+                                onChange={(e) => setStageStatus(e.target.value)}
+                                className="w-full bg-slate-955 border border-white/10 rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-white bg-slate-950"
+                            >
+                                <option value="NOT_STARTED">Not Started</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="ON_HOLD">On Hold</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="NOT_APPLICABLE">Not Applicable</option>
+                            </select>
+                        </div>
+
+                        {/* Counselor Notes */}
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Counselor Remarks / Notes</label>
+                            <textarea
+                                value={stageNotes}
+                                onChange={(e) => setStageNotes(e.target.value)}
+                                placeholder="Describe expectations, reminders, or general progress notes for the student..."
+                                rows={3}
+                                className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-white resize-none"
+                            />
+                        </div>
+
+                        {/* Collaborative Outcomes (Meetings only) */}
+                        {["Collaborative Meeting: Student and Parent", "Report Discussion with the Student", "Research Discussion"].includes(editingStage.stageName) && (
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Meeting Decisions & Outcomes</label>
+                                <textarea
+                                    value={stageOutcomes}
+                                    onChange={(e) => setStageOutcomes(e.target.value)}
+                                    placeholder="Enter finalized key decisions, follow-up points, or agreed alignments here..."
+                                    rows={3}
+                                    className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-xs focus:ring-1 focus:ring-indigo-500 outline-none text-white resize-none"
+                                />
+                            </div>
+                        )}
+
+                        {/* Tasks Checklist Manager */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Checklist Tasks</label>
+                            <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
+                                {stageTasks.length === 0 ? (
+                                    <p className="text-[10px] text-slate-500 italic">No tasks added to this stage yet.</p>
+                                ) : (
+                                    stageTasks.map((t, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-2 bg-slate-950/50 rounded-lg border border-white/5 text-xs">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={t.completed}
+                                                    onChange={(e) => {
+                                                        const updated = [...stageTasks];
+                                                        updated[idx].completed = e.target.checked;
+                                                        setStageTasks(updated);
+                                                    }}
+                                                    className="w-3.5 h-3.5 rounded border-white/20 accent-indigo-500 bg-slate-950 cursor-pointer"
+                                                />
+                                                <span className={t.completed ? "line-through text-slate-500" : ""}>{t.text}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const updated = stageTasks.filter((_, i) => i !== idx);
+                                                    setStageTasks(updated);
+                                                }}
+                                                className="text-red-400 hover:text-red-300 font-bold"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Add a new checklist item..."
+                                    value={newTaskText}
+                                    onChange={(e) => setNewTaskText(e.target.value)}
+                                    className="flex-1 bg-slate-955 border border-white/10 rounded-lg px-3 py-1.5 text-xs outline-none text-white bg-slate-950"
+                                />
+                                <button
+                                    onClick={() => {
+                                        if (!newTaskText.trim()) return;
+                                        setStageTasks([...stageTasks, { text: newTaskText.trim(), completed: false }]);
+                                        setNewTaskText('');
+                                    }}
+                                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white rounded-lg transition-colors"
+                                >
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Documents Manager */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Linked Documents & Resources</label>
+                            <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
+                                {stageDocs.length === 0 ? (
+                                    <p className="text-[10px] text-slate-500 italic">No documents attached yet.</p>
+                                ) : (
+                                    stageDocs.map((doc, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-2 bg-slate-950/50 rounded-lg border border-white/5 text-xs">
+                                            <div className="flex items-center gap-1.5 truncate">
+                                                <span>📄</span>
+                                                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline truncate">
+                                                    {doc.name}
+                                                </a>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const updated = stageDocs.filter((_, i) => i !== idx);
+                                                    setStageDocs(updated);
+                                                }}
+                                                className="text-red-400 hover:text-red-300 font-bold"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Document Name (e.g. Report.pdf)"
+                                    value={newDocName}
+                                    onChange={(e) => setNewDocName(e.target.value)}
+                                    className="bg-slate-955 border border-white/10 rounded-lg px-3 py-1.5 text-xs outline-none text-white bg-slate-950"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Document URL (https://...)"
+                                    value={newDocUrl}
+                                    onChange={(e) => setNewDocUrl(e.target.value)}
+                                    className="bg-slate-955 border border-white/10 rounded-lg px-3 py-1.5 text-xs outline-none text-white bg-slate-950"
+                                />
+                            </div>
+                            <button
+                                onClick={() => {
+                                    if (!newDocName.trim() || !newDocUrl.trim()) return;
+                                    setStageDocs([...stageDocs, { name: newDocName.trim(), url: newDocUrl.trim(), addedAt: new Date().toISOString() }]);
+                                    setNewDocName('');
+                                    setNewDocUrl('');
+                                }}
+                                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-xs font-bold text-white rounded-lg transition-colors text-center"
+                            >
+                                + Attach Document
+                            </button>
+                        </div>
+
+                        {/* Footer Buttons */}
+                        <div className="flex justify-end gap-3 pt-3 border-t border-white/5">
+                            <button
+                                onClick={() => setEditingStage(null)}
+                                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-slate-400 transition-all font-bold uppercase tracking-wider"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveStage}
+                                disabled={updatingStage}
+                                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-xs text-white transition-all font-bold uppercase tracking-wider shadow-lg shadow-indigo-500/20"
+                            >
+                                {updatingStage ? 'Saving...' : 'Save Stage Details'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

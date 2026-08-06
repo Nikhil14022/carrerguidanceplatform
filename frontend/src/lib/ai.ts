@@ -503,3 +503,132 @@ Keep your responses detailed, professional, encouraging, and directly rooted in 
 
   return result.choices[0]?.message?.content || "";
 }
+
+export async function generateProfessionResearch(professionName: string, userId: string) {
+  const clientProfile = await prisma.clientProfile.findFirst({
+    where: { userId },
+    include: {
+      user: { select: { name: true, email: true, age: true } },
+      modules: {
+        where: { status: { in: ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'] } },
+        include: { response: true, module: true }
+      }
+    }
+  })
+
+  let studentProfileText = "No profile assessments completed yet."
+  if (clientProfile && clientProfile.modules.length > 0) {
+    const modulesData = clientProfile.modules.map((m: any) => ({
+      module: m.module.title,
+      answers: m.response?.data
+    }))
+    studentProfileText = JSON.stringify({
+      studentName: clientProfile.user.name,
+      studentAge: clientProfile.user.age,
+      assessments: modulesData
+    }, null, 2)
+  }
+
+  const prompt = `You are a world-class AI Career Guidance Specialist.
+Generate a comprehensive, high-quality, structured profession research report for the profession: "${professionName}".
+
+Student Profile Context (if available, customize Section 2 Questions 14 and 15 based on this; otherwise write general guidance):
+${studentProfileText}
+
+You MUST return a JSON object with exactly the following keys and structure. Return only the raw JSON string:
+
+{
+  "basic": {
+    "q1": "Explain what this profession is in simple, child-friendly language.",
+    "q2": "What does a person in this profession actually do on a daily basis?",
+    "q3": "List the common job roles and designations in this profession.",
+    "q4": "What does a typical workday look like during the first 0-3 years?",
+    "q5": "List the five most important skills needed for this profession.",
+    "q6": "What personal qualities or habits help a person succeed in this profession?",
+    "q7": "What are the main advantages and challenges of this profession?",
+    "q8": "Likely lifestyle (working hours, pressure, travel, flexibility, work-life balance, and social interaction).",
+    "q9": "Describe academic pathways to enter this profession from: after Class 10, after Class 12, and after graduation.",
+    "q10": "Which streams, subjects, degrees, and courses are most relevant for this profession?",
+    "q11": "What entrance exams may be required?",
+    "q12": "Name some leading colleges or universities in India offering relevant courses.",
+    "q13": "What can a child start doing now to explore or prepare (reading, activities, projects, competitions, volunteering, shadowing)?",
+    "q14": "Name short courses, certifications, internships, or projects that build an early advantage."
+  },
+  "advanced": {
+    "q1": "What are the detailed career pathways and specialisations within this profession?",
+    "q2": [
+      {
+        "pathwayName": "Name of specialization or path",
+        "degreeName": "Degree or course name",
+        "duration": "Duration (e.g. 4 years)",
+        "eligibility": "Eligibility criteria",
+        "subjects": "Required streams/subjects",
+        "exam": "Entrance exam",
+        "cutoff": "Approximate cut-off or score expectation",
+        "colleges": "Leading colleges/universities",
+        "fees": "Approximate course fees",
+        "roles": "Career roles after completion"
+      }
+    ],
+    "q3": "What are the best alternative pathways if the preferred course, college, or entrance exam does not work out?",
+    "q4": {
+      "y0_3": "Jobs and responsibilities at 0-3 years experience",
+      "y3_6": "Jobs and responsibilities at 3-6 years experience",
+      "y6_10": "Jobs and responsibilities at 6-10 years experience",
+      "y10_plus": "Jobs and responsibilities at 10+ years experience"
+    },
+    "q5": {
+      "y0_3": "Salary range in India at 0-3 years",
+      "y3_6": "Salary range in India at 3-6 years",
+      "y6_10": "Salary range in India at 6-10 years",
+      "y10_plus": "Salary range in India at 10+ years"
+    },
+    "q6": {
+      "y0_3": "Salary range abroad at 0-3 years (Country, currency, and INR equivalent)",
+      "y3_6": "Salary range abroad at 3-6 years (Country, currency, and INR equivalent)",
+      "y6_10": "Salary range abroad at 6-10 years (Country, currency, and INR equivalent)",
+      "y10_plus": "Salary range abroad at 10+ years (Country, currency, and INR equivalent)"
+    },
+    "q7": "What factors have the biggest impact on success and earnings in this profession?",
+    "q8": "Explain opportunities and requirements for freelancing, entrepreneurship, private practice, or remote work.",
+    "q9": "What are the major risks, difficulties, competition levels, and trade-offs in this career?",
+    "q10": "What is the current demand for this profession in India and internationally?",
+    "q11": "What is the future outlook for the next 3-5 years?",
+    "q12": "How will technology, AI, automation, regulations, or market changes affect this profession?",
+    "q13": "Which future skills and emerging specialisations will be most valuable?",
+    "q14": {
+      "whySuit": "Personalized advice: why this profession may suit the child based on their profile data.",
+      "strengths": "Strengths the child can use",
+      "gaps": "Gaps to work on",
+      "habits": "Habits, skills, and routines to build",
+      "actionPlan": "A practical action plan for next 30 days, 3 months, 6 months, and 1 year"
+    },
+    "q15": {
+      "score": "A number from 1 to 10 for overall profession-fit score",
+      "recommendation": "A concise final counselor recommendation"
+    }
+  }
+}`
+
+  const client = getGroqClient()
+  try {
+    const result = await client.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a JSON-only API. You MUST respond with valid JSON and nothing else. No markdown, no explanations, no code fences. Just raw JSON."
+        },
+        { role: "user", content: prompt }
+      ],
+      model: "llama-3.3-70b-specdec",
+      temperature: 0.7,
+      response_format: { type: "json_object" },
+    })
+
+    const responseText = result.choices[0]?.message?.content || "{}"
+    return JSON.parse(responseText.trim())
+  } catch (error) {
+    console.error('generateProfessionResearch error:', error)
+    throw error
+  }
+}

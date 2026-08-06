@@ -50,6 +50,54 @@ export default function AdminDashboardPage() {
     const [actionLoading, setActionLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
 
+    // Client/Parent Creation Form States
+    const [showCreateClient, setShowCreateClient] = useState(false);
+    const [clientForm, setClientForm] = useState({
+        clientName: '',
+        clientEmail: '',
+        clientPassword: '',
+        clientAge: 16,
+        parentName: '',
+        parentEmail: '',
+        parentPassword: '',
+        mentorProfileId: ''
+    });
+
+    const createClientAndParent = async () => {
+        setActionLoading(true);
+        try {
+            const res = await fetch('/api/admin/clients', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(clientForm)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setShowCreateClient(false);
+                setClientForm({
+                    clientName: '',
+                    clientEmail: '',
+                    clientPassword: '',
+                    clientAge: 16,
+                    parentName: '',
+                    parentEmail: '',
+                    parentPassword: '',
+                    mentorProfileId: ''
+                });
+                alert('Client and Parent accounts created successfully and linked!');
+                fetchMentors(); // Refresh listings
+                fetchClients(); // Refresh client listings
+            } else {
+                alert(`Creation failed: ${data.error || 'Unknown error'}`);
+            }
+        } catch (e: any) {
+            console.error(e);
+            alert(`Error: ${e.message}`);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     useEffect(() => {
         setMounted(true);
         fetchMentors();
@@ -206,7 +254,10 @@ export default function AdminDashboardPage() {
                         <h1 className="text-3xl font-bold tracking-tight text-slate-100">Mentors & Clients</h1>
                         <p className="text-slate-300 mt-1 text-sm">Manage hierarchical access: Mentors and their assigned clients.</p>
                     </div>
-                    <button onClick={() => { setIsEditing(false); setForm({ id: '', name: '', email: '', password: '', type: 'PERMANENT', specializations: '', bio: '', accessEnd: '', whatsappNumber: '', googleCalendarUrl: '' }); setShowCreate(true); }} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Mentor</button>
+                    <div className="flex gap-3">
+                        <button onClick={() => { setShowCreateClient(true); }} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Client & Parent</button>
+                        <button onClick={() => { setIsEditing(false); setForm({ id: '', name: '', email: '', password: '', type: 'PERMANENT', specializations: '', bio: '', accessEnd: '', whatsappNumber: '', googleCalendarUrl: '' }); setShowCreate(true); }} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Mentor</button>
+                    </div>
                 </div>
 
                 <div className="grid lg:grid-cols-[1fr_400px] gap-6">
@@ -439,8 +490,100 @@ export default function AdminDashboardPage() {
                                 className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">{actionLoading ? 'Assigning...' : 'Complete Assignment'}</button>
                         </div>
                     </div>
-                </div>
-                , document.body)}
+                </div>,
+                document.body
+            )}
+
+            {/* Create Client & Parent Modal */}
+            {showCreateClient && mounted && createPortal(
+                <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 lg:pl-64" style={{ zIndex: 99999 }} onClick={() => setShowCreateClient(false)}>
+                    <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-md" />
+                    <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up" onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b border-white/10 shrink-0 bg-slate-900">
+                            <h2 className="text-xl font-bold text-slate-100">Create Client & Parent Accounts</h2>
+                            <p className="text-xs text-slate-500 font-bold mt-1">Registers linked student & parent profiles together and optionally assigns to a mentor.</p>
+                        </div>
+                        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1 bg-white/5">
+                            {/* Client (Student) Details */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-white/5 pb-2">Client (Student) Details</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Student Name</label>
+                                        <input type="text" value={clientForm.clientName} onChange={e => setClientForm({ ...clientForm, clientName: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="John Doe" />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Student Age</label>
+                                        <input type="number" value={clientForm.clientAge} onChange={e => setClientForm({ ...clientForm, clientAge: parseInt(e.target.value) || 16 })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="16" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Student Email</label>
+                                        <input type="email" value={clientForm.clientEmail} onChange={e => setClientForm({ ...clientForm, clientEmail: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="student@example.com" />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Student Password</label>
+                                        <input type="password" value={clientForm.clientPassword} onChange={e => setClientForm({ ...clientForm, clientPassword: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="••••••••" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Parent Details */}
+                            <div className="space-y-4 pt-4 border-t border-white/5">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-white/5 pb-2">Parent Details</h3>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Parent Name</label>
+                                    <input type="text" value={clientForm.parentName} onChange={e => setClientForm({ ...clientForm, parentName: e.target.value })}
+                                        className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Jane Doe" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Parent Email</label>
+                                        <input type="email" value={clientForm.parentEmail} onChange={e => setClientForm({ ...clientForm, parentEmail: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="parent@example.com" />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Parent Password</label>
+                                        <input type="password" value={clientForm.parentPassword} onChange={e => setClientForm({ ...clientForm, parentPassword: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500" placeholder="••••••••" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Direct Assignment */}
+                            <div className="space-y-4 pt-4 border-t border-white/5">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-white/5 pb-2">Assign to Mentor (Optional)</h3>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Select Mentor</label>
+                                    <div className="relative">
+                                        <select value={clientForm.mentorProfileId} onChange={e => setClientForm({ ...clientForm, mentorProfileId: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/15 rounded-xl px-4 py-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer appearance-none">
+                                            <option value="" className="bg-slate-900 text-slate-400">-- Do not assign yet --</option>
+                                            {mentors.map(m => (
+                                                <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-slate-900 text-slate-200">
+                                                    {m.name} ({m.email})
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">▼</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-6 shrink-0 flex gap-3 border-t border-white/5 bg-white/5">
+                            <button onClick={() => setShowCreateClient(false)} className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest border border-white/10 text-slate-400 hover:bg-white/5 transition-colors">Cancel</button>
+                            <button onClick={createClientAndParent} disabled={actionLoading || !clientForm.clientName || !clientForm.clientEmail || !clientForm.clientPassword || !clientForm.parentName || !clientForm.parentEmail || !clientForm.parentPassword}
+                                className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm">{actionLoading ? 'Creating...' : 'Create Client & Parent'}</button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
         </>
     );
 }

@@ -23,12 +23,57 @@ export async function GET() {
         modules: {
           orderBy: { order: 'asc' },
           include: { module: true, response: true }
+        },
+        stages: {
+          orderBy: { stageNumber: 'asc' }
         }
       }
     })
 
     if (!clientProfile) {
       return NextResponse.json({ error: 'No child profile linked' }, { status: 404 })
+    }
+
+    // --- JIT Initialize Workflow Stages ---
+    const defaultStageNames = [
+      "Student Questionnaire",
+      "Parent Questionnaire",
+      "Collaborative Meeting: Student and Parent",
+      "Report Discussion with the Student",
+      "Research and Knowledge Building",
+      "Research Discussion",
+      "Short Courses and Internships",
+      "Shortlisting: Colleges, Universities, and Courses",
+      "Entrance Exams"
+    ];
+
+    let stages = clientProfile.stages || [];
+    if (stages.length < 9) {
+      const existingNums = new Set(stages.map((s: any) => s.stageNumber));
+      const createdStages = [];
+
+      for (let num = 1; num <= 9; num++) {
+        if (!existingNums.has(num)) {
+          const created = await prisma.clientStage.create({
+            data: {
+              clientProfileId: clientProfile.id,
+              stageNumber: num,
+              stageName: defaultStageNames[num - 1],
+              status: "NOT_STARTED",
+              notes: "",
+              tasks: [],
+              documents: [],
+              meetingOutcomes: ""
+            }
+          });
+          createdStages.push(created);
+        }
+      }
+
+      stages = await prisma.clientStage.findMany({
+        where: { clientProfileId: clientProfile.id },
+        orderBy: { stageNumber: 'asc' }
+      });
     }
 
     // --- Just-In-Time Module Synchronization (Parent View) ---
@@ -71,6 +116,9 @@ export async function GET() {
       orderBy: { id: 'desc' }
     })
 
+    const completedStages = stages.filter((s: any) => s.status === 'COMPLETED').length;
+    const progress = Math.round((completedStages / 9) * 100);
+
     return NextResponse.json({
       child: {
         name: clientProfile.user.name,
@@ -79,10 +127,11 @@ export async function GET() {
       stats: {
         completed: completedModules,
         total: totalModules,
-        progress: totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0,
+        progress,
         currentStage: clientProfile.currentStage,
         journeyStatus: clientProfile.journeyStatus
       },
+      stages,
       report: latestReport ? {
         id: latestReport.id,
         content: latestReport.content,

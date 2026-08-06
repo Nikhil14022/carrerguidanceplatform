@@ -110,8 +110,7 @@ export default function ParentDashboardPage() {
         );
     }
 
-    // Guard against high stage numbers (max 8 stages)
-    const currentStage = (data?.stats?.currentStage > 8 ? 8 : (data?.stats?.currentStage || 1));
+    const activeStage = data?.stages?.find((s: any) => s.status === 'IN_PROGRESS')?.stageName || 'None';
 
     return (
         <div className="p-8 space-y-8 animate-fade-in">
@@ -141,8 +140,8 @@ export default function ParentDashboardPage() {
                     <div className="text-3xl font-black text-indigo-400">{data?.stats?.completed || 0} / {data?.stats?.total || 7}</div>
                 </div>
                 <div className="glass-card p-6">
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Current Stage</div>
-                    <div className="text-3xl font-black text-white">{currentStage}</div>
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Active Stage</div>
+                    <div className="text-sm font-bold text-white truncate" title={activeStage}>{activeStage}</div>
                 </div>
             </div>
 

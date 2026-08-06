@@ -27,13 +27,13 @@ export default function ParentProgressPage() {
 
     const statusBadge = (status: string) => {
         const map: Record<string, string> = {
-            LOCKED: 'bg-slate-800 text-slate-400 border-slate-700',
-            UNLOCKED: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-            IN_PROGRESS: 'bg-blue-500/100/10 text-blue-400 border-blue-500/20',
-            SUBMITTED: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-            APPROVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            NOT_STARTED: 'bg-slate-800 text-slate-400 border-slate-700',
+            IN_PROGRESS: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+            ON_HOLD: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+            COMPLETED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            NOT_APPLICABLE: 'bg-slate-800/50 text-slate-500 border-slate-700 line-through',
         };
-        return map[status] || map.LOCKED;
+        return map[status] || map.NOT_STARTED;
     };
 
     if (loading) {
@@ -62,14 +62,14 @@ export default function ParentProgressPage() {
                 {timeline.map((item, i) => (
                     <div key={item.id} className="relative">
                         {/* Dot */}
-                        <div className={`absolute -left-8 top-1.5 w-7 h-7 rounded-full border-4 border-[#030712] flex items-center justify-center z-10 ${item.status === 'APPROVED' ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : item.status === 'UNLOCKED' || item.status === 'IN_PROGRESS' || item.status === 'SUBMITTED' ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-slate-800'}`}>
-                            {item.status === 'APPROVED' && (
+                        <div className={`absolute -left-8 top-1.5 w-7 h-7 rounded-full border-4 border-[#030712] flex items-center justify-center z-10 ${item.status === 'COMPLETED' ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]' : item.status === 'IN_PROGRESS' ? 'bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]' : item.status === 'ON_HOLD' ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'bg-slate-800'}`}>
+                            {item.status === 'COMPLETED' && (
                                 <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                             )}
                         </div>
 
-                        <div className={`glass-card p-6 transition-all ${item.status === 'APPROVED' ? 'bg-white/5/[0.02]' : item.status === 'LOCKED' ? 'opacity-50' : ''}`}>
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className={`glass-card p-6 transition-all ${item.status === 'COMPLETED' ? 'bg-white/5/[0.02]' : item.status === 'NOT_STARTED' ? 'opacity-60' : ''}`}>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-4 mb-4">
                                 <div>
                                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Stage {item.order}</div>
                                     <h3 className="font-bold text-lg">{item.title}</h3>
@@ -83,6 +83,75 @@ export default function ParentProgressPage() {
                                 <span className={`px-4 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest ${statusBadge(item.status)}`}>
                                     {item.status.replace('_', ' ')}
                                 </span>
+                            </div>
+
+                            {/* Additional details for Parent */}
+                            <div className="space-y-3 text-xs text-slate-450">
+                                {item.notes && (
+                                    <div className="bg-slate-950/40 border border-white/5 rounded-xl p-3">
+                                        <h4 className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Counselor Remarks</h4>
+                                        <p className="text-slate-300 leading-relaxed text-xs">{item.notes}</p>
+                                    </div>
+                                )}
+
+                                {item.tasks && (() => {
+                                    let tasksList = [];
+                                    try {
+                                        tasksList = typeof item.tasks === 'string' ? JSON.parse(item.tasks) : (item.tasks || []);
+                                    } catch (e) {
+                                        tasksList = [];
+                                    }
+                                    if (tasksList.length === 0) return null;
+                                    return (
+                                        <div>
+                                            <h4 className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Checklist Tasks</h4>
+                                            <ul className="space-y-1">
+                                                {tasksList.map((t: any, idx: number) => (
+                                                    <li key={idx} className="flex items-center gap-2">
+                                                        <div className={`w-3 h-3 rounded border flex items-center justify-center ${t.completed ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-white/20'}`}>
+                                                            {t.completed && (
+                                                                <svg className="w-2 h-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
+                                                            )}
+                                                        </div>
+                                                        <span className={t.completed ? 'line-through text-slate-500' : 'text-slate-300'}>{t.text}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    );
+                                })()}
+
+                                {item.documents && (() => {
+                                    let docsList = [];
+                                    try {
+                                        docsList = typeof item.documents === 'string' ? JSON.parse(item.documents) : (item.documents || []);
+                                    } catch (e) {
+                                        docsList = [];
+                                    }
+                                    if (docsList.length === 0) return null;
+                                    return (
+                                        <div>
+                                            <h4 className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Shared Documents</h4>
+                                            <ul className="space-y-1">
+                                                {docsList.map((doc: any, idx: number) => (
+                                                    <li key={idx} className="flex items-center gap-2">
+                                                        <span>📄</span>
+                                                        <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+                                                            {doc.name}
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    );
+                                })()}
+
+                                {item.meetingOutcomes && (
+                                    <div className="bg-slate-950/40 border border-white/5 rounded-xl p-3">
+                                        <h4 className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Meeting Decisions & Outcomes</h4>
+                                        <p className="text-slate-300 leading-relaxed text-xs">{item.meetingOutcomes}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

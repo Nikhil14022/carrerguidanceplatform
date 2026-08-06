@@ -17,12 +17,8 @@ export async function GET() {
     const clientProfile = await prisma.clientProfile.findFirst({
       where: { parentId: session.user.id },
       include: {
-        modules: {
-          orderBy: { order: 'asc' },
-          include: {
-            module: { select: { title: true } },
-            response: { select: { approvedAt: true } }
-          }
+        stages: {
+          orderBy: { stageNumber: 'asc' }
         }
       }
     })
@@ -31,12 +27,54 @@ export async function GET() {
       return NextResponse.json({ error: 'No child profile linked' }, { status: 404 })
     }
 
-    const timeline = clientProfile.modules.map(m => ({
-      id: m.id,
-      title: m.module.title,
-      status: m.status,
-      order: m.order,
-      completedAt: m.status === 'APPROVED' ? m.response?.approvedAt : null
+    // --- JIT Initialize Workflow Stages ---
+    const defaultStageNames = [
+      "Student Questionnaire",
+      "Parent Questionnaire",
+      "Collaborative Meeting: Student and Parent",
+      "Report Discussion with the Student",
+      "Research and Knowledge Building",
+      "Research Discussion",
+      "Short Courses and Internships",
+      "Shortlisting: Colleges, Universities, and Courses",
+      "Entrance Exams"
+    ];
+
+    let stages = clientProfile.stages || [];
+    if (stages.length < 9) {
+      const existingNums = new Set(stages.map((s: any) => s.stageNumber));
+      for (let num = 1; num <= 9; num++) {
+        if (!existingNums.has(num)) {
+          await prisma.clientStage.create({
+            data: {
+              clientProfileId: clientProfile.id,
+              stageNumber: num,
+              stageName: defaultStageNames[num - 1],
+              status: "NOT_STARTED",
+              notes: "",
+              tasks: [],
+              documents: [],
+              meetingOutcomes: ""
+            }
+          });
+        }
+      }
+      stages = await prisma.clientStage.findMany({
+        where: { clientProfileId: clientProfile.id },
+        orderBy: { stageNumber: 'asc' }
+      });
+    }
+
+    const timeline = stages.map(s => ({
+      id: s.id,
+      title: s.stageName,
+      status: s.status,
+      order: s.stageNumber,
+      notes: s.notes,
+      tasks: s.tasks,
+      documents: s.documents,
+      meetingOutcomes: s.meetingOutcomes,
+      completedAt: s.status === 'COMPLETED' ? s.updatedAt : null
     }))
 
     return NextResponse.json({ timeline })
