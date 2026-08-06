@@ -511,28 +511,42 @@ export async function generateProfessionResearch(professionName: string, userId:
       user: { select: { name: true, email: true, age: true } },
       modules: {
         where: { status: { in: ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'] } },
-        include: { response: true, module: true }
+        include: { response: true, module: { select: { title: true } } }
       }
     }
   })
 
   let studentProfileText = "No profile assessments completed yet."
   if (clientProfile && clientProfile.modules.length > 0) {
-    const modulesData = clientProfile.modules.map((m: any) => ({
-      module: m.module.title,
-      answers: m.response?.data
-    }))
+    // Truncate profile data to avoid exceeding token limits
+    // Only include the first 5 modules and limit answer length
+    const truncatedModules = clientProfile.modules.slice(0, 5).map((m: any) => {
+      const answers = m.response?.data || {}
+      const truncatedAnswers: Record<string, any> = {}
+      let charCount = 0
+      for (const [key, val] of Object.entries(answers)) {
+        if (charCount > 1500) break // cap per-module context at ~1500 chars
+        const valStr = typeof val === 'string' ? val : JSON.stringify(val)
+        if (valStr.length > 200) {
+          truncatedAnswers[key] = valStr.substring(0, 200) + '...'
+        } else {
+          truncatedAnswers[key] = val
+        }
+        charCount += valStr.length
+      }
+      return { module: m.module.title, answers: truncatedAnswers }
+    })
     studentProfileText = JSON.stringify({
       studentName: clientProfile.user.name,
       studentAge: clientProfile.user.age,
-      assessments: modulesData
+      assessments: truncatedModules
     }, null, 2)
   }
 
   const prompt = `You are a world-class AI Career Guidance Specialist.
 Generate a comprehensive, high-quality, structured profession research report for the profession: "${professionName}".
 
-Student Profile Context (if available, customize Section 2 Questions 14 and 15 based on this; otherwise write general guidance):
+Student Profile Context (if available, customize advice based on this; otherwise write general guidance):
 ${studentProfileText}
 
 You MUST return a JSON object with exactly the following keys and structure. Return only the raw JSON string:
@@ -560,22 +574,21 @@ You MUST return a JSON object with exactly the following keys and structure. Ret
       {
         "pathwayName": "Name of specialization or path",
         "degreeName": "Degree or course name",
-        "duration": "Duration (e.g. 4 years)",
+        "duration": "Duration",
         "eligibility": "Eligibility criteria",
         "subjects": "Required streams/subjects",
         "exam": "Entrance exam",
-        "cutoff": "Approximate cut-off or score expectation",
         "colleges": "Leading colleges/universities",
         "fees": "Approximate course fees",
         "roles": "Career roles after completion"
       }
     ],
-    "q3": "What are the best alternative pathways if the preferred course, college, or entrance exam does not work out?",
+    "q3": "Best alternative pathways if preferred course/college does not work out.",
     "q4": {
-      "y0_3": "Jobs and responsibilities at 0-3 years experience",
-      "y3_6": "Jobs and responsibilities at 3-6 years experience",
-      "y6_10": "Jobs and responsibilities at 6-10 years experience",
-      "y10_plus": "Jobs and responsibilities at 10+ years experience"
+      "y0_3": "Jobs and responsibilities at 0-3 years",
+      "y3_6": "Jobs and responsibilities at 3-6 years",
+      "y6_10": "Jobs and responsibilities at 6-10 years",
+      "y10_plus": "Jobs and responsibilities at 10+ years"
     },
     "q5": {
       "y0_3": "Salary range in India at 0-3 years",
@@ -584,24 +597,24 @@ You MUST return a JSON object with exactly the following keys and structure. Ret
       "y10_plus": "Salary range in India at 10+ years"
     },
     "q6": {
-      "y0_3": "Salary range abroad at 0-3 years (Country, currency, and INR equivalent)",
-      "y3_6": "Salary range abroad at 3-6 years (Country, currency, and INR equivalent)",
-      "y6_10": "Salary range abroad at 6-10 years (Country, currency, and INR equivalent)",
-      "y10_plus": "Salary range abroad at 10+ years (Country, currency, and INR equivalent)"
+      "y0_3": "Salary range abroad at 0-3 years",
+      "y3_6": "Salary range abroad at 3-6 years",
+      "y6_10": "Salary range abroad at 6-10 years",
+      "y10_plus": "Salary range abroad at 10+ years"
     },
-    "q7": "What factors have the biggest impact on success and earnings in this profession?",
-    "q8": "Explain opportunities and requirements for freelancing, entrepreneurship, private practice, or remote work.",
-    "q9": "What are the major risks, difficulties, competition levels, and trade-offs in this career?",
-    "q10": "What is the current demand for this profession in India and internationally?",
-    "q11": "What is the future outlook for the next 3-5 years?",
-    "q12": "How will technology, AI, automation, regulations, or market changes affect this profession?",
+    "q7": "Factors with biggest impact on success and earnings.",
+    "q8": "Opportunities for freelancing, entrepreneurship, private practice, or remote work.",
+    "q9": "Major risks, difficulties, competition levels, and trade-offs.",
+    "q10": "Current demand in India and internationally.",
+    "q11": "Future outlook for the next 3-5 years.",
+    "q12": "How will technology, AI, automation affect this profession?",
     "q13": "Which future skills and emerging specialisations will be most valuable?",
     "q14": {
-      "whySuit": "Personalized advice: why this profession may suit the child based on their profile data.",
+      "whySuit": "Why this profession may suit the child based on their profile.",
       "strengths": "Strengths the child can use",
       "gaps": "Gaps to work on",
       "habits": "Habits, skills, and routines to build",
-      "actionPlan": "A practical action plan for next 30 days, 3 months, 6 months, and 1 year"
+      "actionPlan": "Action plan for next 30 days, 3 months, 6 months, and 1 year"
     },
     "q15": {
       "score": "A number from 1 to 10 for overall profession-fit score",
@@ -620,7 +633,7 @@ You MUST return a JSON object with exactly the following keys and structure. Ret
         },
         { role: "user", content: prompt }
       ],
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       temperature: 0.7,
       response_format: { type: "json_object" },
     })

@@ -77,7 +77,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
         if (!editingStage || !clientId) return;
         setUpdatingStage(true);
         try {
-            const res = await fetch(`/api/admin/clients/${clientId}/stages`, {
+            const res = await fetch(`/api/mentor/clients/${clientId}/stages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1309,11 +1309,11 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                 className="w-full rounded-xl px-4 py-2 text-xs outline-none cursor-pointer"
                                 style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}
                             >
-                                <option value="NOT_STARTED" className="bg-white text-slate-900">Not Started</option>
-                                <option value="IN_PROGRESS" className="bg-white text-slate-900">In Progress</option>
-                                <option value="ON_HOLD" className="bg-white text-slate-900">On Hold</option>
-                                <option value="COMPLETED" className="bg-white text-slate-900">Completed</option>
-                                <option value="NOT_APPLICABLE" className="bg-white text-slate-900">Not Applicable</option>
+                                <option value="NOT_STARTED" style={{ backgroundColor: '#ffffff', color: '#000000' }}>Not Started</option>
+                                <option value="IN_PROGRESS" style={{ backgroundColor: '#ffffff', color: '#000000' }}>In Progress</option>
+                                <option value="ON_HOLD" style={{ backgroundColor: '#ffffff', color: '#000000' }}>On Hold</option>
+                                <option value="COMPLETED" style={{ backgroundColor: '#ffffff', color: '#000000' }}>Completed</option>
+                                <option value="NOT_APPLICABLE" style={{ backgroundColor: '#ffffff', color: '#000000' }}>Not Applicable</option>
                             </select>
                         </div>
 
