@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from "@/components/TestAnswersRenderer";
+import InteractiveObjectEditor from "@/components/InteractiveObjectEditor";
 
 interface QuestionSchema {
     id: string;
@@ -790,17 +791,10 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                             );
                                                                         }
                                                                     })() : (
-                                                                        <textarea
-                                                                            value={typeof editingValue === 'object' ? JSON.stringify(editingValue, null, 2) : (editingValue ?? '')}
-                                                                            onChange={e => {
-                                                                                try {
-                                                                                    setEditingValue(JSON.parse(e.target.value));
-                                                                                } catch {
-                                                                                    setEditingValue(e.target.value);
-                                                                                }
-                                                                            }}
-                                                                            rows={3}
-                                                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-orange-500"
+                                                                        <InteractiveObjectEditor
+                                                                            value={editingValue}
+                                                                            onChange={setEditingValue}
+                                                                            accentColor="orange"
                                                                         />
                                                                     )}
 

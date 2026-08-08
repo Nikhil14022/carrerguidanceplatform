@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from '@/components/TestAnswersRenderer';
+import InteractiveObjectEditor from '@/components/InteractiveObjectEditor';
 
 interface ModuleData {
     id: string;
@@ -769,17 +770,10 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             );
                                         }
                                     })() : (
-                                        <textarea
-                                            value={typeof value === 'object' ? JSON.stringify(value, null, 2) : (value ?? '')}
-                                            onChange={e => {
-                                                try {
-                                                    handleValueChange(JSON.parse(e.target.value));
-                                                } catch {
-                                                    handleValueChange(e.target.value);
-                                                }
-                                            }}
-                                            rows={2}
-                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                        <InteractiveObjectEditor
+                                            value={value}
+                                            onChange={handleValueChange}
+                                            accentColor="orange"
                                         />
                                     )}
 

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from "@/components/TestAnswersRenderer";
+import InteractiveObjectEditor from "@/components/InteractiveObjectEditor";
 
 interface QuestionSchema {
     id: string;
@@ -716,20 +717,11 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
             }
         }
 
-        // For all other types, use textarea with JSON for complex values
         return (
-            <textarea
-                value={isComplex ? JSON.stringify(editValue, null, 2) : (editValue ?? '')}
-                onChange={(e) => {
-                    if (isComplex) {
-                        try { setEditValue(JSON.parse(e.target.value)); } catch { setEditValue(e.target.value); }
-                    } else {
-                        setEditValue(e.target.value);
-                    }
-                }}
-                rows={isComplex ? 6 : 3}
-                className="w-full bg-slate-950 border border-white/10 rounded-xl p-3 text-sm text-slate-300 focus:outline-none focus:border-indigo-500/40 focus:ring-1 focus:ring-indigo-500/20 resize-none"
-                placeholder="Enter answer..."
+            <InteractiveObjectEditor
+                value={editValue}
+                onChange={setEditValue}
+                accentColor="indigo"
             />
         );
     };
