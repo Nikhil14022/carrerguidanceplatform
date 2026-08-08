@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import StageManagementPanel from '@/components/StageManagementPanel';
 
 interface ModuleData {
     id: string;
@@ -429,68 +430,12 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
             </div>
 
             {/* Stages & Workflow Control Panel */}
-            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 shadow-sm space-y-6">
-                <div className="flex justify-between items-center pb-4 border-b border-white/5">
-                    <div>
-                        <h3 className="text-sm font-bold text-slate-100">Client Journey Workflow & Stages</h3>
-                        <p className="text-[10px] text-slate-500 mt-0.5">Flexible progression tracking. Edit notes, tasks, docs, and outcomes manually.</p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider">
-                        {client.journeyStatus}
-                    </span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {(client.stages || []).map((stage: any) => {
-                        const isCompleted = stage.status === 'COMPLETED';
-                        const isInProgress = stage.status === 'IN_PROGRESS';
-                        const isOnHold = stage.status === 'ON_HOLD';
-                        const isNotApplicable = stage.status === 'NOT_APPLICABLE';
-
-                        let badgeStyle = "bg-white/5 border-white/5 text-slate-400";
-                        if (isCompleted) badgeStyle = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-                        else if (isInProgress) badgeStyle = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse";
-                        else if (isOnHold) badgeStyle = "bg-amber-500/10 text-amber-400 border-amber-500/20";
-                        else if (isNotApplicable) badgeStyle = "bg-slate-800/50 text-slate-500 border-slate-800";
-
-                        // Get tasks stats
-                        let tasks = [];
-                        try {
-                            tasks = typeof stage.tasks === 'string' ? JSON.parse(stage.tasks) : (stage.tasks || []);
-                        } catch (e) {
-                            tasks = [];
-                        }
-                        const completedTasks = tasks.filter((t: any) => t.completed).length;
-
-                        return (
-                            <div key={stage.id} className="p-4 bg-slate-950/40 rounded-xl border border-white/5 space-y-3 flex flex-col justify-between hover:border-white/10 transition-all">
-                                <div className="space-y-1">
-                                    <div className="flex justify-between items-start gap-2">
-                                        <span className="text-[10px] font-bold text-slate-500">Stage {stage.stageNumber}</span>
-                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${badgeStyle}`}>
-                                            {stage.status.replace('_', ' ')}
-                                        </span>
-                                    </div>
-                                    <h4 className="text-xs font-semibold text-slate-200 line-clamp-1">{stage.stageName}</h4>
-                                    {stage.notes && (
-                                        <p className="text-[10px] text-slate-500 line-clamp-1 italic">"{stage.notes}"</p>
-                                    )}
-                                    {tasks.length > 0 && (
-                                        <div className="text-[9px] text-slate-400 flex items-center gap-1">
-                                            <span>📋</span> Tasks: {completedTasks}/{tasks.length}
-                                        </div>
-                                    )}
-                                </div>
-                                <button
-                                    onClick={() => handleOpenEditStage(stage)}
-                                    className="w-full mt-2 py-1.5 bg-white/5 hover:bg-white/10 text-[9px] font-bold uppercase tracking-wider text-slate-300 rounded-lg border border-white/5 transition-all text-center"
-                                >
-                                    Manage Stage
-                                </button>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+            <StageManagementPanel
+                stages={client.stages || []}
+                journeyStatus={client.journeyStatus}
+                onEditStage={handleOpenEditStage}
+                accentColor="indigo"
+            />
 
             {/* Scheduled Meetings */}
             {client.appointments && client.appointments.length > 0 && (

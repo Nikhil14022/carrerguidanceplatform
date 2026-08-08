@@ -28,13 +28,32 @@ export async function GET(request: Request) {
     const clients = await prisma.clientProfile.findMany({
       where,
       include: {
-        user: { select: { id: true, email: true, name: true, updatedAt: true } },
+        user: { select: { id: true, email: true, name: true, createdAt: true, updatedAt: true } },
         modules: {
           select: { status: true }
         }
       },
       orderBy: { user: { updatedAt: 'desc' } }
     })
+
+    const clientIds = clients.map(c => c.id);
+    const parentIds = Array.from(new Set(clients.map(c => c.parentId).filter(Boolean))) as string[];
+
+    const parentUsers = parentIds.length > 0 ? await prisma.user.findMany({
+      where: { id: { in: parentIds } },
+      select: { id: true, name: true, email: true }
+    }) : [];
+
+    const mentorAssignments = clientIds.length > 0 ? await prisma.mentorAssignment.findMany({
+      where: { clientProfileId: { in: clientIds }, isActive: true },
+      include: {
+        mentorProfile: {
+          include: { user: { select: { id: true, name: true, email: true } } }
+        }
+      }
+    }) : [];
+
+    const parentMap = new Map(parentUsers.map(p => [p.id, p]));
 
     const filteredClients = clients.map(client => {
       const moduleStats = {
@@ -55,6 +74,9 @@ export async function GET(request: Request) {
         return null
       }
 
+      const parentInfo = client.parentId ? parentMap.get(client.parentId) || null : null;
+      const clientAssignments = mentorAssignments.filter(a => a.clientProfileId === client.id);
+
       return {
         id: client.id,
         userId: client.userId,
@@ -64,6 +86,13 @@ export async function GET(request: Request) {
         journeyStatus: client.journeyStatus,
         stats: moduleStats,
         status: clientStatus,
+        parent: parentInfo ? { id: parentInfo.id, name: parentInfo.name, email: parentInfo.email } : null,
+        assignedMentors: clientAssignments.map(a => ({
+          id: a.mentorProfile.id,
+          name: a.mentorProfile.user.name,
+          email: a.mentorProfile.user.email
+        })),
+        createdAt: client.user.createdAt,
         updatedAt: client.user.updatedAt
       }
     }).filter(Boolean)

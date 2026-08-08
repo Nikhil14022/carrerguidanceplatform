@@ -38,6 +38,19 @@ export default function AIResearchPage() {
     const [activeTab, setActiveTab] = useState<'basic' | 'advanced'>('basic');
     const [advancedUnlocked, setAdvancedUnlocked] = useState(false);
 
+    const renderSafeText = (val: any): string => {
+        if (val === undefined || val === null || val === '') return '—';
+        if (typeof val === 'string') return val;
+        if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+        if (Array.isArray(val)) {
+            return val.map(item => (typeof item === 'object' ? JSON.stringify(item) : String(item))).join(', ');
+        }
+        if (typeof val === 'object') {
+            return Object.entries(val).map(([k, v]) => `${k.replace(/_/g, ' ')}: ${typeof v === 'object' ? JSON.stringify(v) : String(v)}`).join(' | ');
+        }
+        return String(val);
+    };
+
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!topic.trim()) return;
@@ -140,7 +153,7 @@ export default function AIResearchPage() {
                                             <span className="w-5 h-5 rounded-md bg-indigo-50 border border-indigo-150 flex items-center justify-center text-[10px] font-bold text-indigo-650">{q.num}</span>
                                             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{q.title}</h3>
                                         </div>
-                                        <p className="text-slate-700 text-xs leading-relaxed font-medium">{result.basic?.[q.key] || 'Generating information...'}</p>
+                                        <p className="text-slate-700 text-xs leading-relaxed font-medium">{renderSafeText(result.basic?.[q.key]) || 'Generating information...'}</p>
                                     </div>
                                 ))}
                             </div>
@@ -171,10 +184,10 @@ export default function AIResearchPage() {
                                             <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200/50 flex flex-col items-center text-center justify-center space-y-3 shadow-sm">
                                                 <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">AI Profile Fit Score</div>
                                                 <div className="flex items-baseline gap-1">
-                                                    <span className="text-5xl font-black text-slate-900">{result.advanced?.q15?.score || '—'}</span>
+                                                    <span className="text-5xl font-black text-slate-900">{renderSafeText(result.advanced?.q15?.score) || '—'}</span>
                                                     <span className="text-sm text-slate-500 font-bold">/10</span>
                                                 </div>
-                                                <div className="text-xs font-semibold text-slate-700 max-w-xs">{result.advanced?.q15?.recommendation}</div>
+                                                <div className="text-xs font-semibold text-slate-700 max-w-xs">{renderSafeText(result.advanced?.q15?.recommendation)}</div>
                                                 <span className="px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[8px] font-black uppercase tracking-widest border border-indigo-200">Personalized Match</span>
                                             </div>
 
@@ -184,11 +197,11 @@ export default function AIResearchPage() {
                                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                                     <div className="space-y-1">
                                                         <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-wider block">Use Your Strengths</span>
-                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{result.advanced?.q14?.strengths}</p>
+                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{renderSafeText(result.advanced?.q14?.strengths)}</p>
                                                     </div>
                                                     <div className="space-y-1">
                                                         <span className="text-[9px] font-bold text-amber-700 uppercase tracking-wider block">Address Your Gaps</span>
-                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{result.advanced?.q14?.gaps}</p>
+                                                        <p className="text-slate-650 leading-relaxed text-[11px] font-medium">{renderSafeText(result.advanced?.q14?.gaps)}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -209,19 +222,19 @@ export default function AIResearchPage() {
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                                                        {(result.advanced?.q2 || []).map((path: any, idx: number) => (
+                                                        {(Array.isArray(result.advanced?.q2) ? result.advanced.q2 : []).map((path: any, idx: number) => (
                                                             <tr key={idx} className="hover:bg-slate-50/50">
-                                                                <td className="py-3 pr-4 font-bold text-slate-900">{path.pathwayName}</td>
-                                                                <td className="py-3 pr-4">{path.degreeName} ({path.duration})</td>
+                                                                <td className="py-3 pr-4 font-bold text-slate-900">{renderSafeText(path.pathwayName)}</td>
+                                                                <td className="py-3 pr-4">{renderSafeText(path.degreeName)} ({renderSafeText(path.duration)})</td>
                                                                 <td className="py-3 pr-4">
-                                                                    <div>{path.subjects}</div>
-                                                                    <div className="text-[10px] text-slate-500 font-semibold">{path.exam} ({path.cutoff})</div>
+                                                                    <div>{renderSafeText(path.subjects)}</div>
+                                                                    <div className="text-[10px] text-slate-500 font-semibold">{renderSafeText(path.exam)} ({renderSafeText(path.cutoff)})</div>
                                                                 </td>
                                                                 <td className="py-3 pr-4">
-                                                                    <div>{path.colleges}</div>
-                                                                    <div className="text-[10px] text-indigo-650 font-bold">{path.fees}</div>
+                                                                    <div>{renderSafeText(path.colleges)}</div>
+                                                                    <div className="text-[10px] text-indigo-650 font-bold">{renderSafeText(path.fees)}</div>
                                                                 </td>
-                                                                <td className="py-3">{path.roles}</td>
+                                                                <td className="py-3">{renderSafeText(path.roles)}</td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
@@ -244,16 +257,16 @@ export default function AIResearchPage() {
                                                         <div className="space-y-2 text-xs">
                                                             <div>
                                                                 <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Role Tasks</span>
-                                                                <p className="text-slate-700 text-[11px] leading-relaxed mt-0.5 font-medium">{result.advanced?.q4?.[exp.key]}</p>
+                                                                <p className="text-slate-700 text-[11px] leading-relaxed mt-0.5 font-medium">{renderSafeText(result.advanced?.q4?.[exp.key])}</p>
                                                             </div>
                                                             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
                                                                 <div>
                                                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">India Pay</span>
-                                                                    <span className="text-slate-900 font-bold text-[10px]">{result.advanced?.q5?.[exp.key]}</span>
+                                                                    <span className="text-slate-900 font-bold text-[10px]">{renderSafeText(result.advanced?.q5?.[exp.key])}</span>
                                                                 </div>
                                                                 <div>
                                                                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Abroad Pay</span>
-                                                                    <span className="text-slate-900 font-bold text-[10px] line-clamp-2">{result.advanced?.q6?.[exp.key]}</span>
+                                                                    <span className="text-slate-900 font-bold text-[10px] line-clamp-2">{renderSafeText(result.advanced?.q6?.[exp.key])}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -267,7 +280,7 @@ export default function AIResearchPage() {
                                             {advancedQuestions.map((q) => (
                                                 <div key={q.key} className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 hover:border-slate-350 transition-all">
                                                     <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{q.title}</h4>
-                                                    <p className="text-slate-700 text-xs leading-relaxed font-medium">{result.advanced?.[q.key]}</p>
+                                                    <p className="text-slate-700 text-xs leading-relaxed font-medium">{renderSafeText(result.advanced?.[q.key])}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -285,15 +298,15 @@ export default function AIResearchPage() {
                                             <div className="space-y-4 text-xs font-medium text-slate-700">
                                                 <div className="space-y-1">
                                                     <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Why this profession suits you</span>
-                                                    <p className="text-slate-800 leading-relaxed">{result.advanced?.q14?.whySuit}</p>
+                                                    <p className="text-slate-800 leading-relaxed">{renderSafeText(result.advanced?.q14?.whySuit)}</p>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Habits, Skills & Routines to Build</span>
-                                                    <p className="text-slate-800 leading-relaxed">{result.advanced?.q14?.habits}</p>
+                                                    <p className="text-slate-800 leading-relaxed">{renderSafeText(result.advanced?.q14?.habits)}</p>
                                                 </div>
                                                 <div className="space-y-1">
                                                     <span className="text-[9px] font-bold text-indigo-650 uppercase tracking-wider block">Your 12-Month Action Plan</span>
-                                                    <p className="text-slate-800 leading-relaxed whitespace-pre-line">{result.advanced?.q14?.actionPlan}</p>
+                                                    <p className="text-slate-800 leading-relaxed whitespace-pre-line">{renderSafeText(result.advanced?.q14?.actionPlan)}</p>
                                                 </div>
                                             </div>
                                         </div>

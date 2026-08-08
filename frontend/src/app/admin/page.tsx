@@ -30,7 +30,17 @@ interface Mentor {
     } | null;
 }
 
-interface Client { id: string; user: { name: string; email: string } }
+interface Client {
+    id: string;
+    userId: string;
+    email: string;
+    name: string;
+    currentStage: number;
+    journeyStatus: string;
+    status: string;
+    parent?: { id: string; name: string; email: string } | null;
+    assignedMentors?: { id: string; name: string; email: string }[];
+}
 
 const ALL_PERMISSIONS = ['VIEW_MODULES', 'REVIEW_MODULES', 'VIEW_REPORTS', 'EDIT_REPORTS', 'CHAT'];
 
@@ -42,6 +52,8 @@ export default function AdminDashboardPage() {
     const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
     const [showAssign, setShowAssign] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [adminViewTab, setAdminViewTab] = useState<'mentors' | 'clients_parents'>('mentors');
+    const [clientSearchQuery, setClientSearchQuery] = useState('');
 
     // Create/Edit form
     const [form, setForm] = useState({ id: '', name: '', email: '', password: '', type: 'PERMANENT', specializations: '', bio: '', accessEnd: '', whatsappNumber: '', googleCalendarUrl: '' });
@@ -125,7 +137,7 @@ export default function AdminDashboardPage() {
             if (res.ok) {
                 const data = await res.json();
                 const list = Array.isArray(data) ? data : (data.clients || []);
-                setClients(list.map((c: any) => ({ id: c.id, user: { name: c.name || 'Unknown', email: c.email } })));
+                setClients(list);
             }
         } catch (e) { console.error(e); }
     };
@@ -260,109 +272,206 @@ export default function AdminDashboardPage() {
                     </div>
                 </div>
 
-                <div className="grid lg:grid-cols-[1fr_400px] gap-6">
-                    {/* Mentor List */}
-                    <div className="space-y-3">
-                        {mentors.length === 0 ? (
-                            <div className="bg-white/5 border rounded-xl p-12 text-center shadow-sm">
-                                <p className="text-slate-200 font-medium mb-4">No mentors yet. Click below to create one.</p>
-                                <button onClick={() => { setIsEditing(false); setShowCreate(true); }} className="px-4 py-2 border border-white/20 rounded-lg text-slate-100 font-bold text-sm hover:bg-white/5 transition-colors">Add Mentor</button>
+                {/* View Toggle Tabs */}
+                <div className="flex border-b border-white/10 gap-3">
+                    <button
+                        onClick={() => setAdminViewTab('mentors')}
+                        className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${adminViewTab === 'mentors' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+                    >
+                        👨‍🏫 Mentors Roster ({mentors.length})
+                    </button>
+                    <button
+                        onClick={() => setAdminViewTab('clients_parents')}
+                        className={`px-4 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${adminViewTab === 'clients_parents' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+                    >
+                        🎓 Clients & Linked Parent Accounts ({clients.length})
+                    </button>
+                </div>
+
+                {adminViewTab === 'clients_parents' ? (
+                    <div className="space-y-4">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white/5 p-4 rounded-xl border border-white/10">
+                            <input
+                                type="text"
+                                value={clientSearchQuery}
+                                onChange={e => setClientSearchQuery(e.target.value)}
+                                placeholder="Search by student name, student email, or parent email..."
+                                className="w-full sm:w-96 bg-slate-950 border border-white/10 rounded-lg px-4 py-2 text-xs text-slate-200 outline-none focus:border-indigo-500"
+                            />
+                            <div className="text-xs font-bold text-slate-400">
+                                Total Accounts: {clients.length} Students | {clients.filter(c => c.parent).length} Linked Parents
                             </div>
-                        ) : mentors.map(m => (
-                            <div key={m.id} onClick={() => setSelectedMentor(m)}
-                                className={`bg-white/5 border rounded-xl p-5 cursor-pointer transition-all shadow-sm hover:border-indigo-400 hover:shadow-md ${selectedMentor?.id === m.id ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-white/10'}`}>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-bold text-slate-100">{m.name || 'Unnamed'}</h3>
-                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{m.email}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest">{m.mentorProfile?.type || 'LEGACY'}</span>
-                                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${statusColors[m.mentorProfile?.status || 'ACTIVE']}`}>
-                                            {m.mentorProfile?.status || 'ACTIVE'}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4 mt-2 text-[10px] text-slate-500 font-medium">
-                                    <span>{m.mentorProfile?.assignments?.length || 0} clients assigned</span>
-                                    <span>Joined {new Date(m.createdAt).toLocaleDateString()}</span>
-                                    {m.mentorProfile?.specializations?.length ? <span>{m.mentorProfile.specializations.join(', ')}</span> : null}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                        </div>
 
-                    {/* Detail Panel */}
-                    <div className={`bg-white/5 border shadow-sm rounded-xl p-6 space-y-5 sticky top-4 max-h-[80vh] overflow-y-auto ${selectedMentor ? 'block' : 'hidden lg:block'}`}>
-                        {selectedMentor?.mentorProfile ? (
-                            <>
-                                <div className="flex justify-between items-start pb-4 border-b border-white/5">
-                                    <div>
-                                        <h2 className="text-lg font-bold text-slate-100">{selectedMentor.name}</h2>
-                                        <p className="text-xs text-slate-500 font-medium">{selectedMentor.email}</p>
-                                    </div>
-                                    <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${statusColors[selectedMentor.mentorProfile.status]}`}>
-                                        {selectedMentor.mentorProfile.status}
-                                    </span>
-                                    <button onClick={() => handleEditMentor(selectedMentor)} className="ml-2 text-[10px] text-indigo-600 font-bold tracking-wider uppercase border border-indigo-200 bg-indigo-500/10 px-2 py-1 rounded transition-colors hover:bg-indigo-100">Edit</button>
-                                </div>
-
-                                {selectedMentor.mentorProfile.bio && <p className="text-xs text-slate-400 leading-relaxed">{selectedMentor.mentorProfile.bio}</p>}
-
-                                {/* Status Actions */}
-                                <div>
-                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2">Status</div>
-                                    <div className="flex gap-2">
-                                        {['ACTIVE', 'SUSPENDED'].map(s => (
-                                            <button key={s} onClick={() => updateStatus(selectedMentor.mentorProfile!.id, s)}
-                                                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border transition-all ${selectedMentor.mentorProfile!.status === s ? statusColors[s] : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>
-                                                {s}
-                                            </button>
-                                        ))}
-                                        <button onClick={() => deleteMentor(selectedMentor.mentorProfile!.id)}
-                                            className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-rose-200 text-rose-600 hover:bg-rose-50 ml-auto transition-colors">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Assigned Clients */}
-                                <div className="pt-4 border-t border-white/5">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Assigned Clients ({selectedMentor.mentorProfile.assignments.length})</span>
-                                        <button onClick={() => setShowAssign(true)} className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest hover:underline px-2 py-1 rounded bg-indigo-500/10 border border-indigo-200">+ Assign New</button>
-                                    </div>
-                                    {selectedMentor.mentorProfile.assignments.length === 0 ? (
-                                        <p className="text-xs text-slate-500 italic">No clients assigned yet</p>
-                                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {clients
+                                .filter(c => {
+                                    if (!clientSearchQuery.trim()) return true;
+                                    const q = clientSearchQuery.toLowerCase();
+                                    return (c.name || '').toLowerCase().includes(q) ||
+                                        (c.email || '').toLowerCase().includes(q) ||
+                                        (c.parent?.name || '').toLowerCase().includes(q) ||
+                                        (c.parent?.email || '').toLowerCase().includes(q);
+                                })
+                                .map(client => (
+                                    <div key={client.id} className="p-5 bg-slate-950/60 rounded-2xl border border-white/10 space-y-4 shadow-sm flex flex-col justify-between hover:border-indigo-500/40 transition-all">
                                         <div className="space-y-3">
-                                            {selectedMentor.mentorProfile.assignments.map(a => (
-                                                <div key={a.id} className="p-4 rounded-xl border border-white/10 bg-white/50 hover:bg-white/5 hover:shadow-sm transition-all group">
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <span className="text-sm font-bold text-slate-100 group-hover:text-indigo-600 transition-colors">{a.client?.user?.name || 'Unknown'}</span>
-                                                            <p className="text-xs text-slate-500">{a.client?.user?.email}</p>
+                                            {/* Student Header */}
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-400">Student Account</span>
+                                                    <h3 className="font-bold text-sm text-slate-100 mt-0.5">{client.name || 'Unnamed Student'}</h3>
+                                                    <p className="text-xs text-slate-400">{client.email}</p>
+                                                </div>
+                                                <span className="px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                                    Stage {client.currentStage || 1}
+                                                </span>
+                                            </div>
+
+                                            {/* Linked Parent Account */}
+                                            <div className="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">👪 Linked Parent Account</span>
+                                                {client.parent ? (
+                                                    <div>
+                                                        <div className="text-xs font-bold text-slate-200">{client.parent.name || 'Parent'}</div>
+                                                        <div className="text-[11px] text-slate-400">{client.parent.email}</div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[11px] text-slate-500 italic">No parent account linked</div>
+                                                )}
+                                            </div>
+
+                                            {/* Assigned Mentor */}
+                                            <div className="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block">👨‍🏫 Assigned Mentor</span>
+                                                {client.assignedMentors && client.assignedMentors.length > 0 ? (
+                                                    client.assignedMentors.map(m => (
+                                                        <div key={m.id} className="text-xs text-slate-200 font-semibold flex justify-between items-center">
+                                                            <span>{m.name}</span>
+                                                            <span className="text-[9px] text-slate-400">{m.email}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-3">
-                                                            <a href={`/admin/clients/${a.clientProfileId}`} className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold tracking-wider uppercase border border-indigo-200 bg-indigo-500/10 px-2 py-1 rounded transition-colors">Review</a>
-                                                            <button onClick={() => unassignClient(selectedMentor.mentorProfile!.id, a.clientProfileId)}
-                                                                className="text-[10px] text-rose-500 hover:text-rose-700 font-bold tracking-wider uppercase transition-colors">Remove</button>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-[11px] text-slate-500 italic">Unassigned</div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <a
+                                            href={`/admin/clients/${client.id}`}
+                                            className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-center text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm block"
+                                        >
+                                            Review Full Profile & Progress
+                                        </a>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid lg:grid-cols-[1fr_400px] gap-6">
+                        {/* Mentor List */}
+                        <div className="space-y-3">
+                            {mentors.length === 0 ? (
+                                <div className="bg-white/5 border rounded-xl p-12 text-center shadow-sm">
+                                    <p className="text-slate-200 font-medium mb-4">No mentors yet. Click below to create one.</p>
+                                    <button onClick={() => { setIsEditing(false); setShowCreate(true); }} className="px-4 py-2 border border-white/20 rounded-lg text-slate-100 font-bold text-sm hover:bg-white/5 transition-colors">Add Mentor</button>
+                                </div>
+                            ) : mentors.map(m => (
+                                <div key={m.id} onClick={() => setSelectedMentor(m)}
+                                    className={`bg-white/5 border rounded-xl p-5 cursor-pointer transition-all shadow-sm hover:border-indigo-400 hover:shadow-md ${selectedMentor?.id === m.id ? 'border-indigo-500 ring-1 ring-indigo-500' : 'border-white/10'}`}>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-bold text-slate-100">{m.name || 'Unnamed'}</h3>
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{m.email}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-widest">{m.mentorProfile?.type || 'LEGACY'}</span>
+                                            <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${statusColors[m.mentorProfile?.status || 'ACTIVE']}`}>
+                                                {m.mentorProfile?.status || 'ACTIVE'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4 mt-2 text-[10px] text-slate-500 font-medium">
+                                        <span>{m.mentorProfile?.assignments?.length || 0} clients assigned</span>
+                                        <span>Joined {new Date(m.createdAt).toLocaleDateString()}</span>
+                                        {m.mentorProfile?.specializations?.length ? <span>{m.mentorProfile.specializations.join(', ')}</span> : null}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Detail Panel */}
+                        <div className={`bg-white/5 border shadow-sm rounded-xl p-6 space-y-5 sticky top-4 max-h-[80vh] overflow-y-auto ${selectedMentor ? 'block' : 'hidden lg:block'}`}>
+                            {selectedMentor?.mentorProfile ? (
+                                <>
+                                    <div className="flex justify-between items-start pb-4 border-b border-white/5">
+                                        <div>
+                                            <h2 className="text-lg font-bold text-slate-100">{selectedMentor.name}</h2>
+                                            <p className="text-xs text-slate-500 font-medium">{selectedMentor.email}</p>
+                                        </div>
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${statusColors[selectedMentor.mentorProfile.status]}`}>
+                                            {selectedMentor.mentorProfile.status}
+                                        </span>
+                                        <button onClick={() => handleEditMentor(selectedMentor)} className="ml-2 text-[10px] text-indigo-600 font-bold tracking-wider uppercase border border-indigo-200 bg-indigo-500/10 px-2 py-1 rounded transition-colors hover:bg-indigo-100">Edit</button>
+                                    </div>
+
+                                    {selectedMentor.mentorProfile.bio && <p className="text-xs text-slate-400 leading-relaxed">{selectedMentor.mentorProfile.bio}</p>}
+
+                                    {/* Status Actions */}
+                                    <div>
+                                        <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2">Status</div>
+                                        <div className="flex gap-2">
+                                            {['ACTIVE', 'SUSPENDED'].map(s => (
+                                                <button key={s} onClick={() => updateStatus(selectedMentor.mentorProfile!.id, s)}
+                                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border transition-all ${selectedMentor.mentorProfile!.status === s ? statusColors[s] : 'border-white/10 text-slate-400 hover:bg-white/5'}`}>
+                                                    {s}
+                                                </button>
+                                            ))}
+                                            <button onClick={() => deleteMentor(selectedMentor.mentorProfile!.id)}
+                                                className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-rose-200 text-rose-600 hover:bg-rose-50 ml-auto transition-colors">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Assigned Clients */}
+                                    <div className="pt-4 border-t border-white/5">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Assigned Clients ({selectedMentor.mentorProfile.assignments.length})</span>
+                                            <button onClick={() => setShowAssign(true)} className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest hover:underline px-2 py-1 rounded bg-indigo-500/10 border border-indigo-200">+ Assign New</button>
+                                        </div>
+                                        {selectedMentor.mentorProfile.assignments.length === 0 ? (
+                                            <p className="text-xs text-slate-500 italic">No clients assigned yet</p>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {selectedMentor.mentorProfile.assignments.map(a => (
+                                                    <div key={a.id} className="p-4 rounded-xl border border-white/10 bg-white/50 hover:bg-white/5 hover:shadow-sm transition-all group">
+                                                        <div className="flex justify-between items-start">
+                                                            <div>
+                                                                <span className="text-sm font-bold text-slate-100 group-hover:text-indigo-600 transition-colors">{a.client?.user?.name || 'Unknown'}</span>
+                                                                <p className="text-xs text-slate-500">{a.client?.user?.email}</p>
+                                                            </div>
+                                                            <div className="flex items-center gap-3">
+                                                                <a href={`/admin/clients/${a.clientProfileId}`} className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold tracking-wider uppercase border border-indigo-200 bg-indigo-500/10 px-2 py-1 rounded transition-colors">Review</a>
+                                                                <button onClick={() => unassignClient(selectedMentor.mentorProfile!.id, a.clientProfileId)}
+                                                                    className="text-[10px] text-rose-500 hover:text-rose-700 font-bold tracking-wider uppercase transition-colors">Remove</button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-64 text-center">
+                                    <svg className="w-12 h-12 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <p className="text-sm text-slate-500 font-medium">Select a mentor to manage details</p>
                                 </div>
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center h-64 text-center">
-                                <svg className="w-12 h-12 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                <p className="text-sm text-slate-500 font-medium">Select a mentor to manage details</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Create Modal */}
@@ -455,7 +564,7 @@ export default function AdminDashboardPage() {
                                     <select value={assignForm.clientProfileId} onChange={e => setAssignForm({ ...assignForm, clientProfileId: e.target.value })}
                                         className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none appearance-none bg-white/5 shadow-sm cursor-pointer">
                                         <option value="" disabled className="bg-slate-900 text-slate-100">-- Choose a client --</option>
-                                        {clients.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.user.name} ({c.user.email})</option>)}
+                                        {clients.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.name || 'Unnamed Client'} ({c.email})</option>)}
                                     </select>
                                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">▼</div>
                                 </div>

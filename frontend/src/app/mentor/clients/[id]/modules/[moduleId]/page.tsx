@@ -368,8 +368,18 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
         }
 
         // Generic object fallback
-        if (typeof value === 'object') {
-            return <pre className="text-sm text-slate-300 whitespace-pre-wrap bg-white/5 p-3 rounded-xl overflow-x-auto border border-white/5">{JSON.stringify(value, null, 2)}</pre>;
+        if (value && typeof value === 'object') {
+            const entries = Object.entries(value);
+            return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {entries.map(([k, v]) => (
+                        <div key={k} className="p-3 bg-white/5 border border-white/5 rounded-xl space-y-1">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">{k.replace(/_/g, ' ')}</span>
+                            <span className="text-sm text-slate-200 font-medium block">{typeof v === 'object' ? JSON.stringify(v) : String(v ?? '—')}</span>
+                        </div>
+                    ))}
+                </div>
+            );
         }
 
         // Plain text

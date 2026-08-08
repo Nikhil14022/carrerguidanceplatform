@@ -1,0 +1,128 @@
+=== PARAGRAPHS ===
+
+P0 [normal]: Name:  Career Report
+P1 [normal]: INDEX
+P14 [normal]: Demographics
+P27 [normal]: VALUES
+P29 [normal]: ID – Ideal Value; S – Standard Value; WP - Wants & Preference Value
+P39 [normal]: FEARS
+P41 [normal]: 1-4 - not very high; 5-7 – high; 8-10 - very high
+P47 [normal]: 16 PF Protagonist (ENFJ-T)
+P50 [normal]: Add the interpretation paragraph
+P55 [normal]: RIASEC
+P58 [normal]: Add the interpretation from the interpretation doc (Select top 2)
+P65 [normal]: COLOUR TEST
+P68 [normal]: Colour Code
+P70 [normal]: Add the interpretation from the interpretation doc
+P83 [normal]: STRENGTHS & WEAKNESSES
+P85 [normal]: 1-4 - not very high; 5-7 – high; 8-10 - very high
+P89 [normal]: SUBJECT MATTER INTEREST PROFILE SCORING
+P93 [normal]: Add The interpretation from the interpretation doc for the highest 2 (copy the paragraph from the interpretation doc)
+P107 [normal]: MEDIA GENRE
+P109 [normal]: LIFESTYLE
+P122 [normal]: INDIVIDUAL:
+P123 [normal]: 1. How much risk are you willing to take in your career?
+P125 [normal]: 2. How important is creative expression in your career?
+P127 [normal]: 3. What is your priority when it comes to financial stability?
+P129 [normal]: 4. Which best describes your approach to stability and exploration?
+P131 [normal]: 5. How important is working in a field you are passionate about?
+P149 [normal]: OVERVIEW
+P151 [normal]: Summary of other topics each in 2 lines – aim & vision, friends, relationship, family, body image and impactful incidents, other observations
+P153 [normal]: Aim and Vision:
+P155 [normal]: Friends:
+P157 [normal]: Relationship: .
+P159 [normal]: Family:
+P161 [normal]: Body image:
+P163 [normal]: Impactful incidents:
+P170 [normal]: POSSIBLE CAREER OPTIONS
+
+
+=== TABLES ===
+
+
+--- TABLE 0 ---
+  Row 0: Sr. No . | Topics | Page Number | Page Number
+  Row 1: 1 | Values |  | 
+  Row 2: 2 | Fears |  | 
+  Row 3: 3 | 16 Personalities Test (16 pf) |  | 
+  Row 4: 4 | RIASEC |  | 
+  Row 5: 5 | Strengths and Weaknesses |  | 
+  Row 6: 6 | Color Test |  | 
+  Row 7: 7 | Parents Career Perspective |  | 
+  Row 8: 8 | Media Genre |  | 
+  Row 9: 9 | Lifestyle |  | 
+  Row 10: 10 | Overview |  | 
+  Row 11: 11 | Possible Career Options |  | 
+  Row 12: 12 | Next Plan of Action |  | 
+
+--- TABLE 1 ---
+  Row 0: Name:
+Age: 
+Date of Birth: 
+School name: 
+Current year: 
+Residence: 
+Lives with: 
+Parents name: 
+Mother: 
+Father: 
+Subjects (current):
+
+--- TABLE 2 ---
+  Row 0: 
+
+--- TABLE 3 ---
+  Row 0: 
+
+--- TABLE 4 ---
+  Row 0: MIND | ENERGY | NATURE | TACTICS | IDENTITY
+  Row 1: Extraverted | Intuitive | Thinking | Judging | Assertive
+  Row 2: Introverted | Observant | Feeling | Prospecting | Turbulent
+
+--- TABLE 5 ---
+  Row 0:  | I Am | I Can | I Like To
+  Row 1: Realistic = |  |  | 
+  Row 2: Investigative = |  |  | 
+  Row 3: Artistic = |  |  | 
+  Row 4: Social = |  |  | 
+  Row 5: Enterprising = |  |  | 
+  Row 6: Conventional = |  |  | 
+
+--- TABLE 6 ---
+  Row 0: Strengths | Weaknesses
+  Row 1:  | 
+
+--- TABLE 7 ---
+  Row 0: Total the points in each column |  |  |  |  |  |  |  | 
+  Row 1: Highlight the letters of top two highest scores | A | B | C | D | E | F | G | H
+
+--- TABLE 8 ---
+  Row 0: MOVIES- 
+
+SERIES- 
+
+
+GAMES- 
+
+SOCIAL MEDIA- 
+
+SUPERPOWER THEY WOULD LIKE TO HAVE-    
+
+
+CHARACTERS THEY RELATE WITH- 
+1→
+2→
+3→
+•Real Known person →
+SCREEN TIME
+= Instagram 
+= Snapchat
+= WhatsApp 
+= YouTube
+= Games
+
+--- TABLE 9 ---
+  Row 0: See the questions in the sample report and copy paste those here, becomes easier
+
+--- TABLE 10 ---
+  Row 0: 

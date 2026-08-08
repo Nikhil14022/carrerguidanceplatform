@@ -1,0 +1,2264 @@
+{
+  "Module_1_Module_1__Demographics": {
+    "status": "APPROVED",
+    "data": {
+      "demo_name": "Jeet Singhi",
+      "demo_age": "15",
+      "demo_dob": "2006-06-09",
+      "demo_education": {
+        "school": {
+          "active": true,
+          "name": "DPS",
+          "grade": "10th"
+        },
+        "college": {
+          "active": false,
+          "name": "",
+          "grade": ""
+        },
+        "university": {
+          "active": false,
+          "name": "",
+          "grade": ""
+        }
+      },
+      "demo_residence": "Ahmedabad",
+      "demo_lives_with": "Father, Mother, Grandmother",
+      "demo_subjects": [
+        {
+          "col1": "Physics",
+          "col2": "Complex, hate it",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "English",
+          "col2": "Love it, easy marks",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "demo_exams": [
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "demo_academic_overview": [
+        {
+          "col1": "Hindi ",
+          "col2": "Don’t Like but Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "English ",
+          "col2": "Like & Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Biology",
+          "col2": "Don’t Like but Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Chemistry",
+          "col2": "Like & Don’t Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Physics",
+          "col2": "Don’t Like & Don’t Score",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Maths ",
+          "col2": "Like & Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "History ",
+          "col2": "Like & Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Geography ",
+          "col2": "Don’t Like but Score Well",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Economics",
+          "col2": "Don’t Like & Don’t Score",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "demo_hobbies": [
+        {
+          "col1": "Drawing",
+          "col2": "Sketching",
+          "col3": "2-3 hours",
+          "col4": ""
+        },
+        {
+          "col1": "Watching Media",
+          "col2": "Movies/Series",
+          "col3": "4-5 Hours",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "demo_routine": [
+        "School",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Home",
+        "",
+        "",
+        "Tuition",
+        "",
+        "",
+        "Dinner",
+        "",
+        "Homework/Drawing/Study if exams"
+      ]
+    }
+  },
+  "Module_2_Module_2__Aim_and_Vision": {
+    "status": "APPROVED",
+    "data": {
+      "aim_1": "Career Clarity, Interested in Arts (Sketching, Guitar)",
+      "aim_2_career": "Get good marks - 80 Plus",
+      "aim_2_self": " Procrastination improve, do things on time",
+      "aim_2_family": "None right now",
+      "aim_2_friends": "None right now",
+      "aim_3a": [
+        {
+          "col1": "Academics ",
+          "col2": "cause it'll help in the future ",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Hobbies",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Family",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Friends ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Music",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Movies",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "aim_3b": [
+        {
+          "col1": "Movies/Series",
+          "col2": "4-6 hours",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Sketching",
+          "col2": "1-2 hours",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Playing Roblox/Games",
+          "col2": "1-2 hours",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Sleep",
+          "col2": "8-10 hours",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "aim_4": "Movies review for a living \n",
+      "aim_5": "New house, beach side or mountain side, comics, travelling (lakkshawdeep, beaches and peace) want to travel but haven't (switzerland have heard alot about it, then dubai)\nCars - mercedes \nVinyl collection - seen a lot of videos and is interested in it \nTravel\nBuy a house/Bungalow\nBuy Cars/Bike/Yacht\nBuy all the brands - shopping \n\n",
+      "aim_6": [
+        {
+          "col1": "Have my own house ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Sky diving ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Get a decent job (pay scale, 2-3lakhs per month)",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Go to concert (tame impala, baby jane)",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Travelling (switzerland, online dekha hai ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Write his own novel, anatomy drawing not that good, enjoys coming up with dialogues, have a few scripts, a horror story ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Get a decent build, not any particular wt category ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Go on a friends trip abroad, been goa with friends feels it would be better after 18 ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Go clubbing ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Make a huge graffiti ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ]
+    }
+  },
+  "Module_3_Module_3__Career_Perspective": {
+    "status": "APPROVED",
+    "data": {}
+  },
+  "Module_4_Module_4__Risk_Taking_Ability": {
+    "status": "APPROVED",
+    "data": {
+      "risk_1": [
+        "moderate"
+      ],
+      "risk_2": [
+        "very"
+      ],
+      "risk_3": [
+        "high"
+      ],
+      "risk_4": [
+        "explore_first"
+      ],
+      "risk_5": [
+        "very"
+      ]
+    }
+  },
+  "Module_5_Module_5__Movies_and_Visual_World": {
+    "status": "APPROVED",
+    "data": {
+      "visual_fav_movies": [
+        {
+          "col1": "Fight club - brad pitt",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": " weapons - horror, black magic ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "perfect blue - anime, singer and his life story ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": " terffier - serial killer",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Dony Dark - teenager plane crash, fixes past mistakes in life ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "slasher (genre) action, drama, plot twists",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "visual_fav_series": [
+        {
+          "col1": "dexter, murder mystery",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "breaking bad",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "game of thrones",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "walking dead, zombie series ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "FROM, horror, small town in middle of no where, survival ",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "visual_genres": [
+        {
+          "option": "Action"
+        },
+        {
+          "option": "Horror"
+        },
+        {
+          "option": "Dramas"
+        },
+        {
+          "option": "Mystery"
+        },
+        {
+          "option": "Animation"
+        }
+      ],
+      "visual_superpower": "Mind control - and make anyone do anything (exams meh helpful), if i want anything then i can get it from asking anyone",
+      "visual_books": [
+        "yes"
+      ],
+      "visual_book_genres": [
+        "fiction"
+      ],
+      "visual_characters": [
+        {
+          "col1": "Petyr Baelish ",
+          "col2": "clever, sly he uses any situation to use to his advantage, “chaos is a ladder” he goes from bottom to top, someone who he would want to be like, he’s inspiring ",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Griffith",
+          "col2": "nime Character, berserk, he's under a decent category but he doesn’t care about it and wants to get on the top, he's the main villain of the story",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Nate Jacobs",
+          "col2": "Euphoria, attitude is nice, he doesn’t care about anything, vibe",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "visual_games": [
+        {
+          "col1": "Favourite games",
+          "col2": "roblox, counter strike, UNO",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Favourite game genres",
+          "col2": "Action/Fighting, Shooter Games",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Why you enjoy them",
+          "col2": "Fast paced, enjoy with friends",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "visual_music": "Tame Impala and defttones, music , radiohead (let down and no surprises )",
+      "visual_youtube_insta": [
+        {
+          "col1": "YouTube Top Channels",
+          "col2": "Movies recs Paranormal stuff GhostBusters - seen videos, if i encounter ghosts then i will try to record it  Insta - memes (brain rot, etc) - band ke memes, Stunts - red bull, would love to try, ",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Instagram Top Pages",
+          "col2": "Memes, Music, Stunts (red bull), Movie Reviews, talk to friends",
+          "col3": "",
+          "col4": ""
+        }
+      ]
+    }
+  },
+  "Module_6_Module____Friends___Relationships": {
+    "status": "APPROVED",
+    "data": {
+      "friends_1": "The people who you have fun with, no censor needed, \nBff i spend more time with them \nFriend din meh 1-2 times met  \n",
+      "friends_journey": "Pre covid you had alot of friends, but then out of touch cause of online or school changes, post covid, 6th se 7-8 friends and now in 9-10th more 3-4 aa gaye",
+      "friends_2": [
+        {
+          "col1": "school se goa, after 12 dont get out of rooms in hotel, and everyone knew that the teachers were going out drinking after that and he and his friend get out and laxman sir the hindi sir who is the most strict and in his room the light was on and he was standing in the balcony and was smoking, and wanted to take a photo of it so it took it from his friends camera which wasn't working, and his friend gets another camera which was working but the flash was on and sir gets to know, he doesn't know which students have taken the photo and then they hid in the balcony and everyone started checking in the camera and they started checking rooms as well and they went and hid in the girls washroom, and then next day 7-8am friend got relaxed cause no one was there, and then after 2-3 days and then the computer sir made them delete the photo and yelled at them but then they restored it after",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "in 9th std, he and a few of his friends climbed the jhaath and bunked the lectures cause first period was library and the class monitor was with us and then he got scared that so he left and the sports teacher asked why were you there and he said 2-3 people in the class are missing so im searching for them",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "friends_3": "Trustworthy, Playful, Similar task/preferences, Adventurous, funny, Humorous, Liberal/broadminded",
+      "friends_4": [
+        "5"
+      ],
+      "friends_5": [
+        "no"
+      ],
+      "friends_7a": [
+        "no"
+      ],
+      "friends_7c": [
+        "7"
+      ],
+      "friends_8": [
+        "4"
+      ],
+      "friends_9": [
+        "4"
+      ],
+      "friends_10": 8,
+      "friends_10_reason": "differences in taste and preferences \nSociety - 6 (only 1 friend), not open minded like the only thing that he wants to talk about politics and is not interested in anything else - he feels shut down cause he only talks about himself and he isn’t able to talk"
+    }
+  },
+  "Module_7_Module____Family": {
+    "status": "APPROVED",
+    "data": {
+      "family_1": "Most important people, supportive in studies by encouraging, and helping by getting whatever I want, books (novels, comics, manga), clothes. Mostly have ask for it, cause they dont know what I want, even on birthdays I have to say what I want, it doesn’t bother me. They give guidance, during homework I go to my mom. They are the people who help us grow. “Don’t waste time” is a dialogue that they say often, that im not being productive acc to them, watching movies, playing video games.  ",
+      "family_2": "→ MOM (likes, dislikes, opinion on career) 8/10\nKind and caring, supportive, annoying when she keeps telling one thing repetitively for study, eating. She doesn’t demotivate if marks are less, if there are some stuff i want to hide I don’t tell anyone, not even mom. \n\n→ DAD (likes, dislikes, opinion on career) 8/10\nSupportive, never says no to anything, talk abt how our day was, talk abt movies 2gether sometimes, \n\n→ DADI Its irritating when two ppl are talking and she cuts in between to share her opinions. Dont share and talk to them and hide cause scared of consequences \n",
+      "family_3": [
+        "2"
+      ],
+      "family_4": "praise you for - sketching, what do they criticize you for - time management, time waste, matt kar, movies, compare you - no, something they repeatedly tell you - to organise books, clothes, padhai karni chaiye and to not time waste\n",
+      "family_5": [
+        "sometimes"
+      ],
+      "family_5_detail": "acting grumpy, dad, even if he is happy aisa lagta nahi hai ki woh happy hai, its annoying, when i am happy i show that i am happy, for other emotions as well sometimes, its not necessary bcz i cool down from anger fast, not person specific\nare there any rules/ expectations at home that affect your choices\nNo pocket money or no rules as such, no gendered friendship issues \nTry to convince them and if they dont agree then ill let it be\n Mostly forgive the mistakes i make, no punishments  ",
+      "family_6": [
+        "2"
+      ],
+      "family_7": "Don’t want to change anything  "
+    }
+  },
+  "Module_8_Module____Lifestyle_Expectancies": {
+    "status": "APPROVED",
+    "data": {
+      "lifestyle_1": "The way you live  ",
+      "lifestyle_2": [
+        "2",
+        "6",
+        "14"
+      ],
+      "lifestyle_4": [
+        "relaxed",
+        "cultural_social"
+      ],
+      "lifestyle_5": [
+        "2"
+      ],
+      "lifestyle_6": [
+        "5",
+        "8",
+        "3",
+        "4"
+      ],
+      "lifestyle_7": "Personality, taste and preferences (movies, music) - genre of things that he likes, he likes people who are similar to him \nSkills, Art, \nWork, art that you create, \nQuality, dependable (practical problems that people can rely on you)\n",
+      "lifestyle_8": [
+        {
+          "col1": "Going out with friends",
+          "col2": "Home Theatre ",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Sketching ",
+          "col2": "Play Station",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Movies, Series ",
+          "col2": "Pet dog, golden retriever, normal names",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Diff varieties of food (paneer chilli fav food rn)",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Music",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "lifestyle_9": "singers, Thom York, he sings good, concerts etc to held, if he has skills then he would not mind to be in front of a crowd, anything that youre performing, any singer ",
+      "lifestyle_10": [
+        "abroad_study"
+      ],
+      "lifestyle_12": [
+        {
+          "col1": "Fixed schedule, he doesn’t have one so he wants to build on that to complete everything on time",
+          "col2": "Sleep schedule, not fixed, sleeps late, don’t have energy then in the entire day ",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "Forgetting things, cant find things",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "Last moment submission",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "Laziness, HW, assignments, house chores, if someone gives a task and then he forgets to do them and he regrets that he didn’t do that",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "",
+          "col2": "",
+          "col3": "",
+          "col4": ""
+        }
+      ],
+      "lifestyle_13": " Geopolitics, latest movies ",
+      "lifestyle_career_priorities": [
+        {
+          "col1": "Academics",
+          "col2": "2",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Human Nature/Personality",
+          "col2": "8",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Finance",
+          "col2": "6",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Beliefs/Values",
+          "col2": "7",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Family",
+          "col2": "1",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Creative Expression/Expressing yourself",
+          "col2": "10",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Skills",
+          "col2": "3",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Knowledge",
+          "col2": "5",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Lifestyle",
+          "col2": "4",
+          "col3": "",
+          "col4": ""
+        },
+        {
+          "col1": "Relationship",
+          "col2": "9",
+          "col3": "",
+          "col4": ""
+        }
+      ]
+    }
+  },
+  "Module_9_Module____Body_Image___Self_Image": {
+    "status": "APPROVED",
+    "data": {
+      "body_1": 8,
+      "body_2": 9,
+      "body_2_reason": "Height - 5’10, Dream - above 6\nHair - Good texture, color \nMuscles - Arms and legs\nWeight - close to 60, Dream - 75\n",
+      "body_1_reason": "Be more extroverted - talk to new ppl more, dont find topics to talk on, holding convos as well, \nLikes - sense of humour, not limited, sarcasm and dark humour, roasting, ragebaiting - making fun of someone’s insecurities\n",
+      "body_3": 7,
+      "body_4": "Be more extroverted - talk to new ppl more, dont find topics to talk on, holding convos as well, \nLikes - sense of humour, not limited, sarcasm and dark humour, roasting, ragebaiting - making fun of someone’s insecurities\n",
+      "body_5": "Get a tattoo, sometime in the future "
+    }
+  },
+  "Module_10_Module_10__Strengths_and_Weaknesses": {
+    "status": "APPROVED",
+    "data": {
+      "sw_grid": [
+        {
+          "trait": "Communication",
+          "leftLabel": "I sometimes struggle to convey my thoughts",
+          "rightLabel": "I am able to convey my thoughts effectively",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 3
+        },
+        {
+          "trait": "Organisational Skills",
+          "leftLabel": "Disorganized",
+          "rightLabel": "Organized",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 6
+        },
+        {
+          "trait": "Organising Thoughts and Flow in Mind",
+          "leftLabel": "Scattered thoughts",
+          "rightLabel": "Can organise my thoughts well",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Responsibility",
+          "leftLabel": "Irresponsible",
+          "rightLabel": "Responsible",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 3
+        },
+        {
+          "trait": "Problem Solving",
+          "leftLabel": "Avoiding the problem",
+          "rightLabel": "Clear strategy and effective solutions",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 5
+        },
+        {
+          "trait": "Adaptability",
+          "leftLabel": "Find it challenging to adapt",
+          "rightLabel": "Adapt well to new situations",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Prioritising",
+          "leftLabel": "Struggle to prioritise",
+          "rightLabel": "Identify what is most important",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Patience",
+          "leftLabel": "Impatient",
+          "rightLabel": "Patient while working through challenges",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 5
+        },
+        {
+          "trait": "Curiosity",
+          "leftLabel": "Lack curiosity and motivation",
+          "rightLabel": "Always eager to learn new things",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Perseverance",
+          "leftLabel": "Give up easily",
+          "rightLabel": "Persist through difficulties",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Thoughtfulness & Reflection",
+          "leftLabel": "Act without taking time to think",
+          "rightLabel": "Reflect and think things through",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 1
+        },
+        {
+          "trait": "Sticking to Deadlines",
+          "leftLabel": "Struggle to stick to deadlines",
+          "rightLabel": "Stick to deadlines",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 1
+        },
+        {
+          "trait": "Generating Ideas",
+          "leftLabel": "Challenging to come up with ideas",
+          "rightLabel": "Contribute creative ideas",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Multi-tasking",
+          "leftLabel": "Struggle to multitask",
+          "rightLabel": "Can multitask",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 7
+        },
+        {
+          "trait": "Time Management",
+          "leftLabel": "Trouble managing my time",
+          "rightLabel": "Manage time effectively",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 1
+        },
+        {
+          "trait": "Independence",
+          "leftLabel": "Rely too much on others",
+          "rightLabel": "Work well independently",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Seeking Help",
+          "leftLabel": "Hesitate to ask for help",
+          "rightLabel": "Know when to ask for help",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 5
+        },
+        {
+          "trait": "Goal Setting and Execution",
+          "leftLabel": "Difficulty setting/executing goals",
+          "rightLabel": "Set clear goals and work hard",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 6
+        },
+        {
+          "trait": "Stress Management",
+          "leftLabel": "Cannot work under stress",
+          "rightLabel": "Work under stressful situations",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 9
+        },
+        {
+          "trait": "Team Work",
+          "leftLabel": "Don't work well in groups",
+          "rightLabel": "Work well in groups",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 1
+        },
+        {
+          "trait": "Growth Mindset",
+          "leftLabel": "Abilities are innate/cannot improve",
+          "rightLabel": "Embrace challenges and opportunities",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Criticism",
+          "leftLabel": "Cannot take criticism",
+          "rightLabel": "Can take criticism",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 7
+        },
+        {
+          "trait": "Feedback",
+          "leftLabel": "Giving unconstructive feedback",
+          "rightLabel": "Giving constructive feedback",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 3
+        },
+        {
+          "trait": "Listening",
+          "leftLabel": "Not paying attention",
+          "rightLabel": "Good listener and pay attention",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Empathy / Sensitivity",
+          "leftLabel": "Struggle to be empathetic",
+          "rightLabel": "Sensitive and empathetic",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 6
+        },
+        {
+          "trait": "Procrastination",
+          "leftLabel": "Procrastinate a lot",
+          "rightLabel": "Don't procrastinate",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Working Individually/One Person",
+          "leftLabel": "Cannot work effectively with one person",
+          "rightLabel": "Can work well with one person",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 9
+        },
+        {
+          "trait": "Social Interaction",
+          "leftLabel": "Avoiding social interaction",
+          "rightLabel": "Like social interaction",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Expressiveness",
+          "leftLabel": "Unable to express easily",
+          "rightLabel": "Able to express easily & verbally",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Accountability",
+          "leftLabel": "Not accepting mistakes",
+          "rightLabel": "Accepting mistakes & owning up",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 1
+        },
+        {
+          "trait": "Spontaneity",
+          "leftLabel": "Cannot do things impulsively",
+          "rightLabel": "Can do things impulsively",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Rules and Routines",
+          "leftLabel": "Not following rules/routines",
+          "rightLabel": "Following rules/routines",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Accepting Change",
+          "leftLabel": "Cannot accept change",
+          "rightLabel": "Open to and can accept change",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Finding Direction",
+          "leftLabel": "Struggle to find direction",
+          "rightLabel": "Good at finding direction/path",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 4
+        },
+        {
+          "trait": "Conversing with a Group",
+          "leftLabel": "Not able to talk to many people",
+          "rightLabel": "Talking to many people",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 3
+        },
+        {
+          "trait": "Initiating Conversations",
+          "leftLabel": "Cannot start conversations",
+          "rightLabel": "Can start conversations easily",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 2
+        },
+        {
+          "trait": "Taking a Stand for Oneself",
+          "leftLabel": "Not being able to take a stand",
+          "rightLabel": "Taking a stand for oneself",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 8
+        },
+        {
+          "trait": "Self-control",
+          "leftLabel": "Cannot control own impulses",
+          "rightLabel": "Controlling actions/learning to ignore impulses",
+          "isStrength": false,
+          "isWeakness": false,
+          "rating": 7
+        }
+      ]
+    }
+  },
+  "Module_11_Module_11__Fears": {
+    "status": "APPROVED",
+    "data": {
+      "fear_public_speaking": 5,
+      "fear_missing_out": 5,
+      "fear_future": 5,
+      "fear_failure": 5,
+      "fear_rejection": 5,
+      "fear_disappointment_others_to_me": 5,
+      "fear_mediocre_life": 6
+    }
+  },
+  "Module_12_Module_12__1__Personality_Factors_Test": {
+    "status": "APPROVED",
+    "data": {
+      "pf16_1": 3,
+      "pf16_2": 3,
+      "pf16_3": 3,
+      "pf16_4": 3,
+      "pf16_5": 3,
+      "pf16_6": 3,
+      "pf16_7": 3,
+      "pf16_8": 3,
+      "pf16_9": 3,
+      "pf16_10": 3,
+      "pf16_11": 3,
+      "pf16_12": 3,
+      "pf16_13": 3,
+      "pf16_26": 3,
+      "pf16_25": 3,
+      "pf16_24": 3,
+      "pf16_23": 3,
+      "pf16_22": 3,
+      "pf16_21": 3,
+      "pf16_20": 3,
+      "pf16_19": 3,
+      "pf16_18": 3,
+      "pf16_17": 3,
+      "pf16_14": 3,
+      "pf16_15": 3,
+      "pf16_16": 3,
+      "pf16_27": 3,
+      "pf16_28": 3,
+      "pf16_29": 3,
+      "pf16_30": 3,
+      "pf16_31": 3,
+      "pf16_32": 3,
+      "pf16_33": 3,
+      "pf16_34": 3,
+      "pf16_35": 3,
+      "pf16_36": 3,
+      "pf16_37": 3,
+      "pf16_38": 3,
+      "pf16_39": 3,
+      "pf16_40": 3,
+      "pf16_41": 3,
+      "pf16_42": 3,
+      "pf16_43": 3,
+      "pf16_44": 3,
+      "pf16_45": 3,
+      "pf16_46": 3,
+      "pf16_47": 3,
+      "pf16_48": 3,
+      "pf16_49": 3,
+      "pf16_50": 3,
+      "pf16_51": 3,
+      "pf16_52": 3,
+      "pf16_53": 3,
+      "pf16_54": 3,
+      "pf16_55": 3,
+      "pf16_56": 3,
+      "pf16_57": 3,
+      "pf16_58": 3,
+      "pf16_59": 3,
+      "pf16_60": 3,
+      "pf16_61": 3,
+      "pf16_62": 3,
+      "pf16_63": 3,
+      "pf16_64": 3,
+      "pf16_65": 3,
+      "pf16_66": 3,
+      "pf16_67": 3,
+      "pf16_68": 3,
+      "pf16_69": 3,
+      "pf16_70": 3,
+      "pf16_71": 3,
+      "pf16_72": 3,
+      "pf16_73": 3,
+      "pf16_74": 3,
+      "pf16_75": 3,
+      "pf16_76": 3,
+      "pf16_77": 3,
+      "pf16_78": 3,
+      "pf16_79": 3,
+      "pf16_80": 3,
+      "pf16_81": 3,
+      "pf16_82": 3,
+      "pf16_84": 3,
+      "pf16_83": 3,
+      "pf16_85": 3,
+      "pf16_86": 3,
+      "pf16_87": 3,
+      "pf16_88": 3,
+      "pf16_89": 3,
+      "pf16_90": 3,
+      "pf16_91": 3,
+      "pf16_92": 3,
+      "pf16_93": 3,
+      "pf16_94": 3,
+      "pf16_95": 3,
+      "pf16_96": 3,
+      "pf16_97": 3,
+      "pf16_98": 3,
+      "pf16_99": 3,
+      "pf16_100": 3,
+      "pf16_101": 3,
+      "pf16_102": 3,
+      "pf16_103": 3,
+      "pf16_104": 3,
+      "pf16_105": 3,
+      "pf16_106": 3,
+      "pf16_107": 3,
+      "pf16_108": 3,
+      "pf16_109": 3,
+      "pf16_110": 3,
+      "pf16_111": 3,
+      "pf16_112": 3,
+      "pf16_113": 3,
+      "pf16_114": 3,
+      "pf16_115": 3,
+      "pf16_116": 3,
+      "pf16_117": 3,
+      "pf16_118": 3,
+      "pf16_119": 3,
+      "pf16_120": 3,
+      "pf16_121": 3,
+      "pf16_123": 3,
+      "pf16_122": 3,
+      "pf16_124": 3,
+      "pf16_125": 3,
+      "pf16_126": 3,
+      "pf16_127": 3,
+      "pf16_128": 3,
+      "pf16_129": 3
+    }
+  },
+  "Module_13_Module_13__Value_System": {
+    "status": "APPROVED",
+    "data": {
+      "__testData": {
+        "selected": {
+          "Personal": [
+            "Look Good/Appearance",
+            "Self-Development",
+            "Open-Mindedness",
+            "Friendship",
+            "Independent/Solo"
+          ],
+          "Social": [
+            "Freedom",
+            "Be who you are",
+            "Companionship",
+            "Practical Minded",
+            "Equality"
+          ],
+          "Achievement": [
+            "Fame",
+            "Make lots of money",
+            "Happiness is a way of life",
+            "Personal comfort",
+            "Live to the fullest"
+          ],
+          "Physical": [
+            "Seek quality",
+            "Aesthetics",
+            "Comfort",
+            "Unique",
+            "Wealth"
+          ]
+        },
+        "ranked": [
+          "Self-Development",
+          "Be who you are",
+          "Make lots of money",
+          "Friendship",
+          "Wealth",
+          "Look Good/Appearance",
+          "Comfort",
+          "Happiness is a way of life",
+          "Aesthetics",
+          "Open-Mindedness"
+        ],
+        "categorized": {
+          "Self-Development": "Ideal",
+          "Be who you are": "Standard",
+          "Make lots of money": "Ideal",
+          "Friendship": "Ideal",
+          "Wealth": "Ideal",
+          "Look Good/Appearance": "Standard",
+          "Comfort": "Ideal",
+          "Happiness is a way of life": "Standard",
+          "Aesthetics": "Want & Preference",
+          "Open-Mindedness": "Standard"
+        }
+      },
+      "__scored": {
+        "testType": "VALUES",
+        "raw": {
+          "selected": {
+            "Personal": [
+              "Look Good/Appearance",
+              "Self-Development",
+              "Open-Mindedness",
+              "Friendship",
+              "Independent/Solo"
+            ],
+            "Social": [
+              "Freedom",
+              "Be who you are",
+              "Companionship",
+              "Practical Minded",
+              "Equality"
+            ],
+            "Achievement": [
+              "Fame",
+              "Make lots of money",
+              "Happiness is a way of life",
+              "Personal comfort",
+              "Live to the fullest"
+            ],
+            "Physical": [
+              "Seek quality",
+              "Aesthetics",
+              "Comfort",
+              "Unique",
+              "Wealth"
+            ]
+          },
+          "ranked": [
+            "Self-Development",
+            "Be who you are",
+            "Make lots of money",
+            "Friendship",
+            "Wealth",
+            "Look Good/Appearance",
+            "Comfort",
+            "Happiness is a way of life",
+            "Aesthetics",
+            "Open-Mindedness"
+          ],
+          "categorized": {
+            "Self-Development": "Ideal",
+            "Be who you are": "Standard",
+            "Make lots of money": "Ideal",
+            "Friendship": "Ideal",
+            "Wealth": "Ideal",
+            "Look Good/Appearance": "Standard",
+            "Comfort": "Ideal",
+            "Happiness is a way of life": "Standard",
+            "Aesthetics": "Want & Preference",
+            "Open-Mindedness": "Standard"
+          }
+        },
+        "scores": {
+          "totalSelected": 20,
+          "topValues": [
+            {
+              "rank": 1,
+              "value": "Self-Development",
+              "genre": "personal",
+              "category": "Ideal"
+            },
+            {
+              "rank": 2,
+              "value": "Be who you are",
+              "genre": "social",
+              "category": "Standard"
+            },
+            {
+              "rank": 3,
+              "value": "Make lots of money",
+              "genre": "achievement",
+              "category": "Ideal"
+            },
+            {
+              "rank": 4,
+              "value": "Friendship",
+              "genre": "personal",
+              "category": "Ideal"
+            },
+            {
+              "rank": 5,
+              "value": "Wealth",
+              "genre": "physical",
+              "category": "Ideal"
+            },
+            {
+              "rank": 6,
+              "value": "Look Good/Appearance",
+              "genre": "personal",
+              "category": "Standard"
+            },
+            {
+              "rank": 7,
+              "value": "Comfort",
+              "genre": "physical",
+              "category": "Ideal"
+            },
+            {
+              "rank": 8,
+              "value": "Happiness is a way of life",
+              "genre": "achievement",
+              "category": "Standard"
+            },
+            {
+              "rank": 9,
+              "value": "Aesthetics",
+              "genre": "physical",
+              "category": "Want & Preference"
+            },
+            {
+              "rank": 10,
+              "value": "Open-Mindedness",
+              "genre": "personal",
+              "category": "Standard"
+            }
+          ],
+          "distribution": {
+            "ideal": 0,
+            "standard": 0,
+            "want": 0
+          },
+          "genreBreakdown": {
+            "personal": [
+              "Look Good/Appearance",
+              "Self-Development",
+              "Open-Mindedness",
+              "Friendship",
+              "Independent/Solo"
+            ],
+            "social": [
+              "Freedom",
+              "Be who you are",
+              "Companionship",
+              "Practical Minded",
+              "Equality"
+            ],
+            "achievement": [
+              "Fame",
+              "Make lots of money",
+              "Happiness is a way of life",
+              "Personal comfort",
+              "Live to the fullest"
+            ],
+            "physical": [
+              "Seek quality",
+              "Aesthetics",
+              "Comfort",
+              "Unique",
+              "Wealth"
+            ]
+          }
+        },
+        "scoredAt": "2026-06-15T06:14:41.656Z"
+      }
+    }
+  },
+  "Module_14_Module_14__RIASEC_Interest_Test": {
+    "status": "APPROVED",
+    "data": {
+      "__testData": {
+        "R": [
+          "Practical",
+          "Straightforward",
+          "Reliable",
+          "Thrifty",
+          "Genuine",
+          "Read blueprints or diagrams",
+          "Operate tools, machinery, or equipment",
+          "Use physical strength to accomplish things",
+          "Be outdoors",
+          "Be physically active",
+          "Care for animals",
+          "Work with objects"
+        ],
+        "I": [
+          "Inquisitive",
+          "Analytical",
+          "Introverted",
+          "Independent",
+          "Observant",
+          "Intellectual",
+          "Analyze Data",
+          "Evaluate information",
+          "Chart Data on graphs",
+          "Explore ideas",
+          "Use Computers",
+          "Work independently"
+        ],
+        "A": [
+          "Intuitive",
+          "Idealistic",
+          "Draw, sculpt, or paint",
+          "Play a musical instrument, sing, or compose music",
+          "Write stories, poems, music, plays, or scripts",
+          "Design fashions, objects, graphics, or interiors",
+          "Perform in front of an audience",
+          "Attend concerts, movies, theatre, or art exhibitions",
+          "Read fiction, plays, or poetry",
+          "Work on crafts",
+          "Collect artwork",
+          "Read about art, literature, or music",
+          "Take photographs",
+          "Work in unstructured situations",
+          "Take an art course"
+        ],
+        "S": [
+          "Helpful",
+          "Understanding",
+          "Trustworthy",
+          "Generous",
+          "Lead a group discussion",
+          "Cooperate well with others",
+          "Help people with problems",
+          "Entertain others"
+        ],
+        "E": [
+          "Self-confident",
+          "Assertive",
+          "Adventuresome",
+          "Enthusiastic",
+          "Persuasive",
+          "Persuade people",
+          "Sell things or promote ideas",
+          "Run my own service or business",
+          "Make decisions affecting others",
+          "Meet important people",
+          "Read business publications",
+          "Belong to groups or clubs"
+        ],
+        "C": [
+          "Careful",
+          "Conscientious",
+          "Efficient",
+          "Patient",
+          "Follow instructions",
+          "Use a computer and/or office machines",
+          "Write effective business documents",
+          "Organize office products",
+          "Collect and categorize things",
+          "Work in an office",
+          "Follow clearly defined office protocols"
+        ]
+      },
+      "__scored": {
+        "testType": "RIASEC",
+        "raw": {
+          "R": [
+            "Practical",
+            "Straightforward",
+            "Reliable",
+            "Thrifty",
+            "Genuine",
+            "Read blueprints or diagrams",
+            "Operate tools, machinery, or equipment",
+            "Use physical strength to accomplish things",
+            "Be outdoors",
+            "Be physically active",
+            "Care for animals",
+            "Work with objects"
+          ],
+          "I": [
+            "Inquisitive",
+            "Analytical",
+            "Introverted",
+            "Independent",
+            "Observant",
+            "Intellectual",
+            "Analyze Data",
+            "Evaluate information",
+            "Chart Data on graphs",
+            "Explore ideas",
+            "Use Computers",
+            "Work independently"
+          ],
+          "A": [
+            "Intuitive",
+            "Idealistic",
+            "Draw, sculpt, or paint",
+            "Play a musical instrument, sing, or compose music",
+            "Write stories, poems, music, plays, or scripts",
+            "Design fashions, objects, graphics, or interiors",
+            "Perform in front of an audience",
+            "Attend concerts, movies, theatre, or art exhibitions",
+            "Read fiction, plays, or poetry",
+            "Work on crafts",
+            "Collect artwork",
+            "Read about art, literature, or music",
+            "Take photographs",
+            "Work in unstructured situations",
+            "Take an art course"
+          ],
+          "S": [
+            "Helpful",
+            "Understanding",
+            "Trustworthy",
+            "Generous",
+            "Lead a group discussion",
+            "Cooperate well with others",
+            "Help people with problems",
+            "Entertain others"
+          ],
+          "E": [
+            "Self-confident",
+            "Assertive",
+            "Adventuresome",
+            "Enthusiastic",
+            "Persuasive",
+            "Persuade people",
+            "Sell things or promote ideas",
+            "Run my own service or business",
+            "Make decisions affecting others",
+            "Meet important people",
+            "Read business publications",
+            "Belong to groups or clubs"
+          ],
+          "C": [
+            "Careful",
+            "Conscientious",
+            "Efficient",
+            "Patient",
+            "Follow instructions",
+            "Use a computer and/or office machines",
+            "Write effective business documents",
+            "Organize office products",
+            "Collect and categorize things",
+            "Work in an office",
+            "Follow clearly defined office protocols"
+          ]
+        },
+        "scores": {
+          "totals": {
+            "R": 12,
+            "I": 12,
+            "A": 15,
+            "S": 8,
+            "E": 12,
+            "C": 11
+          },
+          "hollandCode": "ARI",
+          "top3": [
+            {
+              "letter": "A",
+              "score": 15,
+              "label": "Artistic",
+              "interpretation": "Artistic individuals are creative, expressive, and guided by imagination and emotion. They are drawn to cultural and aesthetic pursuits, valuing originality, beauty, and self-expression over structure or routine. These individuals often express themselves indirectly through their chosen medium—such as art, music, writing, or performance—and prefer tasks that allow personal creativity and freedom. They enjoy working with ideas, designs, and patterns to create something meaningful or emotionally resonant. Artistic people thrive in flexible, unstructured environments that value innovation and individuality rather than rigid rules or bureaucratic systems. They are often seen as unconventional and may struggle in overly structured or monotonous settings. Their work typically revolves around creating, performing, or communicating ideas that inspire others. They flourish in careers such as writer, artist, musician, designer, actor, editor, choreographer, or filmmaker, where they can bring imagination to life and transform emotions into art."
+            },
+            {
+              "letter": "R",
+              "score": 12,
+              "label": "Realistic",
+              "interpretation": "Realistic individuals are practical, grounded, and focused on the present moment rather than abstract ideas or distant possibilities. They prefer engaging in hands-on tasks that produce tangible, visible results and enjoy working with tools, machinery, animals, or natural materials. Their thinking is structured and logical, and they tend to rely on proven, reliable methods when solving problems. Realistic people value stability, routine, and clarity, often thriving in environments that have clear goals, well-defined authority, and measurable outcomes. They are typically assertive, competitive, and reserved, preferring action and practicality over excessive discussion or paperwork. Their satisfaction comes from creating, repairing, or building things they can see and touch, often in outdoor or technical settings. Common careers for them include engineer, electrician, pilot, firefighter, carpenter, mechanic, and agricultural or construction worker, where they can see the immediate impact of their efforts."
+            },
+            {
+              "letter": "I",
+              "score": 12,
+              "label": "Investigative",
+              "interpretation": "Investigative individuals are analytical, curious, and intellectually driven, preferring to explore ideas rather than engage in physical or social activities. They enjoy understanding cause-and-effect relationships, solving complex problems, and using logic and reasoning to uncover facts. Independent and introspective, they thrive in unstructured environments where they can think deeply, research, and experiment without constant supervision. Their interests lie in discovering, collecting, and analyzing data or theories, often within scientific, mathematical, or technical fields. They are original thinkers with strong vocabularies and a desire to classify, understand, and explain phenomena. These individuals are often more comfortable with ideas and systems than with people or routine tasks. They seek intellectual challenge and are motivated by curiosity and discovery. Careers that suit them include psychologist, scientist, engineer, software developer, economist, physician, and researcher. Such roles allow them to apply their intellect and analytical skills to meaningful, knowledge-driven work."
+            }
+          ],
+          "descriptions": {
+            "R": "Realistic individuals are practical, grounded, and focused on the present moment rather than abstract ideas or distant possibilities. They prefer engaging in hands-on tasks that produce tangible, visible results and enjoy working with tools, machinery, animals, or natural materials. Their thinking is structured and logical, and they tend to rely on proven, reliable methods when solving problems. Realistic people value stability, routine, and clarity, often thriving in environments that have clear goals, well-defined authority, and measurable outcomes. They are typically assertive, competitive, and reserved, preferring action and practicality over excessive discussion or paperwork. Their satisfaction comes from creating, repairing, or building things they can see and touch, often in outdoor or technical settings. Common careers for them include engineer, electrician, pilot, firefighter, carpenter, mechanic, and agricultural or construction worker, where they can see the immediate impact of their efforts.",
+            "I": "Investigative individuals are analytical, curious, and intellectually driven, preferring to explore ideas rather than engage in physical or social activities. They enjoy understanding cause-and-effect relationships, solving complex problems, and using logic and reasoning to uncover facts. Independent and introspective, they thrive in unstructured environments where they can think deeply, research, and experiment without constant supervision. Their interests lie in discovering, collecting, and analyzing data or theories, often within scientific, mathematical, or technical fields. They are original thinkers with strong vocabularies and a desire to classify, understand, and explain phenomena. These individuals are often more comfortable with ideas and systems than with people or routine tasks. They seek intellectual challenge and are motivated by curiosity and discovery. Careers that suit them include psychologist, scientist, engineer, software developer, economist, physician, and researcher. Such roles allow them to apply their intellect and analytical skills to meaningful, knowledge-driven work.",
+            "A": "Artistic individuals are creative, expressive, and guided by imagination and emotion. They are drawn to cultural and aesthetic pursuits, valuing originality, beauty, and self-expression over structure or routine. These individuals often express themselves indirectly through their chosen medium—such as art, music, writing, or performance—and prefer tasks that allow personal creativity and freedom. They enjoy working with ideas, designs, and patterns to create something meaningful or emotionally resonant. Artistic people thrive in flexible, unstructured environments that value innovation and individuality rather than rigid rules or bureaucratic systems. They are often seen as unconventional and may struggle in overly structured or monotonous settings. Their work typically revolves around creating, performing, or communicating ideas that inspire others. They flourish in careers such as writer, artist, musician, designer, actor, editor, choreographer, or filmmaker, where they can bring imagination to life and transform emotions into art.",
+            "S": "Social individuals are compassionate, empathetic, and people-oriented, preferring to work with others rather than with data, machines, or physical objects. They value connection, communication, and personal growth—both their own and others'. With strong verbal and interpersonal skills, they are effective at teaching, guiding, helping, and inspiring those around them. These individuals are sensitive to others' needs and find fulfillment in roles that involve care, understanding, and social contribution. They thrive in environments that encourage collaboration, emotional expression, and learning rather than rigid structure or routine. Social people often avoid technical or mechanical tasks, as they prefer meaningful human interaction. Their motivation lies in making a positive difference and supporting others' development and well-being. They are commonly found in helping professions such as teacher, counsellor, psychologist, nurse, social worker, therapist, or clergy, where empathy, communication, and human connection are central to their work.",
+            "E": "Enterprising individuals are ambitious, confident, and action-oriented, thriving in dynamic environments where they can lead, persuade, and achieve results. They enjoy working with people and ideas, using their communication and leadership skills to influence, motivate, and direct others. These individuals are often competitive and driven by goals related to success, status, and financial reward. They prefer initiating and managing projects, taking calculated risks, and turning opportunities into achievements. Enterprising people are natural decision-makers who value independence, power, and progress. They tend to avoid routine, detailed, or highly analytical work, as they find greater satisfaction in fast-paced, results-oriented settings. Their energy and assertiveness make them effective in roles that involve promotion, negotiation, or leadership. They often excel in careers such as entrepreneur, manager, lawyer, stockbroker, salesperson, public relations executive, or political leader—fields that reward confidence, initiative, and achievement.",
+            "C": "Conventional individuals are organized, detail-oriented, and efficient, preferring structure, stability, and clear rules in both work and life. They enjoy working with data, numbers, and systems rather than abstract ideas or open-ended creativity. These individuals value order, precision, and routine, finding satisfaction in tasks that involve accuracy, recordkeeping, and following established procedures. They thrive in environments with well-defined authority, predictable routines, and measurable outcomes, where efficiency and reliability are appreciated. Conventional people are dependable and methodical, preferring clarity over ambiguity and tradition over experimentation. They excel in business-like or administrative settings that emphasize consistency and precision. Though they may not seek leadership roles, they play a vital part in maintaining organization and smooth operations. Common careers for them include accountant, auditor, financial analyst, administrative assistant, bookkeeper, banker, or data clerk—roles where structure, responsibility, and attention to detail are key."
+          }
+        },
+        "scoredAt": "2026-06-15T11:04:21.198Z"
+      }
+    }
+  },
+  "Module_15_Module_15__Color_Test___Working_Style": {
+    "status": "APPROVED",
+    "data": {
+      "__testData": {
+        "section1": [
+          "a",
+          "b",
+          "b",
+          "b",
+          "b",
+          "a",
+          "a",
+          "a",
+          "b"
+        ],
+        "section2": [
+          "a",
+          "a",
+          "a",
+          "b",
+          "b",
+          "b",
+          "a",
+          "a",
+          "a"
+        ],
+        "section3": [
+          "b",
+          "b",
+          "b",
+          "b",
+          "b",
+          "a",
+          "b",
+          "b",
+          "b"
+        ],
+        "section4": [
+          "b",
+          "b",
+          "b",
+          "a",
+          "b",
+          "b",
+          "b"
+        ],
+        "result": "Blue Red Introvert"
+      }
+    }
+  },
+  "Module_16_Module_1___Subject_Matter_Interest___Hypotheticals": {
+    "status": "APPROVED",
+    "data": {
+      "__testData": {
+        "scenarioAnswers": {
+          "1": {
+            "selected": [
+              0,
+              3,
+              4,
+              6,
+              7
+            ],
+            "ranking": [
+              4,
+              0,
+              6,
+              3,
+              7
+            ]
+          },
+          "2": {
+            "selected": [
+              1,
+              2,
+              4,
+              5,
+              7
+            ],
+            "ranking": [
+              2,
+              1,
+              5,
+              7,
+              4
+            ]
+          },
+          "3": {
+            "selected": [
+              1,
+              2,
+              3,
+              6,
+              7
+            ],
+            "ranking": [
+              7,
+              2,
+              6,
+              1,
+              3
+            ]
+          },
+          "4": {
+            "selected": [
+              1,
+              2,
+              5,
+              6,
+              7
+            ],
+            "ranking": [
+              1,
+              2,
+              7,
+              5,
+              6
+            ]
+          },
+          "5": {
+            "selected": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "ranking": [
+              3,
+              0,
+              4,
+              2,
+              1
+            ]
+          },
+          "6": {
+            "selected": [
+              2,
+              3,
+              5,
+              6,
+              7
+            ],
+            "ranking": [
+              2,
+              3,
+              5,
+              7,
+              6
+            ]
+          },
+          "7": {
+            "selected": [
+              5,
+              0,
+              2,
+              3,
+              6
+            ],
+            "ranking": [
+              5,
+              2,
+              3,
+              6,
+              0
+            ]
+          },
+          "8": {
+            "selected": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "ranking": [
+              1,
+              3,
+              2,
+              5,
+              4
+            ]
+          }
+        },
+        "top3Scenarios": [
+          3,
+          4,
+          1
+        ],
+        "columnTotals": {
+          "A": 10,
+          "B": 17,
+          "C": 27,
+          "D": 18,
+          "E": 10,
+          "F": 15,
+          "G": 10,
+          "H": 13
+        }
+      },
+      "__scored": {
+        "testType": "SMI",
+        "raw": {
+          "scenarioAnswers": {
+            "1": {
+              "selected": [
+                0,
+                3,
+                4,
+                6,
+                7
+              ],
+              "ranking": [
+                4,
+                0,
+                6,
+                3,
+                7
+              ]
+            },
+            "2": {
+              "selected": [
+                1,
+                2,
+                4,
+                5,
+                7
+              ],
+              "ranking": [
+                2,
+                1,
+                5,
+                7,
+                4
+              ]
+            },
+            "3": {
+              "selected": [
+                1,
+                2,
+                3,
+                6,
+                7
+              ],
+              "ranking": [
+                7,
+                2,
+                6,
+                1,
+                3
+              ]
+            },
+            "4": {
+              "selected": [
+                1,
+                2,
+                5,
+                6,
+                7
+              ],
+              "ranking": [
+                1,
+                2,
+                7,
+                5,
+                6
+              ]
+            },
+            "5": {
+              "selected": [
+                0,
+                1,
+                2,
+                3,
+                4
+              ],
+              "ranking": [
+                3,
+                0,
+                4,
+                2,
+                1
+              ]
+            },
+            "6": {
+              "selected": [
+                2,
+                3,
+                5,
+                6,
+                7
+              ],
+              "ranking": [
+                2,
+                3,
+                5,
+                7,
+                6
+              ]
+            },
+            "7": {
+              "selected": [
+                5,
+                0,
+                2,
+                3,
+                6
+              ],
+              "ranking": [
+                5,
+                2,
+                3,
+                6,
+                0
+              ]
+            },
+            "8": {
+              "selected": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "ranking": [
+                1,
+                3,
+                2,
+                5,
+                4
+              ]
+            }
+          },
+          "top3Scenarios": [
+            3,
+            4,
+            1
+          ],
+          "columnTotals": {
+            "A": 10,
+            "B": 17,
+            "C": 27,
+            "D": 18,
+            "E": 10,
+            "F": 15,
+            "G": 10,
+            "H": 13
+          }
+        },
+        "scores": {
+          "columnTotals": {
+            "A": 10,
+            "B": 17,
+            "C": 27,
+            "D": 18,
+            "E": 10,
+            "F": 15,
+            "G": 10,
+            "H": 13
+          },
+          "topColumns": [
+            {
+              "column": "C",
+              "score": 27,
+              "label": "Arts, Entertainment & Media",
+              "interpretation": "Arts, Entertainment, & Media — This domain is centered around inspiring, entertaining, and informing others through multimedia, storytelling, and creative expression. Individuals drawn to Arts, Entertainment, and Media enjoy conveying ideas and emotions, fostering cultural understanding, and connecting with audiences through artistic and communicative mediums. They seek to engage people, spark imagination, and bring attention to diverse perspectives. Careers in this area often involve creativity, innovation, and a strong sense of aesthetic appreciation, allowing individuals to make a meaningful impact on society's cultural landscape."
+            },
+            {
+              "column": "D",
+              "score": 18,
+              "label": "Business & Financial",
+              "interpretation": "Business & Financial — Business and Financial fields involve managing, administering, and operating organizations that produce and provide goods and services. Individuals interested in this area are motivated by teamwork, efficiency, and the economic growth of organizations. They enjoy planning, strategizing, and optimizing processes to meet the needs and desires of clients or customers. Careers in this domain require analytical skills, leadership, and a keen understanding of market dynamics, with the ultimate goal of maximizing value while delivering high-quality products and services."
+            },
+            {
+              "column": "B",
+              "score": 17,
+              "label": "Social Sciences & Humanities",
+              "interpretation": "Social Sciences & Humanities — Social Sciences and Humanities involve the systematic study of people, human behavior, society, and culture. People attracted to this field aim to understand the intricacies of human interactions, societal structures, and cultural norms. They are passionate about analyzing social patterns, exploring human motivations, and developing scientific solutions to address complex social challenges. Careers in this domain often focus on research, policy, advocacy, and education, allowing individuals to contribute to social understanding and positive change."
+            }
+          ],
+          "preferredScenarios": [
+            "3",
+            "4",
+            "1"
+          ],
+          "columnLabels": {
+            "A": "Physical & Life Sciences",
+            "B": "Social Sciences & Humanities",
+            "C": "Arts, Entertainment & Media",
+            "D": "Business & Financial",
+            "E": "Body Kinaesthetic & Sensory Acuity",
+            "F": "Designer & Artisan",
+            "G": "Engineering, Technology & Trades",
+            "H": "Education, Hospitality & Health Care"
+          }
+        },
+        "scoredAt": "2026-06-15T06:15:24.182Z"
+      }
+    }
+  },
+  "Module_17_Module_1___Parents_Meeting_Questionnaire": {
+    "status": "APPROVED",
+    "data": {
+      "__testData": {
+        "q1_mother_description": "Is very stubborn - watching  a lot of movies/series\nGive excuses - delay listening\n",
+        "q1_father_description": "He lies sometimes but is normal as per age group. \nHe feels guilty for not being a ‘good’ student and he is not able to concentrate due to that pressure and that's why he lies that he is studying ",
+        "q2_dad_relationship": "Friendly Bond",
+        "q2_mom_relationship": "Friendly Bond",
+        "q3_favourite_subject": "No clear favourite academic subject identified.\nManages reasonably well with languages.\nShows strong interest in manga, story books, singers, anime-related content, sketching, and drawing.\nEnjoys researching topics related to books, manga, and singers.",
+        "q3_hated_subject": "Mathematics (dislikes and struggles).\nScience (dislikes and struggles).\nComputer/Programming-related subjects.\nNot interested in technical subjects in general.",
+        "q3_kind_of_learner": "Appears to be an average learner academically.\nParents describe him as \"okay okay\" in studies.\nHas difficulty concentrating and lacks academic motivation.\nLearns self-directed skills (e.g., sketching, manga art) independently when interested.",
+        "q3_learning_style": "Strongly appears to be a self-learning and interest-driven learner.\nLearns through:\nReading (200+ books, manga, story books).\nPractical exploration (self-taught sketching, drawing, guitar).\nOnline learning when personally interested.\nDoes not appear motivated by rote learning.\nEngages deeply only in subjects/topics that interest him.",
+        "q3_relationship_teachers": "Challenging relationship.\nSince around 2nd grade, believes teachers \"don't know themselves\" and are \"stupid.\"\nTeachers report that:\nHe does not ask questions.\nHe does not seek clarification even when he does not understand.\nHe has communication difficulties in class.\nDoes not openly engage with teachers.",
+        "q3_relationship_friends": "Has a small, selective friend circle.\nHas always preferred a few close friends rather than many friends.\nNot able to mix easily with people.\nDoesn't play much in society; has only 1 friend there.\nFew friends in tuition as well.\nSells artwork/sketches to friends.\nEnjoys activities with friends such as visiting gaming centres and recording his friend's singing.\nHas become more reserved over the last 1–1.5 years.\nStopped interacting with people as much from around 4th grade onward.",
+        "q3_relationship_opposite_gender": "Has had at least one crush.\nConfessed his crush after significant encouragement from parents.\nDoes not openly discuss relationships or personal matters.\nKeeps such conversations brief and surface-level.",
+        "q3_bullied_or_harassed": "No direct reports of bullying or harassment.\nOne incident in 6th grade involving inappropriate touching on the school bus:\nA complaint was received from another parent.\nJeet reported that friends had pressured him and that \"others were doing it.\"\nNo other bullying-related incidents reported.",
+        "q3_marks_scoring": "Average academic performance.\nParents describe him as \"not academically strong.\"\nFeels guilty about not being a \"good student.\"\nStruggles with concentration and academic pressure.\nRequires tuition support.\nNo mention of exceptionally high or very low marks.",
+        "q3_won_appreciated": "No major academic awards mentioned.\nSells his artwork/sketches to friends, suggesting appreciation for his artistic ability.\nDeveloped notable sketching and portrait-making skills through self-learning.\nLearned swimming for approximately 1.5 years.",
+        "q3_extracurriculars": "Generally avoids extracurricular activities.\nParents often encourage participation, but he usually refuses.\nParticipates only when required or compulsory.\nActivities attempted:\nSwimming (1.5 years)\nGuitar (started in Grade 9; self-initiated but discontinued)\nSketching and drawing (strong sustained interest)\nSchool trips (participates)\nMusic subject in school (briefly)\nDoes not typically participate in competitions, clubs, public speaking, or group activities.",
+        "q4_waking_sleeping": "School Days\n\nWakes up at 5:00 AM for school.\nSchool from 7:00 AM – 1:00 PM.\nSleeps around 11:30 PM – 12:00 AM.\nTakes approximately 1 hour to get ready in the morning and does things slowly.\n\nVacations\n\nStays awake late at night.\nWakes up when asked by parents.",
+        "q4_eating_habits": "Not a picky eater.\nGenerally eats whatever is available.\nHas occasionally ordered food without informing parents.\nNo major food-related concerns reported.\nEnjoys staying indoors and avoids going out in the sun due to concerns about tanning and appearance.",
+        "q4_studying_habits": "Academics are not a major area of interest.\nFrequently distracted by screens (phone, tablet, TV, movies).\nOften switches screens or hides usage when parents enter.\nStudies mainly due to external expectations rather than intrinsic interest.\nAttends tuition classes regularly.\nUses music while studying.\nStudies mostly at night (approximately 9 PM–11 PM).\nUses ChatGPT and technology for projects.\nDifficulty concentrating due to pressure about not being a \"good student.\"\nDoes not ask doubts in class even when he doesn't understand.\nRevision and assignment completion are usually done after tuition.\nMore likely to invest effort in topics of personal interest (manga, sketching, guitar, stories, anime).",
+        "q4_deadlines_approach": "No direct information on deadlines.\nIndirect observations suggest:\nTendency to procrastinate.\nGives excuses and delays tasks.\nAvoids confronting academic challenges.\nCompletes responsibilities when required.\nIn group projects, finishes his assigned work but does not coordinate with others.\nAppears motivated more by necessity than initiative.",
+        "q4_traveling": "Enjoys adventure activities:\nBungee Jumping\nGiant Swing\nZipline\nParticipates in school trips when available.\nNot very interested in moving away from home, boarding school, or studying abroad.\nParents have discussed overseas education, but Jeet has expressed disinterest.\nGenerally prefers staying within familiar environments.",
+        "q4_rate_attention": 4,
+        "q4_rate_emotional_regulation": 5,
+        "q4_rate_decision_making": 5,
+        "q4_rate_social_interaction": 4,
+        "q4_rate_time_management": 4,
+        "q5_money_rating": 4,
+        "q5_money_explanation": "There is very little evidence that Jeet is driven by money, status, wealth, or material success.\nParents describe him as someone who does not aspire to become extremely wealthy or highly ambitious in conventional terms.\nHe has not expressed career goals linked to income, prestige, or financial achievement.\nHis interests (manga, books, sketching, movies, anime) appear driven more by enjoyment than monetary outcomes.\nOne exception is that he has sold sketches/artwork to friends, suggesting he appreciates earning from something he enjoys, but not necessarily as a primary motivator.",
+        "q5_creative_expression_rating": 9,
+        "q5_creative_expression_explanation": "Creative expression appears to be one of the strongest recurring themes in his life.\nHe taught himself sketching and portrait drawing during COVID.\nSketching is described by his father as a major stress-reliever.\nHe continues drawing despite pressure to focus more on academics.\nHe has shown interest in guitar, music, manga, anime culture, storytelling, and visual art.\nHe spends significant time consuming and creating creative content.\nHe even monetizes some of his artwork by selling it to friends.\nWhen parents interfere with his creative outlets, he tends to become frustrated or defensive, suggesting these activities are important to his sense of identity.",
+        "q5_passion_rating": 8,
+        "q5_passion_explanation": "Jeet repeatedly engages deeply in activities he chooses for himself.\nMany of his interests were self-initiated:\nSketching\nGuitar\nManga reading\nAnime exploration\nResearching singers and stories\nHe often resists activities imposed by others but willingly invests time and effort in things he personally enjoys.\nSince childhood he has shown a preference for doing things \"his own way.\"\nHis statement, \"I want to live my life,\" reflects a strong desire for autonomy and personal choice.\nHowever, he has not yet translated these interests into a clear long-term direction or passion-driven goal.",
+        "q5_satisfaction_rating": 8,
+        "q5_satisfaction_explanation": "Jeet appears to prioritize comfort, enjoyment, and personal satisfaction over achievement, competition, or recognition.\nHe gravitates toward activities that help him relax and feel immersed:\nMovies\nManga\nDrawing\nMusic\nReading\nHe avoids many situations that create discomfort, pressure, or judgment.\nParents describe him as wanting to live life on his own terms rather than chasing conventional success.\nHe appears more motivated by personal enjoyment and emotional comfort than external rewards.",
+        "q5_giving_back_rating": 2,
+        "q5_giving_back_explanation": "There is currently very little evidence that social contribution, service, or societal impact is a major motivator.\nHis interests are largely personal, creative, and individualistic.\nHe tends to keep a small social circle and generally prefers solitary activities.\nNo examples were shared of volunteering, leadership, community participation, mentoring, or social causes.\nThis does not necessarily mean he lacks empathy or concern for others; rather, social contribution does not appear to be a conscious priority at this stage of development.",
+        "q6_free_time": "Jeet primarily spends his free time engaging in creative, entertainment-based, and solitary activities. He tends to prefer activities that allow him to immerse himself in his own interests rather than highly social or structured group activities.\n\nMain Free-Time Activities\nWatches movies, web series, and video content extensively, particularly action, dark, and violent genres.\nReads manga, storybooks, and anime-related content.\nHas a collection of over 200 books and manga.\nSketches and draws, particularly portraits and manga-inspired artwork.\nUses sketching as a stress-reliever and form of self-expression.\nSpends significant time on his phone, tablet, and other screens.\nResearches topics related to singers, books, manga, and media that interest him.\nListens to music while studying and during leisure time.\nShows interest in anime culture and wears anime-themed clothing.\nCreative Interests\nSelf-taught sketching and portrait drawing during the COVID period.\nPreviously learned guitar on his own initiative and continues to show interest in music.\nOccasionally sells his artwork to friends.\nEnjoys recording videos while his friend sings.\nSocial Activities\nMaintains a small circle of close friends.\nOccasionally visits gaming centres with friends.\nSpends time with a friend from society but generally does not participate in outdoor group play.\nInteracts more comfortably with a few selected people rather than large groups.\nActivities He Rarely Chooses\nOutdoor sports and physical play.\nSchool extracurricular activities.\nGroup-based competitions or events.\nPublic speaking or highly social activities.\nVisiting relatives or social gatherings.",
+        "q7_comfort_close_family": "Moderate. Comfortable being around family but does not openly share much. More comfortable with a few trusted family members than with everyone.",
+        "q7_comfort_friends": "Moderate to High with selected friends. Prefers a small circle and meaningful interactions over large groups.",
+        "q7_comfort_authority": "Low to Moderate. Often becomes defensive when questioned, corrected, or confronted. Maintains distance from teachers and authority figures.",
+        "q7_comfort_strangers": "Low. Takes time to warm up to new people and generally avoids unnecessary interaction.",
+        "q7_communication_close_family": "Style Brief, selective, and often surface-level. Usually responds when spoken to rather than initiating conversations.",
+        "q7_communication_friends": "More natural around shared interests such as gaming, anime, sketching, music, and movies. Still relatively reserved.",
+        "q7_communication_authority": "Quiet, passive, and avoidant. Rarely asks questions, seeks help, or expresses disagreement openly.",
+        "q7_communication_strangers": "Reserved and hesitant. May avoid conversations unless necessary.",
+        "q7_initiation_close_family": "Low. Usually does not start conversations and waits for others to approach him.",
+        "q7_initiation_friends": "others to approach him. Moderate. Interacts when common interests are involved but generally prefers others to initiate.",
+        "q7_initiation_authority": "Very Low. Does not actively approach teachers or tutors even when he needs help.",
+        "q7_initiation_strangers": "Very Low. Uncomfortable initiating conversations with unfamiliar people.",
+        "q7_emotional_close_family": "Limited. Rarely discusses feelings, frustrations, or personal struggles openly. May express anger indirectly through withdrawal, defensiveness, or throwing things in private.",
+        "q7_emotional_friends": "Moderate. More expressive with a few trusted friends but still generally private about emotions.",
+        "q7_emotional_authority": "Low. Often becomes defensive, avoids vulnerability, and may justify or deflect when confronted.",
+        "q7_emotional_strangers": "Very Low. Keeps emotions private and does not readily express personal feelings.",
+        "q8_free_time_describe": "",
+        "q9_media_rating": 9,
+        "q9_media_content": "Movies and web series form a significant part of his daily routine.\nParticularly drawn to:\nAction and adventure content\nDark and violent movies/series\nGang-war and crime-related content\nAnime and manga-related content\nStories about singers, fictional characters, and entertainment personalities\nReads manga extensively and owns a large collection of books and manga.\nUses social media and digital platforms regularly despite parental restrictions.\nConsumes online content related to sketching, drawing, music, and personal interests.\nParents have observed that media consumption has increased significantly since around 8th grade and may be contributing to his increasing isolation and screen dependency.",
+        "q9_friends_rating": 7,
+        "q9_parents_family_rating": 5,
+        "q9_anything_else_influence": "Personal Interests and Inner World (9/10)\n\nJeet seems highly influenced by his own interests, imagination, and preferences.\nOnce he develops an interest, he tends to explore it deeply and independently.\nManga, art, movies, storytelling, sketching, and music strongly shape his identity.\n\nDigital Environment & Online Communities (8/10)\n\nA large amount of his leisure time is spent online.\nDigital spaces likely play a significant role in shaping his interests, opinions, aesthetics, and lifestyle choices.\n\nCreative Expression (8/10)\n\nSketching, drawing, anime culture, and creative exploration appear to influence how he sees himself and interacts with the world.",
+        "q9b_incidents": "1. Increased Screen Exposure After Grade 8\nParents noticed a significant increase in screen usage after 8th grade.\nThis period coincided with:\nReduced participation in activities.\nGreater isolation.\nIncreased interest in digital entertainment.\nReduced engagement with academics and family interactions.\n2. COVID Period and Self-Learning Journey\nDuring the COVID years, Jeet independently learned sketching and portrait drawing through online resources.\nThis appears to have strengthened:\nHis independence.\nSelf-learning abilities.\nPreference for solitary activities.\nCreative identity.\n3. Transition Around 4th–5th Grade\nParents observed that he gradually became less socially engaged from around 4th grade onwards.\nHe stopped showing interest in visiting people, social gatherings, and broader social interactions.\nBecame increasingly comfortable spending time alone and maintaining a small friend circle.\n4. School Bus Incident (Grade 6)\nA complaint involving inappropriate touching was reported by another parent.\nJeet stated that friends had pressured him and others were involved.\nWhile the long-term impact is unclear, the incident highlights the role of peer influence during that period.\n5. Family Dynamics During Early Childhood\nMother reported occasionally expressing frustration through harsh discipline and raising her voice when he was younger.\nJeet has later expressed feelings such as:\n\"You don't trust me.\"\nThese experiences may have contributed to:\nDefensiveness.\nEmotional withdrawal.\nDifficulty opening up about personal matters.\n6. Increased Focus on Appearance During the Last Year\nOver the past year, Jeet has become increasingly conscious about:\nSkin care\nHair care\nAcne\nAvoiding tanning\nThis suggests a growing awareness of self-image and identity during adolescence.\n7. Grandfather's Passing (January)\nHis grandfather passed away recently.\nAccording to his father, Jeet was relatively open with family during this period.\nThe long-term emotional impact is currently unclear but may be significant given his selective emotional expression.",
+        "q10_career_thoughts": "Both parents emphasize that their primary concern is not a specific profession but that Jeet becomes honest, responsible, independent, and capable of supporting himself.\nHis father is open to non-conventional career paths and believes Jeet will eventually find something meaningful for himself.\nHis mother hopes for a stable and secure future but recognizes that forcing a career direction may not be effective given his personality.",
+        "q11_11_12_home": "Yes",
+        "q11_11_12_home_why": "",
+        "q11_11_12_india": "Yes",
+        "q11_11_12_india_why": "",
+        "q11_11_12_abroad": "No",
+        "q11_11_12_abroad_why": "",
+        "q11_grad_home": "Yes",
+        "q11_grad_home_why": "",
+        "q11_grad_india": "Yes",
+        "q11_grad_india_why": "",
+        "q11_grad_abroad": "Yes",
+        "q11_grad_abroad_why": "",
+        "q11_masters_home": "Yes",
+        "q11_masters_home_why": "",
+        "q11_masters_india": "Yes",
+        "q11_masters_india_why": "",
+        "q11_masters_abroad": "Yes",
+        "q11_masters_abroad_why": "",
+        "q11_settle_home": "Yes",
+        "q11_settle_home_why": "",
+        "q11_settle_india": "Yes",
+        "q11_settle_india_why": "",
+        "q11_settle_abroad": "Yes",
+        "q11_settle_abroad_why": "",
+        "q12_marriage": "Parents do not appear to have strong or rigid expectations regarding marriage.\nJeet has occasionally expressed views such as \"I will never do an arranged marriage\" and has also mentioned not wanting children, indicating that he is already forming independent opinions about relationships and family life.\nHe appears private about romantic relationships and does not openly discuss them unless he feels comfortable.\nParents seem more focused on his well-being, maturity, and independence than on marriage-related expectations.\nOverall, the family appears relatively flexible and likely to respect his future choices regarding marriage and relationships.",
+        "q12_independence_time": "No specific age was mentioned by either parent.\nBoth parents expressed a desire for Jeet to become:\nResponsible\nHonest\nSelf-sufficient\nCapable of managing his own life\nHis mother hopes he gains greater exposure to the world and develops independence over time.\nHis father believes Jeet will eventually find his own path and become independent at his own pace.\nExpectations seem focused more on achieving maturity and responsibility than meeting a fixed timeline.\n\nEstimated Parent Expectation: Independence sometime during or after higher education, when he develops the confidence and life skills required to manage himself effectively.",
+        "q12_financial_support_age": "No explicit age limit was mentioned.\nParents did not express any urgency to withdraw support at a particular age.\nTheir responses suggest they are willing to support him through his education and until he is capable of becoming financially independent.\nThe emphasis appears to be on readiness rather than age.\nGiven their openness toward higher education and concern for his development, they would likely continue supporting him through graduation and, if required, further studies.\n\nLikely Expectation: Financial support until completion of education and until he is reasonably capable of supporting himself independently.",
+        "q13_risk_behaviour": [
+          "First finish degree then explore",
+          "Money is not a factor, okay if they earn less and are happy",
+          "Do something they can manage their home with"
+        ],
+        "q14_hidden_talents": "Strong self-learning ability when genuinely interested in a subject.\nSketching and portrait drawing skills developed largely through independent learning.\nCreative visual thinking and artistic expression.\nAbility to deeply research topics that interest him, particularly manga, stories, singers, and entertainment-related content.\nObservational skills reflected in his artwork and creative interests.\nPotential for content creation, storytelling, visual arts, or creative media-related pursuits.\nAbility to work independently without requiring constant guidance or supervision.\nHas shown initiative in learning skills such as sketching and guitar on his own.\nEntrepreneurial spark through selling his artwork to friends, despite not being overtly business-oriented.",
+        "q14_if_no_constraints": "Based on his interests and natural engagement patterns, Jeet would likely gravitate toward fields involving:\n\nArt and illustration\nSketching and digital art\nManga, anime, comics, or graphic storytelling\nCreative content creation\nFilm, media, or entertainment-related work\nMusic-related pursuits\nIndependent creative projects where he can work at his own pace\n\nMore broadly, he appears drawn toward careers that allow:\n\nFreedom and autonomy\nCreative expression\nIndependent work\nExploration of stories, characters, and imaginative worlds\n\nRather than pursuing a highly structured or conventional profession, he may naturally choose a path where personal interest, creativity, and self-expression play a significant role.",
+        "q14_qualities_from_mom": "Strong-willed and stubborn when he believes in something.\nIndependent thinking.\nEmotional sensitivity, though often expressed indirectly.\nPreference for doing things in his own way.\nAbility to stand his ground when challenged.\nStrong attachment to personal comfort and familiar environments.\nSelective in relationships and trust.",
+        "q14_qualities_from_dad": "Calm and generally non-aggressive nature.\nPreference for a simple and content life rather than chasing status or excessive wealth.\nIndependent and self-directed approach.\nAbility to spend time alone comfortably.\nPractical outlook toward life.\nTendency to internalize emotions rather than express them openly.\nAcceptance of unconventional paths and willingness to think differently from societal expectations.",
+        "q15_anything_else": ""
+      },
+      "__scored": {
+        "testType": "PARENTS_MEETING",
+        "raw": {
+          "q1_mother_description": "Is very stubborn - watching  a lot of movies/series\nGive excuses - delay listening\n",
+          "q1_father_description": "He lies sometimes but is normal as per age group. \nHe feels guilty for not being a ‘good’ student and he is not able to concentrate due to that pressure and that's why he lies that he is studying ",
+          "q2_dad_relationship": "Friendly Bond",
+          "q2_mom_relationship": "Friendly Bond",
+          "q3_favourite_subject": "No clear favourite academic subject identified.\nManages reasonably well with languages.\nShows strong interest in manga, story books, singers, anime-related content, sketching, and drawing.\nEnjoys researching topics related to books, manga, and singers.",
+          "q3_hated_subject": "Mathematics (dislikes and struggles).\nScience (dislikes and struggles).\nComputer/Programming-related subjects.\nNot interested in technical subjects in general.",
+          "q3_kind_of_learner": "Appears to be an average learner academically.\nParents describe him as \"okay okay\" in studies.\nHas difficulty concentrating and lacks academic motivation.\nLearns self-directed skills (e.g., sketching, manga art) independently when interested.",
+          "q3_learning_style": "Strongly appears to be a self-learning and interest-driven learner.\nLearns through:\nReading (200+ books, manga, story books).\nPractical exploration (self-taught sketching, drawing, guitar).\nOnline learning when personally interested.\nDoes not appear motivated by rote learning.\nEngages deeply only in subjects/topics that interest him.",
+          "q3_relationship_teachers": "Challenging relationship.\nSince around 2nd grade, believes teachers \"don't know themselves\" and are \"stupid.\"\nTeachers report that:\nHe does not ask questions.\nHe does not seek clarification even when he does not understand.\nHe has communication difficulties in class.\nDoes not openly engage with teachers.",
+          "q3_relationship_friends": "Has a small, selective friend circle.\nHas always preferred a few close friends rather than many friends.\nNot able to mix easily with people.\nDoesn't play much in society; has only 1 friend there.\nFew friends in tuition as well.\nSells artwork/sketches to friends.\nEnjoys activities with friends such as visiting gaming centres and recording his friend's singing.\nHas become more reserved over the last 1–1.5 years.\nStopped interacting with people as much from around 4th grade onward.",
+          "q3_relationship_opposite_gender": "Has had at least one crush.\nConfessed his crush after significant encouragement from parents.\nDoes not openly discuss relationships or personal matters.\nKeeps such conversations brief and surface-level.",
+          "q3_bullied_or_harassed": "No direct reports of bullying or harassment.\nOne incident in 6th grade involving inappropriate touching on the school bus:\nA complaint was received from another parent.\nJeet reported that friends had pressured him and that \"others were doing it.\"\nNo other bullying-related incidents reported.",
+          "q3_marks_scoring": "Average academic performance.\nParents describe him as \"not academically strong.\"\nFeels guilty about not being a \"good student.\"\nStruggles with concentration and academic pressure.\nRequires tuition support.\nNo mention of exceptionally high or very low marks.",
+          "q3_won_appreciated": "No major academic awards mentioned.\nSells his artwork/sketches to friends, suggesting appreciation for his artistic ability.\nDeveloped notable sketching and portrait-making skills through self-learning.\nLearned swimming for approximately 1.5 years.",
+          "q3_extracurriculars": "Generally avoids extracurricular activities.\nParents often encourage participation, but he usually refuses.\nParticipates only when required or compulsory.\nActivities attempted:\nSwimming (1.5 years)\nGuitar (started in Grade 9; self-initiated but discontinued)\nSketching and drawing (strong sustained interest)\nSchool trips (participates)\nMusic subject in school (briefly)\nDoes not typically participate in competitions, clubs, public speaking, or group activities.",
+          "q4_waking_sleeping": "School Days\n\nWakes up at 5:00 AM for school.\nSchool from 7:00 AM – 1:00 PM.\nSleeps around 11:30 PM – 12:00 AM.\nTakes approximately 1 hour to get ready in the morning and does things slowly.\n\nVacations\n\nStays awake late at night.\nWakes up when asked by parents.",
+          "q4_eating_habits": "Not a picky eater.\nGenerally eats whatever is available.\nHas occasionally ordered food without informing parents.\nNo major food-related concerns reported.\nEnjoys staying indoors and avoids going out in the sun due to concerns about tanning and appearance.",
+          "q4_studying_habits": "Academics are not a major area of interest.\nFrequently distracted by screens (phone, tablet, TV, movies).\nOften switches screens or hides usage when parents enter.\nStudies mainly due to external expectations rather than intrinsic interest.\nAttends tuition classes regularly.\nUses music while studying.\nStudies mostly at night (approximately 9 PM–11 PM).\nUses ChatGPT and technology for projects.\nDifficulty concentrating due to pressure about not being a \"good student.\"\nDoes not ask doubts in class even when he doesn't understand.\nRevision and assignment completion are usually done after tuition.\nMore likely to invest effort in topics of personal interest (manga, sketching, guitar, stories, anime).",
+          "q4_deadlines_approach": "No direct information on deadlines.\nIndirect observations suggest:\nTendency to procrastinate.\nGives excuses and delays tasks.\nAvoids confronting academic challenges.\nCompletes responsibilities when required.\nIn group projects, finishes his assigned work but does not coordinate with others.\nAppears motivated more by necessity than initiative.",
+          "q4_traveling": "Enjoys adventure activities:\nBungee Jumping\nGiant Swing\nZipline\nParticipates in school trips when available.\nNot very interested in moving away from home, boarding school, or studying abroad.\nParents have discussed overseas education, but Jeet has expressed disinterest.\nGenerally prefers staying within familiar environments.",
+          "q4_rate_attention": 4,
+          "q4_rate_emotional_regulation": 5,
+          "q4_rate_decision_making": 5,
+          "q4_rate_social_interaction": 4,
+          "q4_rate_time_management": 4,
+          "q5_money_rating": 4,
+          "q5_money_explanation": "There is very little evidence that Jeet is driven by money, status, wealth, or material success.\nParents describe him as someone who does not aspire to become extremely wealthy or highly ambitious in conventional terms.\nHe has not expressed career goals linked to income, prestige, or financial achievement.\nHis interests (manga, books, sketching, movies, anime) appear driven more by enjoyment than monetary outcomes.\nOne exception is that he has sold sketches/artwork to friends, suggesting he appreciates earning from something he enjoys, but not necessarily as a primary motivator.",
+          "q5_creative_expression_rating": 9,
+          "q5_creative_expression_explanation": "Creative expression appears to be one of the strongest recurring themes in his life.\nHe taught himself sketching and portrait drawing during COVID.\nSketching is described by his father as a major stress-reliever.\nHe continues drawing despite pressure to focus more on academics.\nHe has shown interest in guitar, music, manga, anime culture, storytelling, and visual art.\nHe spends significant time consuming and creating creative content.\nHe even monetizes some of his artwork by selling it to friends.\nWhen parents interfere with his creative outlets, he tends to become frustrated or defensive, suggesting these activities are important to his sense of identity.",
+          "q5_passion_rating": 8,
+          "q5_passion_explanation": "Jeet repeatedly engages deeply in activities he chooses for himself.\nMany of his interests were self-initiated:\nSketching\nGuitar\nManga reading\nAnime exploration\nResearching singers and stories\nHe often resists activities imposed by others but willingly invests time and effort in things he personally enjoys.\nSince childhood he has shown a preference for doing things \"his own way.\"\nHis statement, \"I want to live my life,\" reflects a strong desire for autonomy and personal choice.\nHowever, he has not yet translated these interests into a clear long-term direction or passion-driven goal.",
+          "q5_satisfaction_rating": 8,
+          "q5_satisfaction_explanation": "Jeet appears to prioritize comfort, enjoyment, and personal satisfaction over achievement, competition, or recognition.\nHe gravitates toward activities that help him relax and feel immersed:\nMovies\nManga\nDrawing\nMusic\nReading\nHe avoids many situations that create discomfort, pressure, or judgment.\nParents describe him as wanting to live life on his own terms rather than chasing conventional success.\nHe appears more motivated by personal enjoyment and emotional comfort than external rewards.",
+          "q5_giving_back_rating": 2,
+          "q5_giving_back_explanation": "There is currently very little evidence that social contribution, service, or societal impact is a major motivator.\nHis interests are largely personal, creative, and individualistic.\nHe tends to keep a small social circle and generally prefers solitary activities.\nNo examples were shared of volunteering, leadership, community participation, mentoring, or social causes.\nThis does not necessarily mean he lacks empathy or concern for others; rather, social contribution does not appear to be a conscious priority at this stage of development.",
+          "q6_free_time": "Jeet primarily spends his free time engaging in creative, entertainment-based, and solitary activities. He tends to prefer activities that allow him to immerse himself in his own interests rather than highly social or structured group activities.\n\nMain Free-Time Activities\nWatches movies, web series, and video content extensively, particularly action, dark, and violent genres.\nReads manga, storybooks, and anime-related content.\nHas a collection of over 200 books and manga.\nSketches and draws, particularly portraits and manga-inspired artwork.\nUses sketching as a stress-reliever and form of self-expression.\nSpends significant time on his phone, tablet, and other screens.\nResearches topics related to singers, books, manga, and media that interest him.\nListens to music while studying and during leisure time.\nShows interest in anime culture and wears anime-themed clothing.\nCreative Interests\nSelf-taught sketching and portrait drawing during the COVID period.\nPreviously learned guitar on his own initiative and continues to show interest in music.\nOccasionally sells his artwork to friends.\nEnjoys recording videos while his friend sings.\nSocial Activities\nMaintains a small circle of close friends.\nOccasionally visits gaming centres with friends.\nSpends time with a friend from society but generally does not participate in outdoor group play.\nInteracts more comfortably with a few selected people rather than large groups.\nActivities He Rarely Chooses\nOutdoor sports and physical play.\nSchool extracurricular activities.\nGroup-based competitions or events.\nPublic speaking or highly social activities.\nVisiting relatives or social gatherings.",
+          "q7_comfort_close_family": "Moderate. Comfortable being around family but does not openly share much. More comfortable with a few trusted family members than with everyone.",
+          "q7_comfort_friends": "Moderate to High with selected friends. Prefers a small circle and meaningful interactions over large groups.",
+          "q7_comfort_authority": "Low to Moderate. Often becomes defensive when questioned, corrected, or confronted. Maintains distance from teachers and authority figures.",
+          "q7_comfort_strangers": "Low. Takes time to warm up to new people and generally avoids unnecessary interaction.",
+          "q7_communication_close_family": "Style Brief, selective, and often surface-level. Usually responds when spoken to rather than initiating conversations.",
+          "q7_communication_friends": "More natural around shared interests such as gaming, anime, sketching, music, and movies. Still relatively reserved.",
+          "q7_communication_authority": "Quiet, passive, and avoidant. Rarely asks questions, seeks help, or expresses disagreement openly.",
+          "q7_communication_strangers": "Reserved and hesitant. May avoid conversations unless necessary.",
+          "q7_initiation_close_family": "Low. Usually does not start conversations and waits for others to approach him.",
+          "q7_initiation_friends": "others to approach him. Moderate. Interacts when common interests are involved but generally prefers others to initiate.",
+          "q7_initiation_authority": "Very Low. Does not actively approach teachers or tutors even when he needs help.",
+          "q7_initiation_strangers": "Very Low. Uncomfortable initiating conversations with unfamiliar people.",
+          "q7_emotional_close_family": "Limited. Rarely discusses feelings, frustrations, or personal struggles openly. May express anger indirectly through withdrawal, defensiveness, or throwing things in private.",
+          "q7_emotional_friends": "Moderate. More expressive with a few trusted friends but still generally private about emotions.",
+          "q7_emotional_authority": "Low. Often becomes defensive, avoids vulnerability, and may justify or deflect when confronted.",
+          "q7_emotional_strangers": "Very Low. Keeps emotions private and does not readily express personal feelings.",
+          "q8_free_time_describe": "",
+          "q9_media_rating": 9,
+          "q9_media_content": "Movies and web series form a significant part of his daily routine.\nParticularly drawn to:\nAction and adventure content\nDark and violent movies/series\nGang-war and crime-related content\nAnime and manga-related content\nStories about singers, fictional characters, and entertainment personalities\nReads manga extensively and owns a large collection of books and manga.\nUses social media and digital platforms regularly despite parental restrictions.\nConsumes online content related to sketching, drawing, music, and personal interests.\nParents have observed that media consumption has increased significantly since around 8th grade and may be contributing to his increasing isolation and screen dependency.",
+          "q9_friends_rating": 7,
+          "q9_parents_family_rating": 5,
+          "q9_anything_else_influence": "Personal Interests and Inner World (9/10)\n\nJeet seems highly influenced by his own interests, imagination, and preferences.\nOnce he develops an interest, he tends to explore it deeply and independently.\nManga, art, movies, storytelling, sketching, and music strongly shape his identity.\n\nDigital Environment & Online Communities (8/10)\n\nA large amount of his leisure time is spent online.\nDigital spaces likely play a significant role in shaping his interests, opinions, aesthetics, and lifestyle choices.\n\nCreative Expression (8/10)\n\nSketching, drawing, anime culture, and creative exploration appear to influence how he sees himself and interacts with the world.",
+          "q9b_incidents": "1. Increased Screen Exposure After Grade 8\nParents noticed a significant increase in screen usage after 8th grade.\nThis period coincided with:\nReduced participation in activities.\nGreater isolation.\nIncreased interest in digital entertainment.\nReduced engagement with academics and family interactions.\n2. COVID Period and Self-Learning Journey\nDuring the COVID years, Jeet independently learned sketching and portrait drawing through online resources.\nThis appears to have strengthened:\nHis independence.\nSelf-learning abilities.\nPreference for solitary activities.\nCreative identity.\n3. Transition Around 4th–5th Grade\nParents observed that he gradually became less socially engaged from around 4th grade onwards.\nHe stopped showing interest in visiting people, social gatherings, and broader social interactions.\nBecame increasingly comfortable spending time alone and maintaining a small friend circle.\n4. School Bus Incident (Grade 6)\nA complaint involving inappropriate touching was reported by another parent.\nJeet stated that friends had pressured him and others were involved.\nWhile the long-term impact is unclear, the incident highlights the role of peer influence during that period.\n5. Family Dynamics During Early Childhood\nMother reported occasionally expressing frustration through harsh discipline and raising her voice when he was younger.\nJeet has later expressed feelings such as:\n\"You don't trust me.\"\nThese experiences may have contributed to:\nDefensiveness.\nEmotional withdrawal.\nDifficulty opening up about personal matters.\n6. Increased Focus on Appearance During the Last Year\nOver the past year, Jeet has become increasingly conscious about:\nSkin care\nHair care\nAcne\nAvoiding tanning\nThis suggests a growing awareness of self-image and identity during adolescence.\n7. Grandfather's Passing (January)\nHis grandfather passed away recently.\nAccording to his father, Jeet was relatively open with family during this period.\nThe long-term emotional impact is currently unclear but may be significant given his selective emotional expression.",
+          "q10_career_thoughts": "Both parents emphasize that their primary concern is not a specific profession but that Jeet becomes honest, responsible, independent, and capable of supporting himself.\nHis father is open to non-conventional career paths and believes Jeet will eventually find something meaningful for himself.\nHis mother hopes for a stable and secure future but recognizes that forcing a career direction may not be effective given his personality.",
+          "q11_11_12_home": "Yes",
+          "q11_11_12_home_why": "",
+          "q11_11_12_india": "Yes",
+          "q11_11_12_india_why": "",
+          "q11_11_12_abroad": "No",
+          "q11_11_12_abroad_why": "",
+          "q11_grad_home": "Yes",
+          "q11_grad_home_why": "",
+          "q11_grad_india": "Yes",
+          "q11_grad_india_why": "",
+          "q11_grad_abroad": "Yes",
+          "q11_grad_abroad_why": "",
+          "q11_masters_home": "Yes",
+          "q11_masters_home_why": "",
+          "q11_masters_india": "Yes",
+          "q11_masters_india_why": "",
+          "q11_masters_abroad": "Yes",
+          "q11_masters_abroad_why": "",
+          "q11_settle_home": "Yes",
+          "q11_settle_home_why": "",
+          "q11_settle_india": "Yes",
+          "q11_settle_india_why": "",
+          "q11_settle_abroad": "Yes",
+          "q11_settle_abroad_why": "",
+          "q12_marriage": "Parents do not appear to have strong or rigid expectations regarding marriage.\nJeet has occasionally expressed views such as \"I will never do an arranged marriage\" and has also mentioned not wanting children, indicating that he is already forming independent opinions about relationships and family life.\nHe appears private about romantic relationships and does not openly discuss them unless he feels comfortable.\nParents seem more focused on his well-being, maturity, and independence than on marriage-related expectations.\nOverall, the family appears relatively flexible and likely to respect his future choices regarding marriage and relationships.",
+          "q12_independence_time": "No specific age was mentioned by either parent.\nBoth parents expressed a desire for Jeet to become:\nResponsible\nHonest\nSelf-sufficient\nCapable of managing his own life\nHis mother hopes he gains greater exposure to the world and develops independence over time.\nHis father believes Jeet will eventually find his own path and become independent at his own pace.\nExpectations seem focused more on achieving maturity and responsibility than meeting a fixed timeline.\n\nEstimated Parent Expectation: Independence sometime during or after higher education, when he develops the confidence and life skills required to manage himself effectively.",
+          "q12_financial_support_age": "No explicit age limit was mentioned.\nParents did not express any urgency to withdraw support at a particular age.\nTheir responses suggest they are willing to support him through his education and until he is capable of becoming financially independent.\nThe emphasis appears to be on readiness rather than age.\nGiven their openness toward higher education and concern for his development, they would likely continue supporting him through graduation and, if required, further studies.\n\nLikely Expectation: Financial support until completion of education and until he is reasonably capable of supporting himself independently.",
+          "q13_risk_behaviour": [
+            "First finish degree then explore",
+            "Money is not a factor, okay if they earn less and are happy",
+            "Do something they can manage their home with"
+          ],
+          "q14_hidden_talents": "Strong self-learning ability when genuinely interested in a subject.\nSketching and portrait drawing skills developed largely through independent learning.\nCreative visual thinking and artistic expression.\nAbility to deeply research topics that interest him, particularly manga, stories, singers, and entertainment-related content.\nObservational skills reflected in his artwork and creative interests.\nPotential for content creation, storytelling, visual arts, or creative media-related pursuits.\nAbility to work independently without requiring constant guidance or supervision.\nHas shown initiative in learning skills such as sketching and guitar on his own.\nEntrepreneurial spark through selling his artwork to friends, despite not being overtly business-oriented.",
+          "q14_if_no_constraints": "Based on his interests and natural engagement patterns, Jeet would likely gravitate toward fields involving:\n\nArt and illustration\nSketching and digital art\nManga, anime, comics, or graphic storytelling\nCreative content creation\nFilm, media, or entertainment-related work\nMusic-related pursuits\nIndependent creative projects where he can work at his own pace\n\nMore broadly, he appears drawn toward careers that allow:\n\nFreedom and autonomy\nCreative expression\nIndependent work\nExploration of stories, characters, and imaginative worlds\n\nRather than pursuing a highly structured or conventional profession, he may naturally choose a path where personal interest, creativity, and self-expression play a significant role.",
+          "q14_qualities_from_mom": "Strong-willed and stubborn when he believes in something.\nIndependent thinking.\nEmotional sensitivity, though often expressed indirectly.\nPreference for doing things in his own way.\nAbility to stand his ground when challenged.\nStrong attachment to personal comfort and familiar environments.\nSelective in relationships and trust.",
+          "q14_qualities_from_dad": "Calm and generally non-aggressive nature.\nPreference for a simple and content life rather than chasing status or excessive wealth.\nIndependent and self-directed approach.\nAbility to spend time alone comfortably.\nPractical outlook toward life.\nTendency to internalize emotions rather than express them openly.\nAcceptance of unconventional paths and willingness to think differently from societal expectations.",
+          "q15_anything_else": ""
+        },
+        "scores": null,
+        "scoredAt": "2026-06-15T11:03:35.202Z"
+      }
+    }
+  },
+  "Module_18_Module_1___Self_Discovery_Questionnaire": {
+    "status": "APPROVED",
+    "data": {
+      "sd_age_group": "13-18"
+    }
+  }
+}
