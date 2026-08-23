@@ -64,24 +64,44 @@ export default function AdminDashboardPage() {
 
     // Client/Parent Creation Form States
     const [showCreateClient, setShowCreateClient] = useState(false);
+    const [creationType, setCreationType] = useState<'CLIENT' | 'PARENT'>('CLIENT');
+    const [parents, setParents] = useState<any[]>([]);
     const [clientForm, setClientForm] = useState({
         clientName: '',
         clientEmail: '',
         clientPassword: '',
         clientAge: 16,
+        parentId: '',
+        mentorProfileId: '',
         parentName: '',
         parentEmail: '',
         parentPassword: '',
-        mentorProfileId: ''
+        clientProfileId: ''
     });
 
-    const createClientAndParent = async () => {
+    const createClientOrParent = async () => {
         setActionLoading(true);
         try {
+            const payload = creationType === 'CLIENT' ? {
+                role: 'CLIENT',
+                clientName: clientForm.clientName,
+                clientEmail: clientForm.clientEmail,
+                clientPassword: clientForm.clientPassword,
+                clientAge: clientForm.clientAge,
+                parentId: clientForm.parentId || undefined,
+                mentorProfileId: clientForm.mentorProfileId || undefined
+            } : {
+                role: 'PARENT',
+                parentName: clientForm.parentName,
+                parentEmail: clientForm.parentEmail,
+                parentPassword: clientForm.parentPassword,
+                clientProfileId: clientForm.clientProfileId || undefined
+            };
+
             const res = await fetch('/api/admin/clients', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(clientForm)
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
             if (res.ok) {
@@ -91,12 +111,14 @@ export default function AdminDashboardPage() {
                     clientEmail: '',
                     clientPassword: '',
                     clientAge: 16,
+                    parentId: '',
+                    mentorProfileId: '',
                     parentName: '',
                     parentEmail: '',
                     parentPassword: '',
-                    mentorProfileId: ''
+                    clientProfileId: ''
                 });
-                alert('Client and Parent accounts created successfully and linked!');
+                alert(`${creationType === 'CLIENT' ? 'Student' : 'Parent'} account created successfully!`);
                 fetchMentors(); // Refresh listings
                 fetchClients(); // Refresh client listings
             } else {
@@ -138,6 +160,9 @@ export default function AdminDashboardPage() {
                 const data = await res.json();
                 const list = Array.isArray(data) ? data : (data.clients || []);
                 setClients(list);
+                if (data.parents) {
+                    setParents(data.parents);
+                }
             }
         } catch (e) { console.error(e); }
     };
@@ -266,8 +291,9 @@ export default function AdminDashboardPage() {
                         <h1 className="text-3xl font-bold tracking-tight text-slate-100">Mentors & Clients</h1>
                         <p className="text-slate-300 mt-1 text-sm">Manage hierarchical access: Mentors and their assigned clients.</p>
                     </div>
-                    <div className="flex gap-3">
-                        <button onClick={() => { setShowCreateClient(true); }} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Client & Parent</button>
+                    <div className="flex gap-3 flex-wrap">
+                        <button onClick={() => { setCreationType('CLIENT'); setShowCreateClient(true); }} className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Student</button>
+                        <button onClick={() => { setCreationType('PARENT'); setShowCreateClient(true); }} className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Parent</button>
                         <button onClick={() => { setIsEditing(false); setForm({ id: '', name: '', email: '', password: '', type: 'PERMANENT', specializations: '', bio: '', accessEnd: '', whatsappNumber: '', googleCalendarUrl: '' }); setShowCreate(true); }} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest shadow-sm shrink-0">+ Add Mentor</button>
                     </div>
                 </div>
@@ -609,85 +635,145 @@ export default function AdminDashboardPage() {
                     <div className="absolute inset-0 bg-slate-955/40 backdrop-blur-sm" />
                     <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }} onClick={e => e.stopPropagation()}>
                         <div className="p-6 border-b shrink-0" style={{ borderBottomColor: '#e2e8f0' }}>
-                            <h2 className="text-xl font-bold" style={{ color: '#0f172a' }}>Create Client & Parent Accounts</h2>
-                            <p className="text-xs font-semibold mt-1" style={{ color: '#64748b' }}>Registers linked student & parent profiles together and optionally assigns to a mentor.</p>
+                            <h2 className="text-xl font-bold" style={{ color: '#0f172a' }}>{creationType === 'CLIENT' ? 'Create Student Account' : 'Create Parent Account'}</h2>
+                            <p className="text-xs font-semibold mt-1" style={{ color: '#64748b' }}>
+                                {creationType === 'CLIENT' 
+                                    ? 'Registers a student profile and optionally links them to an existing parent and mentor.' 
+                                    : 'Registers a parent profile and optionally links them to an existing student.'}
+                            </p>
                         </div>
                         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-                            {/* Client (Student) Details */}
-                            <div className="space-y-4">
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Client (Student) Details</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Name</label>
-                                        <input type="text" value={clientForm.clientName} onChange={e => setClientForm({ ...clientForm, clientName: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="John Doe" />
+                            {creationType === 'CLIENT' ? (
+                                <>
+                                    {/* Client (Student) Details */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Student Details</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Name</label>
+                                                <input type="text" value={clientForm.clientName} onChange={e => setClientForm({ ...clientForm, clientName: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="John Doe" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Age</label>
+                                                <input type="number" value={clientForm.clientAge} onChange={e => setClientForm({ ...clientForm, clientAge: parseInt(e.target.value) || 16 })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="16" />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Email</label>
+                                                <input type="email" value={clientForm.clientEmail} onChange={e => setClientForm({ ...clientForm, clientEmail: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="student@example.com" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Password</label>
+                                                <input type="password" value={clientForm.clientPassword} onChange={e => setClientForm({ ...clientForm, clientPassword: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Age</label>
-                                        <input type="number" value={clientForm.clientAge} onChange={e => setClientForm({ ...clientForm, clientAge: parseInt(e.target.value) || 16 })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="16" />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Email</label>
-                                        <input type="email" value={clientForm.clientEmail} onChange={e => setClientForm({ ...clientForm, clientEmail: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="student@example.com" />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Password</label>
-                                        <input type="password" value={clientForm.clientPassword} onChange={e => setClientForm({ ...clientForm, clientPassword: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Parent Details */}
-                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Parent Details</h3>
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Name</label>
-                                    <input type="text" value={clientForm.parentName} onChange={e => setClientForm({ ...clientForm, parentName: e.target.value })}
-                                        className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="Jane Doe" />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Email</label>
-                                        <input type="email" value={clientForm.parentEmail} onChange={e => setClientForm({ ...clientForm, parentEmail: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="parent@example.com" />
+                                    {/* Link to Parent (Optional) */}
+                                    <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
+                                        <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Link Parent (Optional)</h3>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Select Parent</label>
+                                            <div className="relative">
+                                                <select value={clientForm.parentId} onChange={e => setClientForm({ ...clientForm, parentId: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
+                                                    <option value="" className="bg-white text-slate-500">-- Select an existing parent --</option>
+                                                    {parents.map(p => (
+                                                        <option key={p.id} value={p.id} className="bg-white text-slate-900">
+                                                            {p.name} ({p.email})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Password</label>
-                                        <input type="password" value={clientForm.parentPassword} onChange={e => setClientForm({ ...clientForm, parentPassword: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Direct Assignment */}
-                            <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
-                                <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Assign to Mentor (Optional)</h3>
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Select Mentor</label>
-                                    <div className="relative">
-                                        <select value={clientForm.mentorProfileId} onChange={e => setClientForm({ ...clientForm, mentorProfileId: e.target.value })}
-                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
-                                            <option value="" className="bg-white text-slate-500">-- Do not assign yet --</option>
-                                            {mentors.map(m => (
-                                                <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-white text-slate-900">
-                                                    {m.name} ({m.email})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                    {/* Direct Assignment (Optional) */}
+                                    <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
+                                        <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Assign to Mentor (Optional)</h3>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Select Mentor</label>
+                                            <div className="relative">
+                                                <select value={clientForm.mentorProfileId} onChange={e => setClientForm({ ...clientForm, mentorProfileId: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
+                                                    <option value="" className="bg-white text-slate-500">-- Do not assign yet --</option>
+                                                    {mentors.map(m => (
+                                                        <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-white text-slate-900">
+                                                            {m.name} ({m.email})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </>
+                            ) : (
+                                <>
+                                    {/* Parent Details */}
+                                    <div className="space-y-4">
+                                        <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Parent Details</h3>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Name</label>
+                                            <input type="text" value={clientForm.parentName} onChange={e => setClientForm({ ...clientForm, parentName: e.target.value })}
+                                                className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="Jane Doe" />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Email</label>
+                                                <input type="email" value={clientForm.parentEmail} onChange={e => setClientForm({ ...clientForm, parentEmail: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="parent@example.com" />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Parent Password</label>
+                                                <input type="password" value={clientForm.parentPassword} onChange={e => setClientForm({ ...clientForm, parentPassword: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }} placeholder="••••••••" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Link to Student (Optional) */}
+                                    <div className="space-y-4 pt-4 border-t" style={{ borderTopColor: '#e2e8f0' }}>
+                                        <h3 className="text-xs font-bold uppercase tracking-wider border-b pb-2" style={{ color: '#4f46e5', borderBottomColor: '#e2e8f0' }}>Link Student (Optional)</h3>
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Select Student</label>
+                                            <div className="relative">
+                                                <select value={clientForm.clientProfileId} onChange={e => setClientForm({ ...clientForm, clientProfileId: e.target.value })}
+                                                    className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
+                                                    <option value="" className="bg-white text-slate-500">-- Select an existing student --</option>
+                                                    {clients.map(c => (
+                                                        <option key={c.id} value={c.id} className="bg-white text-slate-900">
+                                                            {c.name || 'Unnamed Student'} ({c.email})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         <div className="p-6 shrink-0 flex gap-3 border-t" style={{ borderTopColor: '#e2e8f0', backgroundColor: '#ffffff' }}>
                             <button onClick={() => setShowCreateClient(false)} className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer" style={{ backgroundColor: 'transparent', color: '#475569', border: '1px solid #cbd5e1' }}>Cancel</button>
-                            <button onClick={createClientAndParent} disabled={actionLoading || !clientForm.clientName || !clientForm.clientEmail || !clientForm.clientPassword || !clientForm.parentName || !clientForm.parentEmail || !clientForm.parentPassword}
-                                className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer text-white" style={{ backgroundColor: '#4f46e5' }}>{actionLoading ? 'Creating...' : 'Create Client & Parent'}</button>
+                            <button 
+                                onClick={createClientOrParent} 
+                                disabled={
+                                    actionLoading || 
+                                    (creationType === 'CLIENT' && (!clientForm.clientName || !clientForm.clientEmail || !clientForm.clientPassword)) ||
+                                    (creationType === 'PARENT' && (!clientForm.parentName || !clientForm.parentEmail || !clientForm.parentPassword))
+                                }
+                                className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm cursor-pointer text-white" 
+                                style={{ backgroundColor: '#4f46e5' }}
+                            >
+                                {actionLoading ? 'Creating...' : (creationType === 'CLIENT' ? 'Create Student' : 'Create Parent')}
+                            </button>
                         </div>
                     </div>
                 </div>,

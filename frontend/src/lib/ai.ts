@@ -206,6 +206,53 @@ Return a JSON object with exactly these keys:
   - "reasoning": a 2-3 sentence explanation of why this career fits this student
   - "match_percentage": a number between 60 and 98 representing alignment
 - "skill_gap_analysis": an array of exactly 5 strings, each being a specific skill or certification the student should acquire
+- "holistree_report": an object containing the structured "Holistree Career Design Report" formatted exactly as follows:
+  - "who_is_client": {
+      "core_nature": array of 8-10 concise strings detailing student's natural strengths and personality characteristics.
+      "what_energises": array of 5-8 concise strings describing activities/environments that motivate them.
+      "conditioned_nature": array of 5-8 concise strings detailing learned patterns, screens escape, or routine struggles.
+      "why_patterns_developed": array of 4-6 concise strings explaining environmental or academic causes.
+    }
+  - "what_drives_client": {
+      "strongest_values": array of 5-7 values student drives on.
+      "success_definition": array of 5-7 concise descriptions of what success means to them.
+    }
+  - "how_client_learns": {
+      "learns_best": array of 5-7 learning style strengths.
+      "struggles_with": array of 3-5 learning struggles.
+      "explanation": array of 3-5 sentences mapping specific subject sentiments.
+    }
+  - "emotional_social_profile": {
+      "emotional_strengths": array of 4-6 emotional strengths.
+      "growth_areas": array of 4-6 emotional development goals.
+      "social_style": array of 4-5 concise descriptions of social preferences.
+    }
+  - "biggest_strengths": array of 10-12 key personal/creative strengths.
+  - "development_areas": {
+      "personal": array of 4-5 personal growth goals.
+      "academic": array of 4-5 academic improvement goals.
+      "professional": array of 4-5 communication/networking goals.
+    }
+  - "what_interests_tell_us": array of 4-6 sentences summarizing what hobbies, music, and media tastes reveal.
+  - "career_themes": array of 3-5 objects, each with "theme_name" (e.g. "Theme 1 - Creative Arts") and "careers" (array of 5-8 career titles).
+  - "less_suitable_careers": array of 4-6 careers that do not fit.
+  - "exploration_roadmap": {
+      "class_10": array of 4-5 action items for 10th.
+      "class_11_12": array of 5-7 action items for 11-12th.
+      "before_college": array of 4-6 goals to explore.
+    }
+  - "recommendations_parents": {
+      "continue_encouraging": array of 5-7 things parents should foster.
+      "work_together_on": array of 5-7 things to build together.
+      "avoid": array of 4-5 pitfalls/comparisons to avoid.
+    }
+  - "final_understanding": {
+      "summary": a paragraph summarizing the final understanding.
+      "career_direction": a string describing overall direction.
+      "most_suitable_ecosystems": array of 4-5 recommended ecosystems.
+      "current_priority": 1-2 sentence description of immediate priority checklist.
+    }
+  }
 
 Example format:
 {
@@ -231,7 +278,56 @@ Example format:
   "career_suggestions": [
     { "title": "Art Director", "reasoning": "Fits their strong creative skills...", "match_percentage": 88 }
   ],
-  "skill_gap_analysis": ["Digital Illustration", "Project Management"]
+  "skill_gap_analysis": ["Digital Illustration", "Project Management"],
+  "holistree_report": {
+    "who_is_client": {
+      "core_nature": ["Highly creative and imaginative.", "A visual thinker who learns best through observation."],
+      "what_energises": ["Sketching and creating art.", "Movies and storytelling."],
+      "conditioned_nature": ["Procrastinates on uninteresting tasks.", "Uses screens as emotional escape."],
+      "why_patterns_developed": ["Traditional academics do not match learning style.", "Fear of disappointing others."]
+    },
+    "what_drives_client": {
+      "strongest_values": ["Freedom", "Self-development"],
+      "success_definition": ["Having the freedom to choose lifestyle.", "Doing work that feels interesting."]
+    },
+    "how_client_learns": {
+      "learns_best": ["Visual learning", "Practical exposure"],
+      "struggles_with": ["Memorisation", "Long theoretical lectures"],
+      "explanation": ["English feels easier.", "Physics feels difficult due to lack of visual connection."]
+    },
+    "emotional_social_profile": {
+      "emotional_strengths": ["Calm under pressure.", "Emotionally aware."],
+      "growth_areas": ["Expressing emotions openly.", "Handling criticism positively."],
+      "social_style": ["Prefers smaller friend circles.", "Values trust before openness."]
+    },
+    "biggest_strengths": ["Creative thinking", "Artistic ability", "Visual intelligence"],
+    "development_areas": {
+      "personal": ["Consistency", "Discipline"],
+      "academic": ["Reducing procrastination", "Better planning"],
+      "professional": ["Communication confidence", "Public speaking"]
+    },
+    "what_interests_tell_us": ["Repeatedly returns to art, music, sketching and stories.", "Visual expression is key to career alignment."],
+    "career_themes": [
+      { "theme_name": "Theme 1 - Creative Arts", "careers": ["Screenwriting", "Concept Art"] }
+    ],
+    "less_suitable_careers": ["Pure Coding", "Core Accounting"],
+    "exploration_roadmap": {
+      "class_10": ["Build academic consistency.", "Reduce screen time."],
+      "class_11_12": ["Build art portfolio.", "Attend design workshops."],
+      "before_college": ["Explore film, design and animation."]
+    },
+    "recommendations_parents": {
+      "continue_encouraging": ["Creativity", "Sketching", "Independent learning"],
+      "work_together_on": ["Honest communication", "Building routines"],
+      "avoid": ["Comparing with academically stronger students", "Labelling as lazy"]
+    },
+    "final_understanding": {
+      "summary": "Great potential in creativity, visual thinking, and storytelling. Greatest hurdles are consistency and execution.",
+      "career_direction": "Creative Industries with strong visual, design, and storytelling elements.",
+      "most_suitable_ecosystems": ["Design", "Film & Media", "Animation & Gaming"],
+      "current_priority": "Focus on building stable habits and communication skills over the next 2 years."
+    }
+  }
 }`;
 
   try {
@@ -250,7 +346,8 @@ Example format:
       mbti_type: parsed.mbti_type || 'Unknown',
       mbti_dimensions: parsed.mbti_dimensions || {},
       mbti_interpretation: parsed.mbti_interpretation || '',
-      overview_summaries: parsed.overview_summaries || {}
+      overview_summaries: parsed.overview_summaries || {},
+      holistree_report: parsed.holistree_report || {}
     });
 
     const report = await prisma.report.create({
@@ -287,6 +384,20 @@ Example format:
         family: 'Pending review...',
         body_image: 'Pending review...',
         impactful_incidents: 'Pending review...'
+      },
+      holistree_report: {
+        who_is_client: { core_nature: ['Pending manual analysis...'], what_energises: [], conditioned_nature: [], why_patterns_developed: [] },
+        what_drives_client: { strongest_values: [], success_definition: [] },
+        how_client_learns: { learns_best: [], struggles_with: [], explanation: [] },
+        emotional_social_profile: { emotional_strengths: [], growth_areas: [], social_style: [] },
+        biggest_strengths: [],
+        development_areas: { personal: [], academic: [], professional: [] },
+        what_interests_tell_us: [],
+        career_themes: [],
+        less_suitable_careers: [],
+        exploration_roadmap: { class_10: [], class_11_12: [], before_college: [] },
+        recommendations_parents: { continue_encouraging: [], work_together_on: [], avoid: [] },
+        final_understanding: { summary: 'Pending manual evaluation...', career_direction: '', most_suitable_ecosystems: [], current_priority: '' }
       }
     });
 

@@ -300,3 +300,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
+
+/* Mobile responsiveness overrides */
+@media (max-width: 768px) {
+  /* Force tables to scroll instead of breaking layout width */
+  table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure grid columns wrap nicely on small screens */
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Ensure tag groups and badges wrap instead of overflowing */
+  .tag-group, .flex-wrap {
+    flex-wrap: wrap !important;
+  }
+}

@@ -167,7 +167,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-0">
                 <header className="relative z-50 bg-slate-950 border-b border-slate-800 p-4 flex items-center justify-between md:bg-transparent md:border-transparent md:justify-end md:px-8 md:pt-8 md:pb-0">
-                    <h1 className="font-bold text-lg text-slate-100 md:hidden">Career Explore Journey</h1>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="p-2 -ml-2 text-slate-400 hover:text-white md:hidden cursor-pointer focus:outline-none"
+                        aria-label="Open sidebar"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <h1 className="font-bold text-lg text-slate-100 md:hidden ml-2 flex-1">Career Explore Journey</h1>
                     <div className="flex items-center gap-4 ml-auto">
                         <NotificationDropdown />
                         <ProfileDropdown />

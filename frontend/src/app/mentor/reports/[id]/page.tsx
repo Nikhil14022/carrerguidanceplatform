@@ -7,10 +7,26 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [content, setContent] = useState('');
     const [careerOptions, setCareerOptions] = useState<any[]>([]);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
     const [reportId, setReportId] = useState('');
+
+    // Separate input states to prevent JSON corruption
+    const [personaSummary, setPersonaSummary] = useState('');
+    const [mbtiInterpretation, setMbtiInterpretation] = useState('');
+    const [hReport, setHReport] = useState<any>({
+        who_is_client: { core_nature: [], what_energises: [], conditioned_nature: [], why_patterns_developed: [] },
+        what_drives_client: { strongest_values: [], success_definition: [] },
+        how_client_learns: { learns_best: [], struggles_with: [], explanation: [] },
+        emotional_social_profile: { emotional_strengths: [], growth_areas: [], social_style: [] },
+        biggest_strengths: [],
+        development_areas: { personal: [], academic: [], professional: [] },
+        what_interests_tell_us: [],
+        less_suitable_careers: [],
+        exploration_roadmap: { class_10: [], class_11_12: [], before_college: [] },
+        recommendations_parents: { continue_encouraging: [], work_together_on: [], avoid: [] },
+        final_understanding: { summary: '', career_direction: '', most_suitable_ecosystems: [], current_priority: '' }
+    });
 
     useEffect(() => {
         params.then(async p => {
@@ -21,13 +37,30 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
 
                 if (data.success && data.report) {
                     setReport(data.report);
-                    setContent(data.report.content || '');
                     setCareerOptions(data.report.careerOptions || []);
+                    try {
+                        const parsed = JSON.parse(data.report.content);
+                        setPersonaSummary(parsed.personality_insights || '');
+                        setMbtiInterpretation(parsed.mbti_interpretation || '');
+                        if (parsed.holistree_report) {
+                            setHReport(parsed.holistree_report);
+                        }
+                    } catch (e) {
+                        setPersonaSummary(data.report.content || '');
+                    }
                 } else if (data.report) {
-                    // API might return { report: ... } without success flag
                     setReport(data.report);
-                    setContent(data.report.content || '');
                     setCareerOptions(data.report.careerOptions || []);
+                    try {
+                        const parsed = JSON.parse(data.report.content);
+                        setPersonaSummary(parsed.personality_insights || '');
+                        setMbtiInterpretation(parsed.mbti_interpretation || '');
+                        if (parsed.holistree_report) {
+                            setHReport(parsed.holistree_report);
+                        }
+                    } catch (e) {
+                        setPersonaSummary(data.report.content || '');
+                    }
                 } else {
                     console.error('Report load failed', data.error);
                 }
@@ -42,11 +75,21 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
     const handleSave = async () => {
         setSaving(true);
         try {
+            // Reconstruct content JSON safely
+            const updatedContent = JSON.stringify({
+                personality_insights: personaSummary,
+                mbti_type: report?.mbti_type || 'Unknown',
+                mbti_dimensions: report?.mbti_dimensions || {},
+                mbti_interpretation: mbtiInterpretation,
+                overview_summaries: report?.overview_summaries || {},
+                holistree_report: hReport
+            });
+
             const res = await fetch(`/api/mentor/reports/${reportId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    content,
+                    content: updatedContent,
                     careerOptions: careerOptions.map(o => ({ title: o.title, reasoning: o.reasoning || '', match: o.match }))
                 })
             });
@@ -99,6 +142,30 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
 
     const removeOption = (index: number) => {
         setCareerOptions(careerOptions.filter((_, i) => i !== index));
+    };
+
+    // Helper functions to manage arrays in editor
+    const getArrayText = (arr: any) => Array.isArray(arr) ? arr.join('\n') : '';
+    const setArrayText = (text: string) => text.split('\n').map(s => s.trim()).filter(Boolean);
+
+    const updateHReport = (section: string, field: string, value: any) => {
+        setHReport((prev: any) => ({
+            ...prev,
+            [section]: {
+                ...(prev[section] || {}),
+                [field]: value
+            }
+        }));
+    };
+
+    const updateFinalUnderstanding = (field: string, value: any) => {
+        setHReport((prev: any) => ({
+            ...prev,
+            final_understanding: {
+                ...(prev.final_understanding || {}),
+                [field]: value
+            }
+        }));
     };
 
     if (loading) {
@@ -162,16 +229,329 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
                 </div>
             </div>
 
-            {/* Content Editor */}
-            <div className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-8 space-y-4">
-                <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Persona & Analysis</h2>
-                <textarea
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    className="w-full h-56 bg-white/5 border border-white/10 rounded-xl p-5 text-sm text-slate-300 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 resize-y leading-relaxed shadow-inner"
-                    placeholder="AI-generated persona analysis text goes here..."
-                    disabled={report.status === 'FINALIZED'}
-                />
+            {/* Content Editor Blocks */}
+            <div className="space-y-6">
+                
+                {/* 1. Core Persona & MBTI */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">1. Core Persona & MBTI Remarks</h2>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Professional Persona Summary</label>
+                        <textarea
+                            value={personaSummary}
+                            onChange={e => setPersonaSummary(e.target.value)}
+                            className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                            placeholder="Professional Persona Summary..."
+                            disabled={report.status === 'FINALIZED'}
+                        />
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">MBTI Interpretation Remarks</label>
+                        <textarea
+                            value={mbtiInterpretation}
+                            onChange={e => setMbtiInterpretation(e.target.value)}
+                            className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                            placeholder="MBTI Interpretation..."
+                            disabled={report.status === 'FINALIZED'}
+                        />
+                    </div>
+                </div>
+
+                {/* 2. Who is Client */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">2. Who is Client? (Enter one item per line)</h2>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Core Nature (Natural Self)</label>
+                            <textarea
+                                value={getArrayText(hReport.who_is_client?.core_nature)}
+                                onChange={e => updateHReport('who_is_client', 'core_nature', setArrayText(e.target.value))}
+                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                placeholder="Highly creative...&#10;Highly observational..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">What naturally energises them</label>
+                            <textarea
+                                value={getArrayText(hReport.who_is_client?.what_energises)}
+                                onChange={e => updateHReport('who_is_client', 'what_energises', setArrayText(e.target.value))}
+                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                placeholder="Sketching...&#10;Playing music..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Conditioned Nature (Learnt Behaviours)</label>
+                            <textarea
+                                value={getArrayText(hReport.who_is_client?.conditioned_nature)}
+                                onChange={e => updateHReport('who_is_client', 'conditioned_nature', setArrayText(e.target.value))}
+                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                placeholder="Procrastination...&#10;Screen time escape..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Why these patterns developed</label>
+                            <textarea
+                                value={getArrayText(hReport.who_is_client?.why_patterns_developed)}
+                                onChange={e => updateHReport('who_is_client', 'why_patterns_developed', setArrayText(e.target.value))}
+                                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                placeholder="Academic stress...&#10;Expectation fear..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 3. Drives, learning & social */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">3. Values, Learning & Social Profile (Enter one item per line)</h2>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Strongest Values</label>
+                            <textarea
+                                value={getArrayText(hReport.what_drives_client?.strongest_values)}
+                                onChange={e => updateHReport('what_drives_client', 'strongest_values', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Success Definition</label>
+                            <textarea
+                                value={getArrayText(hReport.what_drives_client?.success_definition)}
+                                onChange={e => updateHReport('what_drives_client', 'success_definition', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Learns best through</label>
+                            <textarea
+                                value={getArrayText(hReport.how_client_learns?.learns_best)}
+                                onChange={e => updateHReport('how_client_learns', 'learns_best', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Struggles more with</label>
+                            <textarea
+                                value={getArrayText(hReport.how_client_learns?.struggles_with)}
+                                onChange={e => updateHReport('how_client_learns', 'struggles_with', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Subject sentiment & application sentiment (Enter one analysis statement per line)</label>
+                            <textarea
+                                value={getArrayText(hReport.how_client_learns?.explanation)}
+                                onChange={e => updateHReport('how_client_learns', 'explanation', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Emotional Strengths</label>
+                            <textarea
+                                value={getArrayText(hReport.emotional_social_profile?.emotional_strengths)}
+                                onChange={e => updateHReport('emotional_social_profile', 'emotional_strengths', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Emotional Growth Areas</label>
+                            <textarea
+                                value={getArrayText(hReport.emotional_social_profile?.growth_areas)}
+                                onChange={e => updateHReport('emotional_social_profile', 'growth_areas', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Social Style</label>
+                            <textarea
+                                value={getArrayText(hReport.emotional_social_profile?.social_style)}
+                                onChange={e => updateHReport('emotional_social_profile', 'social_style', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. Strengths & development */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">4. Strengths, Development & Interests (Enter one item per line)</h2>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Biggest Strengths</label>
+                            <textarea
+                                value={getArrayText(hReport.biggest_strengths)}
+                                onChange={e => setHReport({ ...hReport, biggest_strengths: setArrayText(e.target.value) })}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Priority Development Areas - Personal</label>
+                            <textarea
+                                value={getArrayText(hReport.development_areas?.personal)}
+                                onChange={e => updateHReport('development_areas', 'personal', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Priority Development Areas - Academic</label>
+                            <textarea
+                                value={getArrayText(hReport.development_areas?.academic)}
+                                onChange={e => updateHReport('development_areas', 'academic', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Priority Development Areas - Professional</label>
+                            <textarea
+                                value={getArrayText(hReport.development_areas?.professional)}
+                                onChange={e => updateHReport('development_areas', 'professional', setArrayText(e.target.value))}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">What interests tell us</label>
+                            <textarea
+                                value={getArrayText(hReport.what_interests_tell_us)}
+                                onChange={e => setHReport({ ...hReport, what_interests_tell_us: setArrayText(e.target.value) })}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Careers That May Feel Less Suitable</label>
+                            <textarea
+                                value={getArrayText(hReport.less_suitable_careers)}
+                                onChange={e => setHReport({ ...hReport, less_suitable_careers: setArrayText(e.target.value) })}
+                                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 5. Roadmap & parent recommendations */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">5. Exploration Roadmap & Recommendations (Enter one item per line)</h2>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Roadmap - Grade 10 Focus</label>
+                            <textarea
+                                value={getArrayText(hReport.exploration_roadmap?.class_10)}
+                                onChange={e => updateHReport('exploration_roadmap', 'class_10', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Roadmap - Grade 11-12 Focus</label>
+                            <textarea
+                                value={getArrayText(hReport.exploration_roadmap?.class_11_12)}
+                                onChange={e => updateHReport('exploration_roadmap', 'class_11_12', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Roadmap - Before College</label>
+                            <textarea
+                                value={getArrayText(hReport.exploration_roadmap?.before_college)}
+                                onChange={e => updateHReport('exploration_roadmap', 'before_college', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Parents - Continue Encouraging</label>
+                            <textarea
+                                value={getArrayText(hReport.recommendations_parents?.continue_encouraging)}
+                                onChange={e => updateHReport('recommendations_parents', 'continue_encouraging', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Parents - Work Together On</label>
+                            <textarea
+                                value={getArrayText(hReport.recommendations_parents?.work_together_on)}
+                                onChange={e => updateHReport('recommendations_parents', 'work_together_on', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Parents - Avoid</label>
+                            <textarea
+                                value={getArrayText(hReport.recommendations_parents?.avoid)}
+                                onChange={e => updateHReport('recommendations_parents', 'avoid', setArrayText(e.target.value))}
+                                className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* 6. Final Understanding */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 lg:p-8 space-y-4">
+                    <h2 className="text-lg font-bold text-indigo-400">6. Final Understanding of Student</h2>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Summary (Beyond Marks)</label>
+                        <textarea
+                            value={hReport.final_understanding?.summary || ''}
+                            onChange={e => updateFinalUnderstanding('summary', e.target.value)}
+                            className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                            placeholder="Final overview summary..."
+                            disabled={report.status === 'FINALIZED'}
+                        />
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Career Direction</label>
+                            <input
+                                type="text"
+                                value={hReport.final_understanding?.career_direction || ''}
+                                onChange={e => updateFinalUnderstanding('career_direction', e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="E.g., Creative Industries..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Most Suitable Ecosystems (One per line)</label>
+                            <textarea
+                                value={getArrayText(hReport.final_understanding?.most_suitable_ecosystems)}
+                                onChange={e => updateFinalUnderstanding('most_suitable_ecosystems', setArrayText(e.target.value))}
+                                className="w-full h-20 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 font-mono"
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Current Priority (Next 2-3 Years)</label>
+                            <textarea
+                                value={hReport.final_understanding?.current_priority || ''}
+                                onChange={e => updateFinalUnderstanding('current_priority', e.target.value)}
+                                className="w-full h-20 bg-white/5 border border-white/10 rounded-xl p-4 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                placeholder="E.g., Focus on stability and consistent sketching habits..."
+                                disabled={report.status === 'FINALIZED'}
+                            />
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             {/* Career Options Editor */}

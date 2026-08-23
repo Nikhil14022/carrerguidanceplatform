@@ -97,7 +97,14 @@ export async function GET(request: Request) {
       }
     }).filter(Boolean)
 
-    return NextResponse.json({ clients: filteredClients })
+    // Fetch all parent accounts
+    const allParents = await prisma.user.findMany({
+      where: { role: 'PARENT' },
+      select: { id: true, name: true, email: true },
+      orderBy: { name: 'asc' }
+    })
+
+    return NextResponse.json({ clients: filteredClients, parents: allParents })
   } catch (error) {
     console.error('Admin clients error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -116,102 +123,132 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const {
-      clientName,
-      clientEmail,
-      clientPassword,
-      clientAge,
-      parentName,
-      parentEmail,
-      parentPassword,
-      mentorProfileId
-    } = await request.json()
+    const body = await request.json()
+    const { role } = body
 
-    if (!clientName || !clientEmail || !clientPassword || !parentName || !parentEmail || !parentPassword) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
-    }
+    if (role === 'CLIENT') {
+      const {
+        clientName,
+        clientEmail,
+        clientPassword,
+        clientAge,
+        parentId,
+        mentorProfileId
+      } = body
 
-    // Check if emails already registered
-    const existingClient = await prisma.user.findUnique({ where: { email: clientEmail } })
-    if (existingClient) {
-      return NextResponse.json({ error: `Student email ${clientEmail} is already registered.` }, { status: 400 })
-    }
+      if (!clientName || !clientEmail || !clientPassword) {
+        return NextResponse.json({ error: 'Student name, email, and password are required' }, { status: 400 })
+      }
 
-    const existingParent = await prisma.user.findUnique({ where: { email: parentEmail } })
-    if (existingParent) {
-      return NextResponse.json({ error: `Parent email ${parentEmail} is already registered.` }, { status: 400 })
-    }
+      // Check if student email is already registered
+      const existingClient = await prisma.user.findUnique({ where: { email: clientEmail } })
+      if (existingClient) {
+        return NextResponse.json({ error: `Student email ${clientEmail} is already registered.` }, { status: 400 })
+      }
 
-    const hashedClientPassword = await hash(clientPassword, 12)
-    const hashedParentPassword = await hash(parentPassword, 12)
+      const hashedClientPassword = await hash(clientPassword, 12)
 
-    const moduleTemplates = await prisma.module.findMany({
-      orderBy: { defaultOrder: 'asc' }
-    })
+      const moduleTemplates = await prisma.module.findMany({
+        orderBy: { defaultOrder: 'asc' }
+      })
 
-    // Create both inside a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Create Parent
-      const parentUser = await tx.user.create({
-        data: {
-          name: parentName,
-          email: parentEmail,
-          password: hashedParentPassword,
-          role: 'PARENT'
+      const result = await prisma.$transaction(async (tx) => {
+        const clientUser = await tx.user.create({
+          data: {
+            name: clientName,
+            email: clientEmail,
+            password: hashedClientPassword,
+            role: 'CLIENT',
+            age: parseInt(clientAge as any) || 16,
+            clientProfile: {
+              create: {
+                currentStage: 1,
+                journeyStatus: 'Started',
+                parentId: parentId || null,
+                modules: {
+                  create: moduleTemplates.map((template, idx) => ({
+                    moduleId: template.id,
+                    status: 'LOCKED',
+                    order: idx + 1,
+                    filledBy: 'CLIENT'
+                  }))
+                }
+              }
+            }
+          },
+          include: { clientProfile: true }
+        })
+
+        if (mentorProfileId && clientUser.clientProfile) {
+          await tx.mentorAssignment.create({
+            data: {
+              mentorProfileId,
+              clientProfileId: clientUser.clientProfile.id,
+              permissions: ['VIEW_MODULES', 'VIEW_REPORTS', 'CHAT'],
+              assignedBy: session.user.id,
+              isActive: true,
+              assignedAt: new Date()
+            }
+          })
+        }
+
+        return {
+          clientId: clientUser.id,
+          clientProfileId: clientUser.clientProfile?.id
         }
       })
 
-      // 2. Create Client & Profile
-      const clientUser = await tx.user.create({
-        data: {
-          name: clientName,
-          email: clientEmail,
-          password: hashedClientPassword,
-          role: 'CLIENT',
-          age: parseInt(clientAge as any) || 16,
-          clientProfile: {
-            create: {
-              currentStage: 1,
-              journeyStatus: 'Started',
-              parentId: parentUser.id,
-              modules: {
-                create: moduleTemplates.map((template, idx) => ({
-                  moduleId: template.id,
-                  status: 'LOCKED',
-                  order: idx + 1,
-                  filledBy: 'CLIENT'
-                }))
-              }
-            }
-          }
-        },
-        include: { clientProfile: true }
-      })
+      return NextResponse.json({ success: true, ...result }, { status: 201 })
 
-      // 3. If mentorProfileId is provided, create Assignment
-      if (mentorProfileId && clientUser.clientProfile) {
-        await tx.mentorAssignment.create({
+    } else if (role === 'PARENT') {
+      const {
+        parentName,
+        parentEmail,
+        parentPassword,
+        clientProfileId
+      } = body
+
+      if (!parentName || !parentEmail || !parentPassword) {
+        return NextResponse.json({ error: 'Parent name, email, and password are required' }, { status: 400 })
+      }
+
+      // Check if parent email is already registered
+      const existingParent = await prisma.user.findUnique({ where: { email: parentEmail } })
+      if (existingParent) {
+        return NextResponse.json({ error: `Parent email ${parentEmail} is already registered.` }, { status: 400 })
+      }
+
+      const hashedParentPassword = await hash(parentPassword, 12)
+
+      const result = await prisma.$transaction(async (tx) => {
+        const parentUser = await tx.user.create({
           data: {
-            mentorProfileId,
-            clientProfileId: clientUser.clientProfile.id,
-            permissions: ['VIEW_MODULES', 'VIEW_REPORTS', 'CHAT'],
-            assignedBy: session.user.id,
-            isActive: true,
-            assignedAt: new Date()
+            name: parentName,
+            email: parentEmail,
+            password: hashedParentPassword,
+            role: 'PARENT'
           }
         })
-      }
 
-      return {
-        parentId: parentUser.id,
-        clientId: clientUser.id,
-        clientProfileId: clientUser.clientProfile?.id
-      }
-    })
+        if (clientProfileId) {
+          await tx.clientProfile.update({
+            where: { id: clientProfileId },
+            data: { parentId: parentUser.id }
+          })
+        }
 
-    return NextResponse.json({ success: true, ...result }, { status: 201 })
+        return {
+          parentId: parentUser.id
+        }
+      })
+
+      return NextResponse.json({ success: true, ...result }, { status: 201 })
+
+    } else {
+      return NextResponse.json({ error: 'Invalid or missing role parameter' }, { status: 400 })
+    }
   } catch (error: any) {
-    console.error('Error creating client & parent:', error)
+    console.error('Error creating client or parent:', error)
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

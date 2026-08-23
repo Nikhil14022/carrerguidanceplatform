@@ -17,7 +17,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
     const [finalPlan, setFinalPlan] = useState<any>(null);
     const [isComparisonOpen, setIsComparisonOpen] = useState(false);
     const [generatingPlan, setGeneratingPlan] = useState(false);
-    const [activeTab, setActiveTab] = useState<'persona' | 'personality' | 'cognitive' | 'interests' | 'diagnostic'>('persona');
+    const [activeTab, setActiveTab] = useState<'design_report' | 'themes_roadmap' | 'assessment_scores'>('design_report');
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -175,6 +175,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
     const mbtiInterpretation = isJson ? parsedContent.mbti_interpretation : '';
     const mbtiDimensions = isJson ? parsedContent.mbti_dimensions : null;
     const overviewSummaries = isJson ? parsedContent.overview_summaries : null;
+    const holistreeReport = isJson ? parsedContent.holistree_report : null;
 
     // Helper to format values safely
     const safeVal = (v: any) => v !== undefined && v !== null && v !== '' ? v : '—';
@@ -303,20 +304,17 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                         </button>
                     </div>
                 </header>
-
                 {/* Glassmorphic Navigation Tabs */}
                 <div className="flex flex-wrap gap-2 border-b border-white/5 pb-2">
                     {[
-                        { id: 'persona', label: 'Persona & Careers', icon: '👤' },
-                        { id: 'personality', label: 'Personality & Style', icon: '🧠' },
-                        { id: 'cognitive', label: 'Cognitive & Values', icon: '⚡' },
-                        { id: 'interests', label: 'Interests & Academics', icon: '📚' },
-                        { id: 'diagnostic', label: 'Diagnostic Compartments', icon: '🔎' }
+                        { id: 'design_report', label: 'Career Design Report', icon: '📄' },
+                        { id: 'themes_roadmap', label: 'Career Themes & Roadmap', icon: '🗺️' },
+                        { id: 'assessment_scores', label: 'Assessment Test Scores', icon: '📊' }
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/35 border border-indigo-500/30' : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-transparent'}`}
+                            className={`flex items-center gap-2 px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeTab === tab.id ? 'bg-indigo-650 text-white shadow-lg shadow-indigo-650/35 border border-indigo-500/30' : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white border border-transparent'}`}
                         >
                             <span>{tab.icon}</span>
                             {tab.label}
@@ -328,13 +326,342 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                 <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
                     <div className="space-y-8">
                         
-                        {/* TAB 1: PERSONA & CAREERS */}
-                        {activeTab === 'persona' && (
+                        {/* TAB 1: CAREER DESIGN REPORT */}
+                        {activeTab === 'design_report' && (
+                            <div className="space-y-6">
+                                {holistreeReport ? (
+                                    <>
+                                        {/* Who is Client */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">1. Who is {report.clientProfile?.user?.name || 'Client'}?</h3>
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Core Nature (Natural Self)</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.who_is_client?.core_nature?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Conditioned Nature (Learnt Behaviours)</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.who_is_client?.conditioned_nature?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            {holistreeReport.who_is_client?.what_energises?.length > 0 && (
+                                                <div className="border-t border-white/5 pt-4">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">What naturally energises them</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.who_is_client.what_energises.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            {holistreeReport.who_is_client?.why_patterns_developed?.length > 0 && (
+                                                <div className="border-t border-white/5 pt-4">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Why these patterns have developed</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.who_is_client.why_patterns_developed.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </section>
+
+                                        {/* What Drives Them */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">2. What Drives them?</h3>
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Strongest Values</span>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {holistreeReport.what_drives_client?.strongest_values?.map((val: string) => (
+                                                            <span key={val} className="px-2.5 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded text-xs font-semibold">{val}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Success Definition</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.what_drives_client?.success_definition?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        {/* How Client Learns Best */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">3. How do they learn best?</h3>
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-2">Learns best through</span>
+                                                    <ul className="space-y-1 text-xs text-indigo-300 list-disc pl-4">
+                                                        {holistreeReport.how_client_learns?.learns_best?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-rose-455 uppercase tracking-wider block mb-2">Struggles more with</span>
+                                                    <ul className="space-y-1 text-xs text-rose-300 list-disc pl-4">
+                                                        {holistreeReport.how_client_learns?.struggles_with?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            {holistreeReport.how_client_learns?.explanation?.length > 0 && (
+                                                <div className="border-t border-white/5 pt-4 bg-white/5 p-4 rounded-xl">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Academic Sentiment Analysis:</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.how_client_learns.explanation.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </section>
+
+                                        {/* Emotional & Social Profile */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">4. Emotional & Social Profile</h3>
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Emotional Strengths</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.emotional_social_profile?.emotional_strengths?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Emotional Growth Areas</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.emotional_social_profile?.growth_areas?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            {holistreeReport.emotional_social_profile?.social_style?.length > 0 && (
+                                                <div className="border-t border-white/5 pt-4">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Social Style</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.emotional_social_profile.social_style.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </section>
+
+                                        {/* Biggest Strengths */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">5. Biggest Strengths</h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {holistreeReport.biggest_strengths?.map((str: string) => (
+                                                    <span key={str} className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl text-xs font-semibold">{str}</span>
+                                                ))}
+                                            </div>
+                                        </section>
+
+                                        {/* Priority Development Areas */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">6. Priority Development Areas</h3>
+                                            <div className="grid md:grid-cols-3 gap-6">
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Personal Growth</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.development_areas?.personal?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Academic Growth</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.development_areas?.academic?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Professional Growth</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.development_areas?.professional?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        {/* What Interests Tell Us */}
+                                        {holistreeReport.what_interests_tell_us?.length > 0 && (
+                                            <section className="glass-card p-6 space-y-3">
+                                                <h3 className="text-lg font-bold text-indigo-400">7. What their interests tell us</h3>
+                                                <ul className="space-y-1.5 text-xs text-slate-300 list-disc pl-4">
+                                                    {holistreeReport.what_interests_tell_us.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                </ul>
+                                            </section>
+                                        )}
+
+                                        {/* Final Understanding */}
+                                        <section className="glass-card p-6 bg-indigo-500/5 border-indigo-500/20 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">11. Final Understanding of {report.clientProfile?.user?.name || 'Student'}</h3>
+                                            <blockquote className="border-l-4 border-indigo-500 pl-4 italic text-sm text-slate-300 leading-relaxed">
+                                                "{holistreeReport.final_understanding?.summary}"
+                                            </blockquote>
+                                            <div className="grid md:grid-cols-2 gap-4 pt-2">
+                                                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-[10px] uppercase text-slate-500 block mb-1">Career Direction</span>
+                                                    <strong className="text-indigo-400 text-xs">{holistreeReport.final_understanding?.career_direction}</strong>
+                                                </div>
+                                                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-[10px] uppercase text-slate-500 block mb-1">Most Suitable Ecosystems</span>
+                                                    <strong className="text-indigo-400 text-xs">{holistreeReport.final_understanding?.most_suitable_ecosystems?.join(', ')}</strong>
+                                                </div>
+                                            </div>
+                                            {holistreeReport.final_understanding?.current_priority && (
+                                                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-[10px] uppercase text-slate-500 block mb-1">Current Priority (Next 2-3 Years)</span>
+                                                    <p className="text-slate-300 text-xs">{holistreeReport.final_understanding.current_priority}</p>
+                                                </div>
+                                            )}
+                                        </section>
+                                    </>
+                                ) : (
+                                    /* Backward Compatibility fallback */
+                                    <section className="glass-card p-6 space-y-4">
+                                        <h3 className="text-lg font-bold text-indigo-400">Professional Persona Summary</h3>
+                                        <p className="text-xs text-slate-300 leading-relaxed">{personalityInsights}</p>
+                                    </section>
+                                )}
+                            </div>
+                        )}
+
+                        {/* TAB 2: CAREER THEMES & ROADMAP */}
+                        {activeTab === 'themes_roadmap' && (
+                            <div className="space-y-6">
+                                {/* Career Options List */}
+                                <section className="space-y-4">
+                                    <h3 className="text-lg font-bold text-indigo-400">Curated Career Trajectories</h3>
+                                    {report.careerOptions && report.careerOptions.length > 0 ? (
+                                        <div className="grid gap-4">
+                                            {report.careerOptions.map((opt: any) => {
+                                                const isShortlisted = shortlistedIds.includes(opt.id);
+                                                return (
+                                                    <div key={opt.id} className="glass-card p-6 space-y-3">
+                                                        <div className="flex justify-between items-start gap-4">
+                                                            <div>
+                                                                <h4 className="text-base font-extrabold text-white">{opt.title}</h4>
+                                                                <span className="text-xs text-slate-500">Curated Option</span>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <span className="text-xl font-black text-indigo-400">{opt.match}%</span>
+                                                                <span className="text-[10px] text-slate-500 block">Alignment</span>
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-xs text-slate-300 leading-relaxed">{opt.reasoning}</p>
+                                                        {opt.skillGaps && opt.skillGaps.length > 0 && (
+                                                            <div className="flex flex-wrap gap-1.5 pt-2">
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-450 w-full mb-1">Focus Skill Gaps:</span>
+                                                                {opt.skillGaps.map((gap: any) => (
+                                                                    <span key={gap.skill || gap} className="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded text-[10px] font-medium">
+                                                                        {gap.skill || gap}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        <div className="flex gap-3 pt-3 border-t border-white/5">
+                                                            <button
+                                                                onClick={() => handleShortlist(opt.id)}
+                                                                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${isShortlisted ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white/5 text-slate-450 hover:bg-white/10 hover:text-slate-200'}`}
+                                                            >
+                                                                {isShortlisted ? '✓ Shortlisted' : 'Shortlist'}
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setSelectedCareer({ id: opt.id, title: opt.title })}
+                                                                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer"
+                                                            >
+                                                                Research Path
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center p-8 bg-white/5 border border-white/5 rounded-xl text-slate-500 italic">No career trajectories recommended yet.</div>
+                                    )}
+                                </section>
+
+                                {holistreeReport && (
+                                    <>
+                                        {/* Career Themes */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">8. Career Themes</h3>
+                                            <div className="space-y-4">
+                                                {holistreeReport.career_themes?.map((theme: any, idx: number) => (
+                                                    <div key={idx} className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                        <strong className="text-indigo-400 text-sm block mb-1">{theme.theme_name}</strong>
+                                                        <p className="text-xs text-slate-300">{theme.careers?.join(', ')}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {holistreeReport.less_suitable_careers?.length > 0 && (
+                                                <div className="border-t border-white/5 pt-4">
+                                                    <span className="text-xs font-bold text-rose-400 uppercase tracking-wider block mb-2">Careers That May Feel Less Suitable</span>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {holistreeReport.less_suitable_careers.map((car: string) => (
+                                                            <span key={car} className="px-2.5 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded text-xs font-semibold">{car}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </section>
+
+                                        {/* Exploration Roadmap */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">9. Exploration Roadmap</h3>
+                                            <div className="grid md:grid-cols-3 gap-6">
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block mb-2">Grade 10 Focus</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.exploration_roadmap?.class_10?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block mb-2">Grade 11–12 Focus</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.exploration_roadmap?.class_11_12?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-white/5 rounded-xl border border-white/5">
+                                                    <span className="text-xs font-bold text-slate-450 uppercase tracking-wider block mb-2">Before College</span>
+                                                    <ul className="space-y-1 text-xs text-slate-300 list-disc pl-4">
+                                                        {holistreeReport.exploration_roadmap?.before_college?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </section>
+
+                                        {/* Recommendations for Parents */}
+                                        <section className="glass-card p-6 space-y-4">
+                                            <h3 className="text-lg font-bold text-indigo-400">10. Recommendations for Parents</h3>
+                                            <div className="grid md:grid-cols-3 gap-6">
+                                                <div className="p-4 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
+                                                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-2">Continue Encouraging</span>
+                                                    <ul className="space-y-1 text-xs text-emerald-300 list-disc pl-4">
+                                                        {holistreeReport.recommendations_parents?.continue_encouraging?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-indigo-500/5 border border-indigo-500/15 rounded-xl">
+                                                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider block mb-2">Work Together On</span>
+                                                    <ul className="space-y-1 text-xs text-indigo-350 list-disc pl-4">
+                                                        {holistreeReport.recommendations_parents?.work_together_on?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                                <div className="p-4 bg-rose-500/5 border border-rose-500/15 rounded-xl">
+                                                    <span className="text-xs font-bold text-rose-400 uppercase tracking-wider block mb-2">Avoid</span>
+                                                    <ul className="space-y-1 text-xs text-rose-350 list-disc pl-4">
+                                                        {holistreeReport.recommendations_parents?.avoid?.map((item: string, idx: number) => <li key={idx}>{item}</li>)}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </>
+                                )}
+                            </div>
+                        )}
+
+                        {/* TAB 3: ASSESSMENT TEST SCORES */}
+                        {activeTab === 'assessment_scores' && (
                             <>
                                 {/* Demographics Sub-Card */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">2.</span> Demographics & Profile
+                                        Demographics & Profile
                                     </h3>
                                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                                         <div className="p-3 bg-white/5 rounded-lg border border-white/5">
@@ -381,102 +708,10 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                     )}
                                 </section>
 
-                                {/* Professional Persona */}
-                                <section className="glass-card p-6 relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[80px] -mr-32 -mt-32" />
-                                    <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">13.</span> Professional Persona Summary
-                                    </h3>
-                                    <div className="text-slate-300 leading-relaxed space-y-4 text-base">
-                                        {personalityInsights}
-                                        {(personalityInsights.includes('Pending Analysis') || personalityInsights.includes('temporarily unavailable')) && (
-                                            <div className="mt-6 p-5 rounded-xl bg-indigo-500/5 border border-indigo-500/20 text-center">
-                                                <p className="text-xs text-indigo-300 mb-3 italic">API recovered? Generate the comprehensive AI persona analysis now.</p>
-                                                <button
-                                                    onClick={handleGenerateReport}
-                                                    disabled={generating}
-                                                    className="btn-primary py-2.5 px-6 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 mx-auto"
-                                                >
-                                                    {generating ? (
-                                                        <>
-                                                            <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                                            Analyzing...
-                                                        </>
-                                                    ) : 'Generate AI Analysis'}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-
-                                {/* Career suggestions */}
-                                <section className="space-y-4">
-                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <span className="text-slate-500">13.</span> Recommended Career Trajectories
-                                    </h3>
-                                    <div className="grid gap-6">
-                                        {report.careerOptions?.map((opt: any, i: number) => (
-                                            <div key={opt.id} className="glass-card p-6 border hover:border-indigo-500/35 transition-all group">
-                                                <div className="flex justify-between items-start gap-4 mb-4">
-                                                    <div>
-                                                        <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1">Option {i + 1}</span>
-                                                        <h4 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{opt.title}</h4>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <span className="text-2xl font-black text-indigo-500">{opt.match}%</span>
-                                                        <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mt-0.5">Match</span>
-                                                    </div>
-                                                </div>
-                                                <p className="text-slate-400 leading-relaxed text-sm mb-4 border-l-2 border-slate-800 pl-4">
-                                                    {opt.reasoning}
-                                                </p>
-                                                {opt.skillGaps && opt.skillGaps.length > 0 && (
-                                                    <div className="mb-4">
-                                                        <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1.5">Focus Skill Gaps:</span>
-                                                        <div className="flex flex-wrap gap-1.5">
-                                                            {opt.skillGaps.map((sg: any) => (
-                                                                <span key={sg.id} className="bg-sky-500/10 text-sky-400 border border-sky-500/15 text-[10px] px-2 py-0.5 rounded font-medium">
-                                                                    {sg.skill || sg}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                <div className="flex gap-4 items-center justify-between border-t border-white/5 pt-4">
-                                                    <button
-                                                        onClick={() => handleShortlist(opt.id)}
-                                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all text-[10px] font-bold uppercase tracking-wider ${shortlistedIds.includes(opt.id) ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'border-white/5 text-slate-500 hover:border-white/10 hover:text-slate-400'}`}
-                                                    >
-                                                        <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${shortlistedIds.includes(opt.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
-                                                            {shortlistedIds.includes(opt.id) && (
-                                                                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                                </svg>
-                                                            )}
-                                                        </div>
-                                                        {shortlistedIds.includes(opt.id) ? 'Shortlisted' : 'Shortlist'}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => setSelectedCareer({ id: opt.id, title: opt.title })}
-                                                        className="px-4 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 hover:text-white transition-all border border-white/5"
-                                                    >
-                                                        Research Pathway
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            </>
-                        )}
-
-                        {/* TAB 2: PERSONALITY & STYLE */}
-                        {activeTab === 'personality' && (
-                            <>
-                                {/* MBTI 16PF Card */}
+                                {/* 16PF MBTI Card */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">5.</span> 16PF personality Factor
+                                        16PF Personality Factor (MBTI Calculations)
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-6 items-start mb-6">
                                         <div className="bg-indigo-600 text-white font-black text-3xl px-6 py-4 rounded-xl shadow-lg shadow-indigo-600/20 text-center min-w-[120px]">
@@ -487,7 +722,6 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                             {mbtiInterpretation || 'Standard 16 personality types details compiled from assessment indexes.'}
                                         </div>
                                     </div>
-                                    
                                     {mbtiDimensions && (
                                         <div className="space-y-4 border-t border-white/5 pt-4">
                                             <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400">MBTI Trait Gradients</h4>
@@ -511,7 +745,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                 {/* Holland Code RIASEC Card */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">6.</span> RIASEC Occupational Interests
+                                        RIASEC Occupational Interests (Holland Codes)
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-6 items-center mb-6">
                                         <div className="bg-sky-600 text-white font-black text-2xl px-5 py-3.5 rounded-xl shadow-lg shadow-sky-600/20 text-center min-w-[100px]">
@@ -525,8 +759,8 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                                 return (
                                                     <div key={char} className="bg-white/5 border border-white/5 rounded-xl p-2.5 text-center">
                                                         <div className="text-base font-bold text-white">{char}</div>
-                                                        <div className="text-[8px] text-slate-500 capitalize">{labels[char]}</div>
-                                                        <div className="text-xs font-bold text-indigo-400 mt-1">{val}</div>
+                                                        <div className="text-[9px] text-slate-500 font-semibold mb-1">{labels[char]}</div>
+                                                        <div className="text-xs text-indigo-400 font-extrabold">{val}</div>
                                                     </div>
                                                 );
                                             })}
@@ -534,12 +768,12 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                     </div>
                                     {riasecTop3.length > 0 && (
                                         <div className="space-y-4 border-t border-white/5 pt-4">
-                                            <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400">Dominant Profiles</h4>
+                                            <h4 className="text-xs uppercase font-bold tracking-wider text-slate-400">Dominant Holland Profiles</h4>
                                             <div className="grid gap-4">
                                                 {riasecTop3.map((item: any) => (
                                                     <div key={item.label} className="p-3 bg-white/5 rounded-xl border border-white/5">
                                                         <span className="text-xs font-bold text-indigo-400 block mb-1">{item.label} ({item.letter}) — Score: {item.score}</span>
-                                                        <p className="text-xs text-slate-400 leading-relaxed">{item.interpretation}</p>
+                                                        <p className="text-xs text-slate-450 leading-relaxed">{item.interpretation}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -547,10 +781,10 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                     )}
                                 </section>
 
-                                {/* Color Style */}
+                                {/* Color Style Card */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">7.</span> Colour Test (Working Style)
+                                        Colour Test (Working Style)
                                     </h3>
                                     <div className="flex flex-col md:flex-row gap-4 items-start bg-white/5 border border-white/5 p-4 rounded-xl">
                                         <div className="flex items-center gap-2 bg-indigo-500/10 px-4 py-2 rounded-lg border border-indigo-500/20 text-indigo-400 font-bold text-sm uppercase tracking-wider">
@@ -559,16 +793,11 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                         <p className="flex-1 text-xs text-slate-300 leading-relaxed pt-1">{resolvedStyleDesc}</p>
                                     </div>
                                 </section>
-                            </>
-                        )}
 
-                        {/* TAB 3: COGNITIVE & VALUES */}
-                        {activeTab === 'cognitive' && (
-                            <>
                                 {/* Values Profile */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">3.</span> Value System Profile
+                                        Value System Profile (Ideal vs Standard)
                                     </h3>
                                     <div className="grid gap-4 text-sm">
                                         {Object.entries(valuesByCategory).map(([cat, valList]) => {
@@ -600,7 +829,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                 {/* Fears Rating */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">4.</span> Fears Rating Profile
+                                        Fears Rating Profile
                                     </h3>
                                     <div className="grid md:grid-cols-3 gap-4">
                                         <div className="p-4 bg-rose-500/5 border border-rose-500/15 rounded-xl">
@@ -633,13 +862,13 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                 {/* Strengths & Weaknesses */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">8.</span> Strengths & Weaknesses Grid
+                                        Strengths & Weaknesses Gradients
                                     </h3>
                                     <div className="grid md:grid-cols-3 gap-4">
                                         <div className="p-4 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
                                             <strong className="text-xs uppercase text-emerald-400 block tracking-wider mb-2">Core Strengths (8-10)</strong>
                                             {swGrouped.strengths.length > 0 ? (
-                                                <ul className="space-y-1.5 text-xs text-emerald-300/80">
+                                                <ul className="space-y-1.5 text-xs text-emerald-350 block">
                                                     {swGrouped.strengths.map(s => <li key={s} className="list-disc ml-4">{s}</li>)}
                                                 </ul>
                                             ) : <em className="text-xs text-slate-500 italic block">None</em>}
@@ -662,13 +891,8 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                         </div>
                                     </div>
                                 </section>
-                            </>
-                        )}
 
-                        {/* TAB 4: INTERESTS & ACADEMICS */}
-                        {activeTab === 'interests' && (
-                            <>
-                                {/* Academic & Hobbies */}
+                                {/* Academics & Hobbies */}
                                 <section className="grid md:grid-cols-2 gap-6">
                                     <div className="glass-card p-6">
                                         <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">🏫 Academic Sentiments</h4>
@@ -701,10 +925,10 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                     </div>
                                 </section>
 
-                                {/* Subject Matter Interest (SMI) */}
+                                {/* SMI */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">9.</span> Subject Matter Interest (SMI)
+                                        Subject Matter Interest (SMI)
                                     </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center mb-6">
                                         {Object.entries({
@@ -732,10 +956,10 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                     )}
                                 </section>
 
-                                {/* Media Genre Profile */}
+                                {/* Media */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">10.</span> Media Genre & Visual World
+                                        Media Genre & Visual World Preference
                                     </h3>
                                     <div className="grid md:grid-cols-2 gap-4 text-xs">
                                         {mediaMovies.length > 0 && (
@@ -762,19 +986,13 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                                 <p className="text-slate-300 font-medium">{mediaGames.join(', ')}</p>
                                             </div>
                                         )}
-                                        {visualData?.visual_superpower && (
-                                            <div className="p-3 bg-white/5 rounded-lg border border-white/5 md:col-span-2">
-                                                <span className="text-slate-500 font-semibold block mb-1">Visual Superpower Choice</span>
-                                                <p className="text-indigo-300 italic">"{visualData.visual_superpower}"</p>
-                                            </div>
-                                        )}
                                     </div>
                                 </section>
 
-                                {/* Lifestyle & Struggles */}
+                                {/* Lifestyle Expectancies */}
                                 <section className="glass-card p-6">
                                     <h3 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
-                                        <span className="text-slate-500">11.</span> Lifestyle Expectancies
+                                        Lifestyle Expectancies & Priority Drivers
                                     </h3>
                                     <div className="grid md:grid-cols-2 gap-6 text-xs">
                                         <div>
@@ -804,36 +1022,33 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                                         </div>
                                     </div>
                                 </section>
+
+                                {/* Diagnostics (Aim, Family, Friends, Romantic, Body, Impactful) */}
+                                <section className="glass-card p-6">
+                                    <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
+                                        Diagnostic Compartments (Overview summaries)
+                                    </h3>
+                                    <div className="space-y-6">
+                                        {[
+                                            { label: 'Aim & Vision Summary', text: finalOverview.aim, icon: '🎯' },
+                                            { label: 'Family Compartment Dynamics', text: finalOverview.family, icon: '🏠' },
+                                            { label: 'Friends & Social Group Dynamics', text: finalOverview.friends, icon: '🤝' },
+                                            { label: 'Romantic & Relationship Styles', text: finalOverview.relationship, icon: '💖' },
+                                            { label: 'Body Image & Self Identity', text: finalOverview.bodyImage, icon: '🧍' },
+                                            { label: 'Impactful Life Incidents', text: finalOverview.impactful, icon: '⚡' }
+                                        ].map((comp, idx) => (
+                                            <div key={idx} className="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-indigo-500/20 transition-all">
+                                                <h4 className="text-sm font-bold text-white flex items-center gap-2 mb-2">
+                                                    <span>{comp.icon}</span>
+                                                    {comp.label}
+                                                </h4>
+                                                <p className="text-xs text-slate-300 leading-relaxed pl-6">{comp.text}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
                             </>
                         )}
-
-                        {/* TAB 5: DIAGNOSTIC COMPARTMENTS */}
-                        {activeTab === 'diagnostic' && (
-                            <section className="glass-card p-6">
-                                <h3 className="text-lg font-bold mb-6 text-white flex items-center gap-2">
-                                    <span className="text-slate-500">12.</span> Overview Section Compartments
-                                </h3>
-                                <div className="space-y-6">
-                                    {[
-                                        { label: 'Aim & Vision Summary', text: finalOverview.aim, icon: '🎯' },
-                                        { label: 'Family Compartment Dynamics', text: finalOverview.family, icon: '🏠' },
-                                        { label: 'Friends & Social Group Dynamics', text: finalOverview.friends, icon: '🤝' },
-                                        { label: 'Romantic & Relationship Styles', text: finalOverview.relationship, icon: '💖' },
-                                        { label: 'Body Image & Self Identity', text: finalOverview.bodyImage, icon: '🧍' },
-                                        { label: 'Impactful Life Incidents', text: finalOverview.impactful, icon: '⚡' }
-                                    ].map((comp, idx) => (
-                                        <div key={idx} className="p-4 bg-white/5 rounded-xl border border-white/5 hover:border-indigo-500/20 transition-all">
-                                            <h4 className="text-sm font-bold text-white flex items-center gap-2 mb-2">
-                                                <span>{comp.icon}</span>
-                                                {comp.label}
-                                            </h4>
-                                            <p className="text-xs text-slate-300 leading-relaxed pl-6">{comp.text}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
                     </div>
 
                     {/* Right Sidebar - Finalization Comparison Actions */}
