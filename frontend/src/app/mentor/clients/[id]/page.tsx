@@ -561,8 +561,10 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                     {/* Reports */}
                     {(client.reports || []).length > 0 && (
                         <div className="space-y-6 pt-4">
-                            <h2 className="text-xl font-bold text-slate-100">AI Generated Reports</h2>
-                            {(client.reports || []).map(report => {
+                            <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                <span>✨</span> Newly Updated Report
+                            </h2>
+                            {[...client.reports].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 1).map(report => {
                                 // Parse AI report content
                                 let parsedContent: any = {};
                                 let isJson = false;
@@ -701,7 +703,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                             <div>
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
-                                                    <h3 className="font-bold text-slate-100 text-lg">Comprehensive Career Analysis Report</h3>
+                                                    <h3 className="font-bold text-slate-100 text-lg">Newly Updated Career Analysis Report</h3>
                                                 </div>
                                                 <p className="text-xs text-slate-500 mt-1 font-medium">
                                                     Generated on {formattedReportDate}
@@ -1035,6 +1037,55 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     </div>
                                 );
                             })}
+
+                            {/* Separate Section: Previous Reports History */}
+                            {(client.reports || []).length > 1 && (
+                                <div className="bg-white/5 rounded-2xl border border-white/10 p-6 space-y-4 pt-4 mt-6">
+                                    <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-lg">📜</span>
+                                            <h3 className="text-lg font-bold text-slate-200">Previous Reports History</h3>
+                                            <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-xs font-bold text-slate-400">
+                                                {(client.reports || []).length - 1} archived {((client.reports || []).length - 1) === 1 ? 'version' : 'versions'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-400">
+                                        Previous versions of the report generated for this client.
+                                    </p>
+
+                                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        {[...client.reports]
+                                            .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+                                            .slice(1)
+                                            .map((oldRep: any) => {
+                                                const dateStr = oldRep.createdAt ? new Date(oldRep.createdAt).toLocaleDateString() : 'Past Report';
+                                                const statusStr = (oldRep.status || 'FINALIZED').replace('_', ' ');
+                                                return (
+                                                    <div key={oldRep.id} className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 flex flex-col justify-between hover:border-slate-700 transition-all space-y-3">
+                                                        <div className="space-y-1">
+                                                            <div className="flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-slate-300">Report #{oldRep.id.substring(oldRep.id.length - 6)}</span>
+                                                                <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-widest">
+                                                                    {statusStr}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[11px] text-slate-500">Generated on {dateStr}</p>
+                                                        </div>
+                                                        <div className="pt-2 flex items-center justify-between border-t border-white/5">
+                                                            <a
+                                                                href={`/mentor/reports/${oldRep.id}`}
+                                                                className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
+                                                            >
+                                                                View / Edit Report →
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                     {/* Parent Data */}

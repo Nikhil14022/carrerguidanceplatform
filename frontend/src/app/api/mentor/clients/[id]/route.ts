@@ -19,9 +19,6 @@ export async function GET(
         const role = session.user.role;
         const mentorProfileId = session.user.mentorProfileId;
 
-        const role = session.user.role;
-        const mentorProfileId = session.user.mentorProfileId;
-
         let clientProfile = await prisma.clientProfile.findUnique({
             where: { id },
             include: {
