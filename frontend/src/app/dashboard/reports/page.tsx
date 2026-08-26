@@ -78,7 +78,7 @@ export default function ReportsListPage() {
                                         <div className="w-2 h-2 rounded-full bg-indigo-500" />
                                         <h3 className="text-xl font-bold group-hover:text-indigo-400 transition-colors uppercase tracking-tight">AI Career Analysis</h3>
                                     </div>
-                                    <p className="text-slate-500 text-xs font-medium uppercase tracking-widest">Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-slate-500 text-xs font-medium uppercase tracking-widest">Generated on {new Date(report.createdAt || Date.now()).toLocaleDateString()}</p>
                                     <p className="text-slate-400 line-clamp-1 max-w-xl text-sm">{report.content}</p>
                                 </div>
                                 <div className="flex items-center gap-4">

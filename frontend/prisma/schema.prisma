@@ -432,6 +432,8 @@ model Report {
   content         String?      // Replaced by specific sections practically
   active          Boolean      @default(true)
   mentorApproved  Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
   
   careerOptions   CareerOption[]
   finalPlan       FinalPlan?

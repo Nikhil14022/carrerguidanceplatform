@@ -569,14 +569,14 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                 if (report.content) {
                                     try {
                                         parsedContent = JSON.parse(report.content);
-                                        isJson = typeof parsedContent === 'object' && parsedContent !== null && 'personality_insights' in parsedContent;
+                                        isJson = typeof parsedContent === 'object' && parsedContent !== null;
                                     } catch (e) {
                                         isJson = false;
                                     }
                                 }
-                                const personalityInsights = isJson ? parsedContent.personality_insights : (report.content || '');
-                                const mbtiType = isJson ? parsedContent.mbti_type : 'Pending';
-                                const mbtiInterpretation = isJson ? parsedContent.mbti_interpretation : '';
+                                const personalityInsights = isJson ? (parsedContent.personality_insights || (typeof report.content === 'string' && !report.content.trim().startsWith('{') ? report.content : '')) : (report.content || '');
+                                const mbtiType = isJson ? (parsedContent.mbti_type || 'Pending') : 'Pending';
+                                const mbtiInterpretation = isJson ? (parsedContent.mbti_interpretation || '') : '';
                                 const mbtiDimensions = isJson ? parsedContent.mbti_dimensions : null;
                                 const overviewSummaries = isJson ? parsedContent.overview_summaries : null;
 
@@ -595,17 +595,25 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                 const smiData = getModuleData(['subject', 'interest', 'hypotheticals', 'smi', 'module_16', 'module 16']);
 
                                 // 1. Demographics Arrays
-                                const activeSubjects = (demoData?.demo_subjects || []).filter((s: any) => s && s.col1 && s.col1.trim() !== '');
-                                const activeHobbies = (demoData?.demo_hobbies || []).filter((h: any) => h && h.col1 && h.col1.trim() !== '');
-                                const activeRoutine = (demoData?.demo_routine || []).filter((r: any) => r && r.trim() !== '');
+                                const activeSubjects = Array.isArray(demoData?.demo_subjects) 
+                                    ? demoData.demo_subjects.filter((s: any) => s && s.col1 && typeof s.col1 === 'string' && s.col1.trim() !== '') 
+                                    : [];
+                                const activeHobbies = Array.isArray(demoData?.demo_hobbies) 
+                                    ? demoData.demo_hobbies.filter((h: any) => h && h.col1 && typeof h.col1 === 'string' && h.col1.trim() !== '') 
+                                    : [];
+                                const activeRoutine = Array.isArray(demoData?.demo_routine) 
+                                    ? demoData.demo_routine.filter((r: any) => r && typeof r === 'string' && r.trim() !== '') 
+                                    : [];
 
                                 // 2. Values Category Grouping
-                                const topValues = valuesData?.__scored?.scores?.topValues || [];
+                                const topValues = Array.isArray(valuesData?.__scored?.scores?.topValues) ? valuesData.__scored.scores.topValues : [];
                                 const valuesByCategory: Record<string, string[]> = { Ideal: [], Standard: [], 'Want & Preference': [] };
                                 topValues.forEach((valObj: any) => {
-                                    const cat = valObj.category || 'Ideal';
-                                    if (cat in valuesByCategory) {
-                                        valuesByCategory[cat].push(valObj.value);
+                                    if (!valObj) return;
+                                    const cat = (typeof valObj === 'object' && valObj.category) ? valObj.category : 'Ideal';
+                                    const val = (typeof valObj === 'object' && valObj.value) ? valObj.value : String(valObj);
+                                    if (cat in valuesByCategory && val) {
+                                        valuesByCategory[cat].push(val);
                                     }
                                 });
 
@@ -630,11 +638,14 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
 
                                 // 4. RIASEC Totals
                                 const riasecTotals = riasecData?.__scored?.scores?.columnTotals || riasecData?.__scored?.raw?.totals || {};
-                                const riasecTop3 = riasecData?.__scored?.scores?.top3 || [];
+                                const riasecTop3 = Array.isArray(riasecData?.__scored?.scores?.top3) ? riasecData.__scored.scores.top3 : [];
                                 const hollandCode = riasecData?.__scored?.scores?.hollandCode || riasecData?.__scored?.raw?.hollandCode || 'ARI';
 
                                 // 5. Working Style
-                                const workingStyleResult = colorData?.__testData?.result || 'Blue Red Introvert';
+                                const rawWorkingStyle = colorData?.__testData?.result;
+                                const workingStyleResult = (typeof rawWorkingStyle === 'string' && rawWorkingStyle.trim() !== '') 
+                                    ? rawWorkingStyle 
+                                    : 'Blue Red Introvert';
                                 const workingStyleInterpretations: Record<string, string> = {
                                     'blue red introvert': 'Structured, detail-oriented, and highly analytical. Prefers quiet execution, values precision, and works best in individual contexts where logic and organization are paramount.',
                                     'red blue introvert': 'Goal-focused and logical. Direct and outcome-driven, but operates with high precision and structure, preferring to plan thoroughly before taking action.',
@@ -645,12 +656,13 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                   'Combines analytical structure, decisiveness, and focused execution. Values competence, clear boundaries, and independence in the workplace.';
 
                                 // 6. Strengths & Weaknesses
-                                const swGrid = swData?.sw_grid || [];
+                                const swGrid = Array.isArray(swData?.sw_grid) ? swData.sw_grid : [];
                                 const swGrouped = { weaknesses: [] as string[], situational: [] as string[], strengths: [] as string[] };
                                 swGrid.forEach((item: any) => {
-                                    const rating = Number(item.rating);
+                                    if (!item) return;
+                                    const rating = Number(item.rating || 5);
                                     const label = rating >= 8 ? (item.rightLabel || item.trait) : rating <= 4 ? (item.leftLabel || item.trait) : item.trait;
-                                    const text = `${label} (${rating}/10)`;
+                                    const text = `${label || 'Trait'} (${rating}/10)`;
                                     if (rating >= 8) swGrouped.strengths.push(text);
                                     else if (rating <= 4) swGrouped.weaknesses.push(text);
                                     else swGrouped.situational.push(text);
@@ -658,17 +670,17 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
 
                                 // 7. SMI Totals
                                 const smiTotals = smiData?.__scored?.scores?.columnTotals || smiData?.__scored?.raw?.columnTotals || {};
-                                const smiTop3 = smiData?.__scored?.scores?.topColumns || [];
+                                const smiTop3 = Array.isArray(smiData?.__scored?.scores?.topColumns) ? smiData.__scored.scores.topColumns : [];
 
                                 // 8. Media Genre & Visual World
-                                const mediaMovies = (visualData?.visual_fav_movies || []).filter((m: any) => m && m.col1).map((m: any) => m.col1);
-                                const mediaSeries = (visualData?.visual_fav_series || []).filter((s: any) => s && s.col1).map((s: any) => s.col1);
-                                const mediaGenres = (visualData?.visual_genres || []).filter((g: any) => g && g.option).map((g: any) => g.option);
-                                const mediaGames = (visualData?.visual_games || []).filter((g: any) => g && g.col2).map((g: any) => g.col2);
+                                const mediaMovies = Array.isArray(visualData?.visual_fav_movies) ? visualData.visual_fav_movies.filter((m: any) => m && m.col1).map((m: any) => m.col1) : [];
+                                const mediaSeries = Array.isArray(visualData?.visual_fav_series) ? visualData.visual_fav_series.filter((s: any) => s && s.col1).map((s: any) => s.col1) : [];
+                                const mediaGenres = Array.isArray(visualData?.visual_genres) ? visualData.visual_genres.filter((g: any) => g && g.option).map((g: any) => g.option) : [];
+                                const mediaGames = Array.isArray(visualData?.visual_games) ? visualData.visual_games.filter((g: any) => g && g.col2).map((g: any) => g.col2) : [];
 
                                 // 9. Lifestyle Priorities & Struggles
-                                const lifestylePriorities = lifestyleData?.lifestyle_career_priorities || [];
-                                const lifestyleStruggles = (lifestyleData?.lifestyle_12 || []).filter((s: any) => s && s.col2).map((s: any) => s.col2);
+                                const lifestylePriorities = Array.isArray(lifestyleData?.lifestyle_career_priorities) ? lifestyleData.lifestyle_career_priorities : [];
+                                const lifestyleStruggles = Array.isArray(lifestyleData?.lifestyle_12) ? lifestyleData.lifestyle_12.filter((s: any) => s && s.col2).map((s: any) => s.col2) : [];
 
                                 // 10. Diagnostics Overview
                                 const finalOverview = {
@@ -680,6 +692,9 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     impactful: overviewSummaries?.impactful_incidents || 'Independently learned sketching and music during COVID, defining a self-taught, creative identity.'
                                 };
 
+                                const formattedReportDate = report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Recent';
+                                const reportStatusStr = (report.status || 'FINALIZED').replace('_', ' ');
+
                                 return (
                                     <div key={report.id} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 space-y-6 relative group">
                                         <div className="flex justify-between items-center border-b border-white/5 pb-4">
@@ -689,7 +704,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                     <h3 className="font-bold text-slate-100 text-lg">Comprehensive Career Analysis Report</h3>
                                                 </div>
                                                 <p className="text-xs text-slate-500 mt-1 font-medium">
-                                                    Generated on {new Date(report.createdAt).toLocaleDateString()}
+                                                    Generated on {formattedReportDate}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -698,7 +713,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                         ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
                                                         : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
                                                 }`}>
-                                                    {report.status.replace('_', ' ')}
+                                                    {reportStatusStr}
                                                 </span>
                                                 <a 
                                                     href={`/mentor/reports/${report.id}`} 
@@ -1030,7 +1045,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                 <div key={pd.id} className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6">
                                     <div className="flex justify-between items-start mb-3">
                                         <h3 className="font-bold text-slate-100">Record Data</h3>
-                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{new Date(pd.createdAt).toLocaleDateString()}</span>
+                                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{pd.createdAt ? new Date(pd.createdAt).toLocaleDateString() : 'Record'}</span>
                                     </div>
                                     <div className="space-y-2">
                                         {pd.reportCardUrl && <a href={pd.reportCardUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-indigo-600 hover:text-indigo-800 font-medium hover:underline block truncate flex items-center gap-2">📄 Report Card</a>}
