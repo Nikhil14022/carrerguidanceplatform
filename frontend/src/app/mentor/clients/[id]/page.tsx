@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import StageManagementPanel from '@/components/StageManagementPanel';
 
@@ -28,13 +28,13 @@ interface ClientData {
 
 export default function MentorClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id: clientId } = use(params);
     const [client, setClient] = useState<ClientData | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
     const [mentorNotes, setMentorNotes] = useState('');
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
-    const [clientId, setClientId] = useState<string>('');
     const [customPrompt, setCustomPrompt] = useState('');
     const [activeReportTab, setActiveReportTab] = useState<'persona' | 'personality' | 'cognitive' | 'interests' | 'diagnostic'>('persona');
 
@@ -143,19 +143,10 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
     };
 
     useEffect(() => {
-        const resolveParams = async () => {
-            try {
-                const p = await params;
-                if (p?.id) {
-                    setClientId(p.id);
-                    fetchClient(p.id);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        resolveParams();
-    }, [params]);
+        if (clientId) {
+            fetchClient(clientId);
+        }
+    }, [clientId]);
 
     const fetchClient = async (id: string) => {
         try {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from '@/components/TestAnswersRenderer';
 import InteractiveObjectEditor from '@/components/InteractiveObjectEditor';
@@ -30,12 +30,12 @@ interface ClientData {
 
 export default function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id: clientId } = use(params);
     const [client, setClient] = useState<ClientData | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
-    const [clientId, setClientId] = useState<string>('');
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState<any>({});
     const [allModules, setAllModules] = useState<any[]>([]);
@@ -145,20 +145,11 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
     };
 
     useEffect(() => {
-        const resolveParams = async () => {
-            try {
-                const p = await params;
-                if (p?.id) {
-                    setClientId(p.id);
-                    fetchClient(p.id);
-                    fetchAllModules();
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        resolveParams();
-    }, [params]);
+        if (clientId) {
+            fetchClient(clientId);
+            fetchAllModules();
+        }
+    }, [clientId]);
 
     const fetchAllModules = async () => {
         try {

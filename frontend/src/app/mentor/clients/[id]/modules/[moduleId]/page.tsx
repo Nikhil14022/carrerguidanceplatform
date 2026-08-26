@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from "@/components/TestAnswersRenderer";
 import InteractiveObjectEditor from "@/components/InteractiveObjectEditor";
@@ -47,10 +47,11 @@ interface ModuleData {
 
 export default function MentorModuleAnswersPage({ params }: { params: Promise<{ id: string; moduleId: string }> }) {
     const router = useRouter();
+    const resolvedParams = use(params);
+    const clientId = resolvedParams.id;
+    const moduleId = resolvedParams.moduleId;
     const [mod, setMod] = useState<ModuleData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [clientId, setClientId] = useState('');
-    const [moduleId, setModuleId] = useState('');
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editValue, setEditValue] = useState<any>(null);
     const [editNotesValue, setEditNotesValue] = useState<string>('');
@@ -71,20 +72,10 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
     }, [mod]);
 
     useEffect(() => {
-        const resolveParams = async () => {
-            try {
-                const p = await params;
-                if (p?.id && p?.moduleId) {
-                    setClientId(p.id);
-                    setModuleId(p.moduleId);
-                    fetchModule(p.id, p.moduleId);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        resolveParams();
-    }, [params]);
+        if (clientId && moduleId) {
+            fetchModule(clientId, moduleId);
+        }
+    }, [clientId, moduleId]);
 
     const fetchModule = async (cId: string, mId: string) => {
         try {

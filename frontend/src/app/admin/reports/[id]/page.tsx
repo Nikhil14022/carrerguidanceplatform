@@ -1,49 +1,45 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminReportEditorPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id: reportId } = use(params);
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [content, setContent] = useState('');
     const [careerOptions, setCareerOptions] = useState<any[]>([]);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
-    const [reportId, setReportId] = useState('');
+
+    const loadReport = async (rId: string) => {
+        try {
+            // Fetch all clients and find the report
+            const clientsRes = await fetch('/api/admin/clients');
+            const clientsData = await clientsRes.json();
+            for (const client of (clientsData.clients || [])) {
+                const detailRes = await fetch(`/api/admin/clients/${client.id}`);
+                const detailData = await detailRes.json();
+                const found = detailData.client?.reports?.find((r: any) => r.id === rId);
+                if (found) {
+                    setReport({ ...found, clientName: client.name, clientEmail: client.email });
+                    setContent(found.content || '');
+                    setCareerOptions(found.careerOptions || []);
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error('Failed to load report', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const resolveParamsAndLoad = async () => {
-            try {
-                const p = await params;
-                if (!p?.id) return;
-                setReportId(p.id);
-                try {
-                    // Fetch all clients and find the report
-                    const clientsRes = await fetch('/api/admin/clients');
-                    const clientsData = await clientsRes.json();
-                    for (const client of (clientsData.clients || [])) {
-                        const detailRes = await fetch(`/api/admin/clients/${client.id}`);
-                        const detailData = await detailRes.json();
-                        const found = detailData.client?.reports?.find((r: any) => r.id === p.id);
-                        if (found) {
-                            setReport({ ...found, clientName: client.name, clientEmail: client.email });
-                            setContent(found.content || '');
-                            setCareerOptions(found.careerOptions || []);
-                            break;
-                        }
-                    }
-                } catch (err) {
-                    console.error('Failed to load report', err);
-                } finally {
-                    setLoading(false);
-                }
-            } catch (err) {
-                console.error('Params resolution failed', err);
-            }
-        };
-        resolveParamsAndLoad();
-    }, [params]);
+        if (reportId) {
+            loadReport(reportId);
+        }
+    }, [reportId]);
 
     const handleSave = async () => {
         setSaving(true);

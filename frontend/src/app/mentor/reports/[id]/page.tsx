@@ -1,15 +1,15 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function MentorReportEditorPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id: reportId } = use(params);
     const [report, setReport] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [careerOptions, setCareerOptions] = useState<any[]>([]);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
-    const [reportId, setReportId] = useState('');
 
     // Separate input states to prevent JSON corruption
     const [personaSummary, setPersonaSummary] = useState('');
@@ -28,56 +28,52 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
         final_understanding: { summary: '', career_direction: '', most_suitable_ecosystems: [], current_priority: '' }
     });
 
-    useEffect(() => {
-        const resolveParamsAndLoad = async () => {
-            try {
-                const p = await params;
-                if (!p?.id) return;
-                setReportId(p.id);
-                try {
-                    const res = await fetch(`/api/mentor/reports/${p.id}`);
-                    const data = await res.json();
+    const loadReport = async (rId: string) => {
+        try {
+            const res = await fetch(`/api/mentor/reports/${rId}`);
+            const data = await res.json();
 
-                    if (data.success && data.report) {
-                        setReport(data.report);
-                        setCareerOptions(data.report.careerOptions || []);
-                        try {
-                            const parsed = JSON.parse(data.report.content);
-                            setPersonaSummary(parsed.personality_insights || '');
-                            setMbtiInterpretation(parsed.mbti_interpretation || '');
-                            if (parsed.holistree_report) {
-                                setHReport(parsed.holistree_report);
-                            }
-                        } catch (e) {
-                            setPersonaSummary(data.report.content || '');
-                        }
-                    } else if (data.report) {
-                        setReport(data.report);
-                        setCareerOptions(data.report.careerOptions || []);
-                        try {
-                            const parsed = JSON.parse(data.report.content);
-                            setPersonaSummary(parsed.personality_insights || '');
-                            setMbtiInterpretation(parsed.mbti_interpretation || '');
-                            if (parsed.holistree_report) {
-                                setHReport(parsed.holistree_report);
-                            }
-                        } catch (e) {
-                            setPersonaSummary(data.report.content || '');
-                        }
-                    } else {
-                        console.error('Report load failed', data.error);
+            if (data.success && data.report) {
+                setReport(data.report);
+                setCareerOptions(data.report.careerOptions || []);
+                try {
+                    const parsed = JSON.parse(data.report.content);
+                    setPersonaSummary(parsed.personality_insights || '');
+                    setMbtiInterpretation(parsed.mbti_interpretation || '');
+                    if (parsed.holistree_report) {
+                        setHReport(parsed.holistree_report);
                     }
-                } catch (err) {
-                    console.error('Failed to load report', err);
-                } finally {
-                    setLoading(false);
+                } catch (e) {
+                    setPersonaSummary(data.report.content || '');
                 }
-            } catch (err) {
-                console.error('Params resolution failed', err);
+            } else if (data.report) {
+                setReport(data.report);
+                setCareerOptions(data.report.careerOptions || []);
+                try {
+                    const parsed = JSON.parse(data.report.content);
+                    setPersonaSummary(parsed.personality_insights || '');
+                    setMbtiInterpretation(parsed.mbti_interpretation || '');
+                    if (parsed.holistree_report) {
+                        setHReport(parsed.holistree_report);
+                    }
+                } catch (e) {
+                    setPersonaSummary(data.report.content || '');
+                }
+            } else {
+                console.error('Report load failed', data.error);
             }
-        };
-        resolveParamsAndLoad();
-    }, [params]);
+        } catch (err) {
+            console.error('Failed to load report', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (reportId) {
+            loadReport(reportId);
+        }
+    }, [reportId]);
 
     const handleSave = async () => {
         setSaving(true);

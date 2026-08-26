@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, use } from 'react';
 import { useRouter } from 'next/navigation';
 import TestAnswersRenderer from "@/components/TestAnswersRenderer";
 import InteractiveObjectEditor from "@/components/InteractiveObjectEditor";
@@ -182,9 +182,9 @@ const formatValueForCopy = (q: any, val: any): string => {
 
 export default function CombinedAnswersPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
+    const { id: clientId } = use(params);
     const [client, setClient] = useState<ClientData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [clientId, setClientId] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedModuleFilters, setSelectedModuleFilters] = useState<string[]>([]);
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'COMPLETED_ONLY'>('ALL');
@@ -198,11 +198,10 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
 
     useEffect(() => {
-        params.then(p => {
-            setClientId(p.id);
-            fetchClientData(p.id);
-        });
-    }, []);
+        if (clientId) {
+            fetchClientData(clientId);
+        }
+    }, [clientId]);
 
     const fetchClientData = async (id: string) => {
         try {
