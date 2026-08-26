@@ -93,6 +93,93 @@ const SELF_DISCOVERY_QUESTIONS: Record<string, string> = {
     sd_r2_q20: "One big regret you want to make sure you avoid?",
 };
 
+const formatValueForCopy = (q: any, val: any): string => {
+    if (val === undefined || val === null) return '—';
+    
+    // 1. Array of values or objects
+    if (Array.isArray(val)) {
+        const items = val.map((valItem: any) => {
+            if (valItem && typeof valItem === 'object') {
+                // Check if it has time and activity (slots)
+                if (valItem.time || valItem.activity) {
+                    return `${valItem.time || '—'}: ${valItem.activity || '—'}`;
+                }
+                // Check if it's a schedule block
+                if (valItem.days && Array.isArray(valItem.slots)) {
+                    const slotsStr = valItem.slots.map((s: any) => `${s.time || '—'}: ${s.activity || '—'}`).join(', ');
+                    return `Days: ${valItem.days.join(', ')} [${slotsStr}]`;
+                }
+                // Default object values extraction
+                const values = Object.values(valItem)
+                    .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
+                    .filter(v => v !== '');
+                return values.length > 0 ? values.join(' - ') : '';
+            }
+            if (q && q.options) {
+                const opt = q.options.find((o: any) => o.id === valItem);
+                if (opt) return opt.text;
+            }
+            return String(valItem);
+        }).filter(Boolean);
+        
+        return items.length > 0 ? items.join(', ') : '—';
+    }
+    
+    // 2. Ranked lists
+    if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
+        return (val as any).ranked.map((valItem: any, idx: number) => {
+            if (q && q.options) {
+                const opt = q.options.find((o: any) => o.id === valItem);
+                if (opt) return `${idx + 1}. ${opt.text}`;
+            }
+            return `${idx + 1}. ${valItem}`;
+        }).join(', ');
+    }
+    
+    // 3. Education block object (school/college/university)
+    if (val && typeof val === 'object' && (val.school || val.college || val.university)) {
+        const parts: string[] = [];
+        ['school', 'college', 'university'].forEach(level => {
+            const d = (val as any)[level];
+            if (d?.active) {
+                parts.push(`${level.toUpperCase()}: ${d.name || 'N/A'} (Grade: ${d.grade || 'N/A'})`);
+            }
+        });
+        return parts.join(' | ');
+    }
+    
+    // 4. Time-activity schedule object
+    if (val && typeof val === 'object' && Object.keys(val).some(k => k.includes('AM') || k.includes('PM'))) {
+        return Object.entries(val)
+            .map(([time, activity]) => `${time}: ${activity}`)
+            .join(', ');
+    }
+    
+    // 5. Generic object formatting
+    if (val && typeof val === 'object') {
+        const keys = Object.keys(val);
+        if (keys.length === 0) return '—';
+        const formatted = keys
+            .map(k => {
+                const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
+                const v = val[k];
+                if (v && typeof v === 'object') return `${label}: ${JSON.stringify(v)}`;
+                if (v === undefined || v === null || v === '') return '';
+                return `${label}: ${v}`;
+            })
+            .filter(Boolean);
+        return formatted.length > 0 ? formatted.join(' | ') : '—';
+    }
+    
+    // 6. Options mapping for primitives
+    if (q && q.options) {
+        const opt = q.options.find((o: any) => o.id === val);
+        return opt ? opt.text : String(val);
+    }
+    
+    return String(val);
+};
+
 export default function CombinedAnswersPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const [client, setClient] = useState<ClientData | null>(null);

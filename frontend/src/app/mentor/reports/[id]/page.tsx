@@ -29,48 +29,55 @@ export default function MentorReportEditorPage({ params }: { params: Promise<{ i
     });
 
     useEffect(() => {
-        params.then(async p => {
-            setReportId(p.id);
+        const resolveParamsAndLoad = async () => {
             try {
-                const res = await fetch(`/api/mentor/reports/${p.id}`);
-                const data = await res.json();
+                const p = await params;
+                if (!p?.id) return;
+                setReportId(p.id);
+                try {
+                    const res = await fetch(`/api/mentor/reports/${p.id}`);
+                    const data = await res.json();
 
-                if (data.success && data.report) {
-                    setReport(data.report);
-                    setCareerOptions(data.report.careerOptions || []);
-                    try {
-                        const parsed = JSON.parse(data.report.content);
-                        setPersonaSummary(parsed.personality_insights || '');
-                        setMbtiInterpretation(parsed.mbti_interpretation || '');
-                        if (parsed.holistree_report) {
-                            setHReport(parsed.holistree_report);
+                    if (data.success && data.report) {
+                        setReport(data.report);
+                        setCareerOptions(data.report.careerOptions || []);
+                        try {
+                            const parsed = JSON.parse(data.report.content);
+                            setPersonaSummary(parsed.personality_insights || '');
+                            setMbtiInterpretation(parsed.mbti_interpretation || '');
+                            if (parsed.holistree_report) {
+                                setHReport(parsed.holistree_report);
+                            }
+                        } catch (e) {
+                            setPersonaSummary(data.report.content || '');
                         }
-                    } catch (e) {
-                        setPersonaSummary(data.report.content || '');
-                    }
-                } else if (data.report) {
-                    setReport(data.report);
-                    setCareerOptions(data.report.careerOptions || []);
-                    try {
-                        const parsed = JSON.parse(data.report.content);
-                        setPersonaSummary(parsed.personality_insights || '');
-                        setMbtiInterpretation(parsed.mbti_interpretation || '');
-                        if (parsed.holistree_report) {
-                            setHReport(parsed.holistree_report);
+                    } else if (data.report) {
+                        setReport(data.report);
+                        setCareerOptions(data.report.careerOptions || []);
+                        try {
+                            const parsed = JSON.parse(data.report.content);
+                            setPersonaSummary(parsed.personality_insights || '');
+                            setMbtiInterpretation(parsed.mbti_interpretation || '');
+                            if (parsed.holistree_report) {
+                                setHReport(parsed.holistree_report);
+                            }
+                        } catch (e) {
+                            setPersonaSummary(data.report.content || '');
                         }
-                    } catch (e) {
-                        setPersonaSummary(data.report.content || '');
+                    } else {
+                        console.error('Report load failed', data.error);
                     }
-                } else {
-                    console.error('Report load failed', data.error);
+                } catch (err) {
+                    console.error('Failed to load report', err);
+                } finally {
+                    setLoading(false);
                 }
             } catch (err) {
-                console.error('Failed to load report', err);
-            } finally {
-                setLoading(false);
+                console.error('Params resolution failed', err);
             }
-        });
-    }, []);
+        };
+        resolveParamsAndLoad();
+    }, [params]);
 
     const handleSave = async () => {
         setSaving(true);

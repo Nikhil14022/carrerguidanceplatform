@@ -13,30 +13,37 @@ export default function AdminReportEditorPage({ params }: { params: Promise<{ id
     const [reportId, setReportId] = useState('');
 
     useEffect(() => {
-        params.then(async p => {
-            setReportId(p.id);
+        const resolveParamsAndLoad = async () => {
             try {
-                // Fetch all clients and find the report
-                const clientsRes = await fetch('/api/admin/clients');
-                const clientsData = await clientsRes.json();
-                for (const client of (clientsData.clients || [])) {
-                    const detailRes = await fetch(`/api/admin/clients/${client.id}`);
-                    const detailData = await detailRes.json();
-                    const found = detailData.client?.reports?.find((r: any) => r.id === p.id);
-                    if (found) {
-                        setReport({ ...found, clientName: client.name, clientEmail: client.email });
-                        setContent(found.content || '');
-                        setCareerOptions(found.careerOptions || []);
-                        break;
+                const p = await params;
+                if (!p?.id) return;
+                setReportId(p.id);
+                try {
+                    // Fetch all clients and find the report
+                    const clientsRes = await fetch('/api/admin/clients');
+                    const clientsData = await clientsRes.json();
+                    for (const client of (clientsData.clients || [])) {
+                        const detailRes = await fetch(`/api/admin/clients/${client.id}`);
+                        const detailData = await detailRes.json();
+                        const found = detailData.client?.reports?.find((r: any) => r.id === p.id);
+                        if (found) {
+                            setReport({ ...found, clientName: client.name, clientEmail: client.email });
+                            setContent(found.content || '');
+                            setCareerOptions(found.careerOptions || []);
+                            break;
+                        }
                     }
+                } catch (err) {
+                    console.error('Failed to load report', err);
+                } finally {
+                    setLoading(false);
                 }
             } catch (err) {
-                console.error('Failed to load report', err);
-            } finally {
-                setLoading(false);
+                console.error('Params resolution failed', err);
             }
-        });
-    }, []);
+        };
+        resolveParamsAndLoad();
+    }, [params]);
 
     const handleSave = async () => {
         setSaving(true);

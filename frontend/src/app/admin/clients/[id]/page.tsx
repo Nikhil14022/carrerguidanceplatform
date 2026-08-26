@@ -145,12 +145,20 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
     };
 
     useEffect(() => {
-        params.then(p => {
-            setClientId(p.id);
-            fetchClient(p.id);
-            fetchAllModules();
-        });
-    }, []);
+        const resolveParams = async () => {
+            try {
+                const p = await params;
+                if (p?.id) {
+                    setClientId(p.id);
+                    fetchClient(p.id);
+                    fetchAllModules();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        resolveParams();
+    }, [params]);
 
     const fetchAllModules = async () => {
         try {

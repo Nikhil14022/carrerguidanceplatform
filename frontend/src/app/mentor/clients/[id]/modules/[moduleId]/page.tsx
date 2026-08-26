@@ -71,12 +71,20 @@ export default function MentorModuleAnswersPage({ params }: { params: Promise<{ 
     }, [mod]);
 
     useEffect(() => {
-        params.then(p => {
-            setClientId(p.id);
-            setModuleId(p.moduleId);
-            fetchModule(p.id, p.moduleId);
-        });
-    }, []);
+        const resolveParams = async () => {
+            try {
+                const p = await params;
+                if (p?.id && p?.moduleId) {
+                    setClientId(p.id);
+                    setModuleId(p.moduleId);
+                    fetchModule(p.id, p.moduleId);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        resolveParams();
+    }, [params]);
 
     const fetchModule = async (cId: string, mId: string) => {
         try {

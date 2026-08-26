@@ -93,6 +93,93 @@ const SELF_DISCOVERY_QUESTIONS: Record<string, string> = {
     sd_r2_q20: "One big regret you want to make sure you avoid?",
 };
 
+const formatValueForCopy = (q: any, val: any): string => {
+    if (val === undefined || val === null) return '—';
+    
+    // 1. Array of values or objects
+    if (Array.isArray(val)) {
+        const items = val.map((valItem: any) => {
+            if (valItem && typeof valItem === 'object') {
+                // Check if it has time and activity (slots)
+                if (valItem.time || valItem.activity) {
+                    return `${valItem.time || '—'}: ${valItem.activity || '—'}`;
+                }
+                // Check if it's a schedule block
+                if (valItem.days && Array.isArray(valItem.slots)) {
+                    const slotsStr = valItem.slots.map((s: any) => `${s.time || '—'}: ${s.activity || '—'}`).join(', ');
+                    return `Days: ${valItem.days.join(', ')} [${slotsStr}]`;
+                }
+                // Default object values extraction
+                const values = Object.values(valItem)
+                    .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
+                    .filter(v => v !== '');
+                return values.length > 0 ? values.join(' - ') : '';
+            }
+            if (q && q.options) {
+                const opt = q.options.find((o: any) => o.id === valItem);
+                if (opt) return opt.text;
+            }
+            return String(valItem);
+        }).filter(Boolean);
+        
+        return items.length > 0 ? items.join(', ') : '—';
+    }
+    
+    // 2. Ranked lists
+    if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
+        return (val as any).ranked.map((valItem: any, idx: number) => {
+            if (q && q.options) {
+                const opt = q.options.find((o: any) => o.id === valItem);
+                if (opt) return `${idx + 1}. ${opt.text}`;
+            }
+            return `${idx + 1}. ${valItem}`;
+        }).join(', ');
+    }
+    
+    // 3. Education block object (school/college/university)
+    if (val && typeof val === 'object' && (val.school || val.college || val.university)) {
+        const parts: string[] = [];
+        ['school', 'college', 'university'].forEach(level => {
+            const d = (val as any)[level];
+            if (d?.active) {
+                parts.push(`${level.toUpperCase()}: ${d.name || 'N/A'} (Grade: ${d.grade || 'N/A'})`);
+            }
+        });
+        return parts.join(' | ');
+    }
+    
+    // 4. Time-activity schedule object
+    if (val && typeof val === 'object' && Object.keys(val).some(k => k.includes('AM') || k.includes('PM'))) {
+        return Object.entries(val)
+            .map(([time, activity]) => `${time}: ${activity}`)
+            .join(', ');
+    }
+    
+    // 5. Generic object formatting
+    if (val && typeof val === 'object') {
+        const keys = Object.keys(val);
+        if (keys.length === 0) return '—';
+        const formatted = keys
+            .map(k => {
+                const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
+                const v = val[k];
+                if (v && typeof v === 'object') return `${label}: ${JSON.stringify(v)}`;
+                if (v === undefined || v === null || v === '') return '';
+                return `${label}: ${v}`;
+            })
+            .filter(Boolean);
+        return formatted.length > 0 ? formatted.join(' | ') : '—';
+    }
+    
+    // 6. Options mapping for primitives
+    if (q && q.options) {
+        const opt = q.options.find((o: any) => o.id === val);
+        return opt ? opt.text : String(val);
+    }
+    
+    return String(val);
+};
+
 export default function AdminCombinedAnswersPage({ params }: { params: Promise<{ id: string }> }) {
     const router = useRouter();
     const [client, setClient] = useState<ClientData | null>(null);
@@ -111,11 +198,19 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
 
     useEffect(() => {
-        params.then(p => {
-            setClientId(p.id);
-            fetchClientData(p.id);
-        });
-    }, []);
+        const resolveParams = async () => {
+            try {
+                const p = await params;
+                if (p?.id) {
+                    setClientId(p.id);
+                    fetchClientData(p.id);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        resolveParams();
+    }, [params]);
 
     const fetchClientData = async (id: string) => {
         try {
@@ -199,48 +294,27 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
             if (m.module.schema.testType === 'SELF_DISCOVERY') {
                 Object.entries(hasAns).forEach(([key, val]) => {
                     const qText = SELF_DISCOVERY_QUESTIONS[key] || key;
-                    summaryText += `Q: ${qText}\nA: ${String(val)}\n\n`;
+                    summaryText += `Q: ${qText}\nA: ${formatValueForCopy(null, val)}\n\n`;
                 });
             } else if (m.module.schema.testType && hasAns.__scored?.scores) {
+                // Formatting scores cleanly
+                summaryText += `Scored Results:\n`;
                 const scoreObj = hasAns.__scored.scores;
-                summaryText += `Scored Results:\n${JSON.stringify(scoreObj, null, 2)}\n\n`;
+                Object.entries(scoreObj).forEach(([k, v]) => {
+                    if (Array.isArray(v)) {
+                        summaryText += `${k}: ${v.map(item => typeof item === 'object' ? JSON.stringify(item) : String(item)).join(', ')}\n`;
+                    } else if (typeof v === 'object' && v !== null) {
+                        summaryText += `${k}: ${JSON.stringify(v)}\n`;
+                    } else {
+                        summaryText += `${k}: ${v}\n`;
+                    }
+                });
+                summaryText += `\n`;
             } else if (m.module.schema.questions) {
                 m.module.schema.questions.forEach((q: any) => {
                     const val = hasAns[q.id];
                     if (val !== undefined && val !== null) {
-                        let displayVal = "";
-                        if (Array.isArray(val)) {
-                            displayVal = val.map((valItem: any) => {
-                                if (valItem && typeof valItem === 'object') {
-                                    const values = Object.values(valItem)
-                                        .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
-                                        .filter(v => v !== '');
-                                    return values.length > 0 ? values.join(' - ') : JSON.stringify(valItem);
-                                }
-                                if (q.options) {
-                                    const opt = q.options.find((o: any) => o.id === valItem);
-                                    if (opt) return opt.text;
-                                }
-                                return String(valItem);
-                            }).filter(Boolean).join(', ');
-                        } else if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
-                            displayVal = (val as any).ranked.map((valItem: any, idx: number) => {
-                                if (q.options) {
-                                    const opt = q.options.find((o: any) => o.id === valItem);
-                                    if (opt) return `${idx + 1}. ${opt.text}`;
-                                }
-                                return `${idx + 1}. ${valItem}`;
-                            }).join(', ');
-                        } else if (val && typeof val === 'object') {
-                            displayVal = JSON.stringify(val);
-                        } else {
-                            if (q.options) {
-                                const opt = q.options.find((o: any) => o.id === val);
-                                displayVal = opt ? opt.text : String(val);
-                            } else {
-                                displayVal = String(val);
-                            }
-                        }
+                        const displayVal = formatValueForCopy(q, val);
                         summaryText += `Q: ${q.question}\nA: ${displayVal}\n\n`;
                     }
                 });

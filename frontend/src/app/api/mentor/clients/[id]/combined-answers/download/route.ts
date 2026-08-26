@@ -62,13 +62,12 @@ export async function GET(
       return new NextResponse('Client not found', { status: 404 });
     }
 
-    // Helper functions for rendering modules
     const formatResponseValue = (q: any, val: any): string => {
       if (val === undefined || val === null) return '—';
       
       // 1. Array of values or objects
       if (Array.isArray(val)) {
-        return val.map((valItem: any) => {
+        const items = val.map((valItem: any) => {
           if (valItem && typeof valItem === 'object') {
             // Check if it has time and activity (slots)
             if (valItem.time || valItem.activity) {
@@ -83,14 +82,16 @@ export async function GET(
             const values = Object.values(valItem)
               .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
               .filter(v => v !== '');
-            return values.length > 0 ? values.join(' - ') : JSON.stringify(valItem);
+            return values.length > 0 ? values.join(' - ') : '';
           }
           if (q.options) {
             const opt = q.options.find((o: any) => o.id === valItem);
             if (opt) return opt.text;
           }
           return String(valItem);
-        }).filter(Boolean).join(', ');
+        }).filter(Boolean);
+
+        return items.length > 0 ? items.join(', ') : '—';
       }
       
       // 2. Ranked lists
@@ -127,14 +128,16 @@ export async function GET(
       if (val && typeof val === 'object') {
         const keys = Object.keys(val);
         if (keys.length === 0) return '—';
-        return keys
+        const formatted = keys
           .map(k => {
             const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
             const v = val[k];
             if (v && typeof v === 'object') return `${label}: ${JSON.stringify(v)}`;
+            if (v === undefined || v === null || v === '') return '';
             return `${label}: ${v}`;
           })
-          .join(' | ');
+          .filter(Boolean);
+        return formatted.length > 0 ? formatted.join(' | ') : '—';
       }
       
       // 6. Options mapping for primitives

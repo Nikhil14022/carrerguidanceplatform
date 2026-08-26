@@ -143,11 +143,19 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
     };
 
     useEffect(() => {
-        params.then(p => {
-            setClientId(p.id);
-            fetchClient(p.id);
-        });
-    }, []);
+        const resolveParams = async () => {
+            try {
+                const p = await params;
+                if (p?.id) {
+                    setClientId(p.id);
+                    fetchClient(p.id);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        resolveParams();
+    }, [params]);
 
     const fetchClient = async (id: string) => {
         try {
@@ -560,10 +568,10 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                     </div>
 
                     {/* Reports */}
-                    {client.reports.length > 0 && (
+                    {(client.reports || []).length > 0 && (
                         <div className="space-y-6 pt-4">
                             <h2 className="text-xl font-bold text-slate-100">AI Generated Reports</h2>
-                            {client.reports.map(report => {
+                            {(client.reports || []).map(report => {
                                 // Parse AI report content
                                 let parsedContent: any = {};
                                 let isJson = false;
@@ -806,19 +814,22 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                             </div>
                                                             <p className="text-xs text-slate-400 leading-relaxed">{mbtiInterpretation || "Personality factors interpretation compiled from the assessments."}</p>
                                                         </div>
-                                                        {mbtiDimensions && (
+                                                        {mbtiDimensions && typeof mbtiDimensions === 'object' && (
                                                             <div className="grid gap-3 pt-3 border-t border-white/5">
-                                                                {Object.entries(mbtiDimensions).map(([k, d]: any) => (
-                                                                    <div key={k} className="space-y-1">
-                                                                        <div className="flex justify-between text-[10px] font-bold">
-                                                                            <span className="text-slate-500 capitalize">{k}</span>
-                                                                            <span className="text-indigo-400">{d.label} ({d.percentage}%)</span>
+                                                                {Object.entries(mbtiDimensions).map(([k, d]: any) => {
+                                                                    if (!d) return null;
+                                                                    return (
+                                                                        <div key={k} className="space-y-1">
+                                                                            <div className="flex justify-between text-[10px] font-bold">
+                                                                                <span className="text-slate-500 capitalize">{k}</span>
+                                                                                <span className="text-indigo-400">{d?.label || 'N/A'} ({d?.percentage || 0}%)</span>
+                                                                            </div>
+                                                                            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                                                <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${d?.percentage || 0}%` }} />
+                                                                            </div>
                                                                         </div>
-                                                                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                                                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${d.percentage}%` }} />
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
+                                                                    );
+                                                                })}
                                                             </div>
                                                         )}
                                                     </div>
@@ -839,14 +850,17 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                                                 ))}
                                                             </div>
                                                         </div>
-                                                        {riasecTop3.length > 0 && (
+                                                        {riasecTop3 && Array.isArray(riasecTop3) && riasecTop3.length > 0 && (
                                                             <div className="space-y-2 pt-3 border-t border-white/5 text-xs">
-                                                                {riasecTop3.map((item: any) => (
-                                                                    <div key={item.label} className="text-xs">
-                                                                        <span className="font-bold text-indigo-400">{item.label} ({item.letter}) — Score: {item.score}</span>
-                                                                        <p className="text-slate-450 leading-relaxed mt-0.5">{item.interpretation}</p>
-                                                                    </div>
-                                                                ))}
+                                                                {riasecTop3.map((item: any) => {
+                                                                    if (!item) return null;
+                                                                    return (
+                                                                        <div key={item.label || item.letter} className="text-xs">
+                                                                            <span className="font-bold text-indigo-400">{item.label || 'N/A'} ({item.letter || 'N/A'}) — Score: {item.score || 0}</span>
+                                                                            <p className="text-slate-450 leading-relaxed mt-0.5">{item.interpretation || ''}</p>
+                                                                        </div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         )}
                                                     </div>
