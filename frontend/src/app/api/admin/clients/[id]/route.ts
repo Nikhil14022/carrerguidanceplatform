@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const clientProfile = await prisma.clientProfile.findUnique({
+    let clientProfile = await prisma.clientProfile.findUnique({
       where: { id },
       include: {
         user: { select: { id: true, email: true, name: true, createdAt: true } },
@@ -37,6 +37,28 @@ export async function GET(
         }
       }
     })
+
+    if (!clientProfile) {
+      clientProfile = await prisma.clientProfile.findUnique({
+        where: { userId: id },
+        include: {
+          user: { select: { id: true, email: true, name: true, createdAt: true } },
+          modules: {
+            orderBy: { order: 'asc' },
+            include: {
+              module: true,
+              response: { select: { data: true, submittedAt: true, approvedAt: true } }
+            }
+          },
+          reports: {
+            include: { careerOptions: true }
+          },
+          stages: {
+            orderBy: { stageNumber: 'asc' }
+          }
+        }
+      })
+    }
 
     if (!clientProfile) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 })
@@ -84,7 +106,7 @@ export async function GET(
 
     // Fetch client appointments
     const rawBookings = await prisma.appointmentBooking.findMany({
-      where: { clientProfileId: id },
+      where: { clientProfileId: clientProfile.id },
       orderBy: { createdAt: 'desc' }
     });
 

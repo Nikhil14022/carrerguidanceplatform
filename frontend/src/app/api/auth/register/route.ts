@@ -50,7 +50,7 @@ export async function POST(request: Request) {
                   })
                   .map((mod, index) => ({
                     moduleId: mod.id,
-                    status: 'LOCKED',
+                    status: index === 0 ? 'UNLOCKED' : 'LOCKED',
                     order: index + 1,
                     filledBy: 'CLIENT'
                   }))

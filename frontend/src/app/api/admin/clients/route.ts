@@ -168,7 +168,7 @@ export async function POST(request: Request) {
                 modules: {
                   create: moduleTemplates.map((template, idx) => ({
                     moduleId: template.id,
-                    status: 'LOCKED',
+                    status: idx === 0 ? 'UNLOCKED' : 'LOCKED',
                     order: idx + 1,
                     filledBy: 'CLIENT'
                   }))

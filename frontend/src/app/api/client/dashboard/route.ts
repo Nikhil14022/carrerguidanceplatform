@@ -17,7 +17,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const clientProfile = await prisma.clientProfile.findUnique({
+    let clientProfile = await prisma.clientProfile.findUnique({
       where: { userId: session.user.id },
       include: {
         modules: {
@@ -35,7 +35,38 @@ export async function GET() {
     })
 
     if (!clientProfile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+      const moduleTemplates = await prisma.module.findMany({
+        orderBy: { defaultOrder: 'asc' }
+      });
+
+      clientProfile = await prisma.clientProfile.create({
+        data: {
+          userId: session.user.id,
+          currentStage: 1,
+          journeyStatus: 'Started',
+          modules: {
+            create: moduleTemplates.map((template, idx) => ({
+              moduleId: template.id,
+              status: idx === 0 ? 'UNLOCKED' : 'LOCKED',
+              order: idx + 1,
+              filledBy: 'CLIENT'
+            }))
+          }
+        },
+        include: {
+          modules: {
+            orderBy: { order: 'asc' },
+            include: { module: true, response: true }
+          },
+          reports: {
+            where: { active: true },
+            orderBy: { id: 'desc' }
+          },
+          stages: {
+            orderBy: { stageNumber: 'asc' }
+          }
+        }
+      });
     }
 
     // --- JIT Initialize Workflow Stages ---
@@ -54,23 +85,25 @@ export async function GET() {
     let stages = clientProfile.stages || [];
     if (stages.length < 9) {
       const existingNums = new Set(stages.map((s: any) => s.stageNumber));
-      const createdStages = [];
 
       for (let num = 1; num <= 9; num++) {
         if (!existingNums.has(num)) {
-          const created = await prisma.clientStage.create({
-            data: {
-              clientProfileId: clientProfile.id,
-              stageNumber: num,
-              stageName: defaultStageNames[num - 1],
-              status: "NOT_STARTED",
-              notes: "",
-              tasks: [],
-              documents: [],
-              meetingOutcomes: ""
-            }
-          });
-          createdStages.push(created);
+          try {
+            await prisma.clientStage.create({
+              data: {
+                clientProfileId: clientProfile.id,
+                stageNumber: num,
+                stageName: defaultStageNames[num - 1],
+                status: "NOT_STARTED",
+                notes: "",
+                tasks: [],
+                documents: [],
+                meetingOutcomes: ""
+              }
+            });
+          } catch (e) {
+            console.error(`Error creating stage ${num}:`, e);
+          }
         }
       }
 
@@ -107,23 +140,25 @@ export async function GET() {
 
       // Refresh the modules list and recalibrate journey status if needed
       clientProfile.modules = [...clientProfile.modules, ...newClientModules].sort((a, b) => a.order - b.order)
+    }
 
-      // If they were stuck at "Analysis in Progress" but now have more modules, unlock the next one
-      if (clientProfile.journeyStatus === "Analysis in Progress") {
-        const nextToUnlock = clientProfile.modules.find(m => m.status === 'LOCKED')
-        if (nextToUnlock) {
-          await prisma.clientModule.update({
-            where: { id: nextToUnlock.id },
-            data: { status: 'UNLOCKED' }
-          })
-          nextToUnlock.status = 'UNLOCKED'
-          await prisma.clientProfile.update({
-            where: { id: clientProfile.id },
-            data: { journeyStatus: "In Progress" }
-          })
-          clientProfile.journeyStatus = "In Progress"
-        }
-      }
+    // --- Auto-unlock Module 1 if all modules are locked ---
+    const hasAnyUnlocked = clientProfile.modules.some(
+      (m: any) => ['UNLOCKED', 'IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status)
+    );
+
+    if (!hasAnyUnlocked && clientProfile.modules.length > 0) {
+      const firstModule = clientProfile.modules[0];
+      await prisma.clientModule.update({
+        where: { id: firstModule.id },
+        data: { status: 'UNLOCKED' }
+      });
+      firstModule.status = 'UNLOCKED';
+      await prisma.clientProfile.update({
+        where: { id: clientProfile.id },
+        data: { journeyStatus: "In Progress" }
+      });
+      clientProfile.journeyStatus = "In Progress";
     }
     // ------------------------------------------
 
