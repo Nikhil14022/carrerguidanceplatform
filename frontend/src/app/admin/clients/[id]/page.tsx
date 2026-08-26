@@ -1058,145 +1058,142 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                                     <span>🤖 AI Report & Counselor Chat</span>
                                     {approvedCount < client.modules.length && (
-                                        <span className="text-[10px] bg-red-500/10 border border-red-500/20 text-red-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded">
-                                            Locked
+                                        <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded animate-pulse">
+                                            Incomplete Data Warning
                                         </span>
                                     )}
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-1">
-                                    {approvedCount < client.modules.length 
-                                        ? `Complete and approve all ${client.modules.length} modules to unlock report generation and chat (Current progress: ${approvedCount}/${client.modules.length}).`
-                                        : "Ask questions about module answers, refine recommendations, or compile the report."
-                                    }
+                                    Ask questions about module answers, refine recommendations, or compile the report.
                                 </p>
                             </div>
                         </div>
 
-                        {approvedCount < client.modules.length ? (
-                            <div className="py-6 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2">
-                                <svg className="w-8 h-8 text-slate-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                <span>Awaiting completion of all modules to activate counselor AI.</span>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <div className="flex bg-slate-950 p-1.5 rounded-xl border border-white/5 gap-1 self-start inline-flex">
-                                    <button
-                                        onClick={() => setAiTab('standard')}
-                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                                            aiTab === 'standard' 
-                                                ? 'bg-orange-500 text-white' 
-                                                : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        Standard Generator
-                                    </button>
-                                    <button
-                                        onClick={() => setAiTab('chat')}
-                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                                            aiTab === 'chat' 
-                                                ? 'bg-orange-500 text-white' 
-                                                : 'text-slate-400 hover:text-slate-200'
-                                        }`}
-                                    >
-                                        AI Chat Counselor
-                                    </button>
-                                </div>
-
-                                {aiTab === 'standard' ? (
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
-                                                Custom Report Instructions (Optional)
-                                            </label>
-                                            <textarea
-                                                value={customPrompt}
-                                                onChange={e => setCustomPrompt(e.target.value)}
-                                                placeholder="e.g., Focus on careers in clean energy and sustainability, highlight their RIASEC Artistic score..."
-                                                rows={3}
-                                                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-orange-500"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={() => handleGenerateReport()}
-                                            disabled={actionLoading}
-                                            className="w-full py-2.5 rounded-xl bg-orange-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-all disabled:opacity-50"
-                                        >
-                                            {actionLoading ? 'Generating...' : 'Generate Career Report'}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {/* Chat Feed */}
-                                        <div className="bg-slate-950 border border-slate-850 rounded-2xl p-4 h-[300px] overflow-y-auto space-y-3 custom-scrollbar">
-                                            <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-slate-400 leading-relaxed">
-                                                🤖 **AI Counselor:** Hi! I have indexed all of the client's survey data. Ask me specific questions about their modules, get help drafting reports, or verify details.
-                                            </div>
-                                            {chatHistory.map((msg, i) => (
-                                                <div 
-                                                    key={i} 
-                                                    className={`flex flex-col max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${
-                                                        msg.role === 'user'
-                                                            ? 'bg-orange-500/10 border border-orange-500/20 text-orange-300 ml-auto'
-                                                            : 'bg-white/5 border border-white/5 text-slate-300'
-                                                    }`}
-                                                >
-                                                    <span className="font-bold text-[9px] uppercase tracking-widest text-slate-500 mb-1">
-                                                        {msg.role === 'user' ? 'Administrator' : 'Counselor AI'}
-                                                    </span>
-                                                    <div className="whitespace-pre-wrap">{msg.content}</div>
-                                                </div>
-                                            ))}
-                                            {chatLoading && (
-                                                <div className="flex items-center gap-2 text-xs text-slate-500">
-                                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" />
-                                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-                                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.4s]" />
-                                                    <span>Analyzing response details...</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Chat Input */}
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={chatInput}
-                                                onChange={e => setChatInput(e.target.value)}
-                                                onKeyDown={e => e.key === 'Enter' && handleSendChatMessage()}
-                                                placeholder="Ask questions about modules or ask to draft a report..."
-                                                className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
-                                                disabled={chatLoading}
-                                            />
-                                            <button
-                                                onClick={handleSendChatMessage}
-                                                disabled={chatLoading || !chatInput.trim()}
-                                                className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-40"
-                                            >
-                                                Send
-                                            </button>
-                                        </div>
-
-                                        {/* Generate from Chat shortcut */}
-                                        {chatHistory.length > 0 && (
-                                            <button
-                                                onClick={() => {
-                                                    const lastAssistantMsg = [...chatHistory].reverse().find(m => m.role === 'assistant')?.content;
-                                                    if (lastAssistantMsg) {
-                                                        setCustomPrompt(`Generate a report incorporating these guidelines: ${lastAssistantMsg}`);
-                                                        setAiTab('standard');
-                                                    }
-                                                }}
-                                                className="w-full py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-orange-400 uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-1.5"
-                                            >
-                                                <span>📋 Apply Last AI Output as Custom Prompt</span>
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
+                        {approvedCount < client.modules.length && (
+                            <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs space-y-1">
+                                <p className="font-semibold">⚠️ Attention: Incomplete Modules</p>
+                                <p className="text-[11px] text-amber-400/90 leading-relaxed">
+                                    Not all modules have been approved yet (Progress: {approvedCount}/{client.modules.length}). Generating a report or chat now may use incomplete data.
+                                </p>
                             </div>
                         )}
+
+                        <div className="space-y-4">
+                            <div className="flex bg-slate-950 p-1.5 rounded-xl border border-white/5 gap-1 self-start inline-flex">
+                                <button
+                                    onClick={() => setAiTab('standard')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                                        aiTab === 'standard' 
+                                            ? 'bg-orange-500 text-white' 
+                                            : 'text-slate-400 hover:text-slate-200'
+                                    }`}
+                                >
+                                    Standard Generator
+                                </button>
+                                <button
+                                    onClick={() => setAiTab('chat')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                                        aiTab === 'chat' 
+                                            ? 'bg-orange-500 text-white' 
+                                            : 'text-slate-400 hover:text-slate-200'
+                                    }`}
+                                >
+                                    AI Chat Counselor
+                                </button>
+                            </div>
+
+                            {aiTab === 'standard' ? (
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
+                                            Custom Report Instructions (Optional)
+                                        </label>
+                                        <textarea
+                                            value={customPrompt}
+                                            onChange={e => setCustomPrompt(e.target.value)}
+                                            placeholder="e.g., Focus on careers in clean energy and sustainability, highlight their RIASEC Artistic score..."
+                                            rows={3}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-orange-500"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => handleGenerateReport()}
+                                        disabled={actionLoading}
+                                        className="w-full py-2.5 rounded-xl bg-orange-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-all disabled:opacity-50"
+                                    >
+                                        {actionLoading ? 'Generating...' : 'Generate Career Report'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* Chat Feed */}
+                                    <div className="bg-slate-950 border border-slate-850 rounded-2xl p-4 h-[300px] overflow-y-auto space-y-3 custom-scrollbar">
+                                        <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-xs text-slate-400 leading-relaxed">
+                                            🤖 **AI Counselor:** Hi! I have indexed all of the client's survey data. Ask me specific questions about their modules, get help drafting reports, or verify details.
+                                        </div>
+                                        {chatHistory.map((msg, i) => (
+                                            <div 
+                                                key={i} 
+                                                className={`flex flex-col max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${
+                                                    msg.role === 'user'
+                                                        ? 'bg-orange-500/10 border border-orange-500/20 text-orange-300 ml-auto'
+                                                        : 'bg-white/5 border border-white/5 text-slate-300'
+                                                }`}
+                                            >
+                                                <span className="font-bold text-[9px] uppercase tracking-widest text-slate-500 mb-1">
+                                                    {msg.role === 'user' ? 'Administrator' : 'Counselor AI'}
+                                                </span>
+                                                <div className="whitespace-pre-wrap">{msg.content}</div>
+                                            </div>
+                                        ))}
+                                        {chatLoading && (
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" />
+                                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+                                                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce [animation-delay:0.4s]" />
+                                                <span>Analyzing response details...</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Chat Input */}
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={chatInput}
+                                            onChange={e => setChatInput(e.target.value)}
+                                            onKeyDown={e => e.key === 'Enter' && handleSendChatMessage()}
+                                            placeholder="Ask questions about modules or ask to draft a report..."
+                                            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-orange-500"
+                                            disabled={chatLoading}
+                                        />
+                                        <button
+                                            onClick={handleSendChatMessage}
+                                            disabled={chatLoading || !chatInput.trim()}
+                                            className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-40"
+                                        >
+                                            Send
+                                        </button>
+                                    </div>
+
+                                    {/* Generate from Chat shortcut */}
+                                    {chatHistory.length > 0 && (
+                                        <button
+                                            onClick={() => {
+                                                const lastAssistantMsg = [...chatHistory].reverse().find(m => m.role === 'assistant')?.content;
+                                                if (lastAssistantMsg) {
+                                                    setCustomPrompt(`Generate a report incorporating these guidelines: ${lastAssistantMsg}`);
+                                                    setAiTab('standard');
+                                                }
+                                            }}
+                                            className="w-full py-2 rounded-xl bg-white/5 border border-white/10 text-[10px] font-bold text-orange-400 uppercase tracking-widest hover:bg-white/10 transition-colors flex items-center justify-center gap-1.5"
+                                        >
+                                            <span>📋 Apply Last AI Output as Custom Prompt</span>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Reports */}

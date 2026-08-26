@@ -527,36 +527,36 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                             </div>
                         </div>
 
-                        {approvedCount < client.modules.length ? (
-                            <div className="py-6 text-center text-slate-500 text-xs flex flex-col items-center justify-center gap-2">
-                                <svg className="w-8 h-8 text-slate-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                <span>Awaiting completion of all modules to activate AI report generator.</span>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
-                                        Custom Report Instructions (Optional)
-                                    </label>
-                                    <textarea
-                                        value={customPrompt}
-                                        onChange={e => setCustomPrompt(e.target.value)}
-                                        placeholder="e.g., Focus on careers in clean energy and sustainability, highlight their RIASEC Artistic score..."
-                                        rows={3}
-                                        className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => handleGenerateReport()}
-                                    disabled={actionLoading}
-                                    className="w-full py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all disabled:opacity-50"
-                                >
-                                    {actionLoading ? 'Generating...' : 'Generate Career Report'}
-                                </button>
+                        {approvedCount < client.modules.length && (
+                            <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 rounded-xl text-xs space-y-1">
+                                <p className="font-semibold">⚠️ Attention: Incomplete Modules</p>
+                                <p className="text-[11px] text-amber-400/90 leading-relaxed">
+                                    Not all modules have been approved yet (Progress: {approvedCount}/{client.modules.length}). Generating a report now may result in incomplete analysis.
+                                </p>
                             </div>
                         )}
+
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">
+                                    Custom Report Instructions (Optional)
+                                </label>
+                                <textarea
+                                    value={customPrompt}
+                                    onChange={e => setCustomPrompt(e.target.value)}
+                                    placeholder="e.g., Focus on careers in clean energy and sustainability, highlight their RIASEC Artistic score..."
+                                    rows={3}
+                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                                />
+                            </div>
+                            <button
+                                onClick={() => handleGenerateReport()}
+                                disabled={actionLoading}
+                                className="w-full py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading ? 'Generating...' : 'Generate Career Report'}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Reports */}

@@ -65,9 +65,21 @@ export async function GET(
     // Helper functions for rendering modules
     const formatResponseValue = (q: any, val: any): string => {
       if (val === undefined || val === null) return '—';
+      
+      // 1. Array of values or objects
       if (Array.isArray(val)) {
         return val.map((valItem: any) => {
           if (valItem && typeof valItem === 'object') {
+            // Check if it has time and activity (slots)
+            if (valItem.time || valItem.activity) {
+              return `${valItem.time || '—'}: ${valItem.activity || '—'}`;
+            }
+            // Check if it's a schedule block
+            if (valItem.days && Array.isArray(valItem.slots)) {
+              const slotsStr = valItem.slots.map((s: any) => `${s.time || '—'}: ${s.activity || '—'}`).join(', ');
+              return `Days: ${valItem.days.join(', ')} [${slotsStr}]`;
+            }
+            // Default object values extraction
             const values = Object.values(valItem)
               .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
               .filter(v => v !== '');
@@ -80,6 +92,8 @@ export async function GET(
           return String(valItem);
         }).filter(Boolean).join(', ');
       }
+      
+      // 2. Ranked lists
       if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
         return (val as any).ranked.map((valItem: any, idx: number) => {
           if (q.options) {
@@ -89,13 +103,46 @@ export async function GET(
           return `${idx + 1}. ${valItem}`;
         }).join(', ');
       }
-      if (val && typeof val === 'object') {
-        return JSON.stringify(val);
+      
+      // 3. Education block object (school/college/university)
+      if (val && typeof val === 'object' && (val.school || val.college || val.university)) {
+        const parts: string[] = [];
+        ['school', 'college', 'university'].forEach(level => {
+          const d = (val as any)[level];
+          if (d?.active) {
+            parts.push(`${level.toUpperCase()}: ${d.name || 'N/A'} (Grade: ${d.grade || 'N/A'})`);
+          }
+        });
+        return parts.join(' | ');
       }
+      
+      // 4. Time-activity schedule object
+      if (val && typeof val === 'object' && Object.keys(val).some(k => k.includes('AM') || k.includes('PM'))) {
+        return Object.entries(val)
+          .map(([time, activity]) => `${time}: ${activity}`)
+          .join(', ');
+      }
+      
+      // 5. Generic object formatting
+      if (val && typeof val === 'object') {
+        const keys = Object.keys(val);
+        if (keys.length === 0) return '—';
+        return keys
+          .map(k => {
+            const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
+            const v = val[k];
+            if (v && typeof v === 'object') return `${label}: ${JSON.stringify(v)}`;
+            return `${label}: ${v}`;
+          })
+          .join(' | ');
+      }
+      
+      // 6. Options mapping for primitives
       if (q.options) {
         const opt = q.options.find((o: any) => o.id === val);
         return opt ? opt.text : String(val);
       }
+      
       return String(val);
     };
 
