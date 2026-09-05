@@ -17,35 +17,50 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (session.user.role !== 'CLIENT') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
     const body = await request.json()
     const validatedData = moduleResponseSchema.parse(body)
+    const isTeam = ['SUPER_ADMIN', 'ADMIN', 'EXPERT', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY'].includes(session.user.role)
 
-    const clientProfile = await prisma.clientProfile.findUnique({
-      where: { userId: session.user.id }
-    })
+    let clientProfile = null;
+    let clientModule = null;
 
-    if (!clientProfile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    if (isTeam) {
+      clientModule = await prisma.clientModule.findUnique({
+        where: { id }
+      });
+      if (clientModule) {
+        clientProfile = await prisma.clientProfile.findUnique({
+          where: { id: clientModule.clientProfileId }
+        });
+      }
+    } else {
+      if (session.user.role !== 'CLIENT') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
+      clientProfile = await prisma.clientProfile.findUnique({
+        where: { userId: session.user.id }
+      })
+
+      if (!clientProfile) {
+        return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+      }
+
+      clientModule = await prisma.clientModule.findFirst({
+        where: {
+          id: id,
+          clientProfileId: clientProfile.id
+        }
+      })
     }
 
-    const clientModule = await prisma.clientModule.findFirst({
-      where: {
-        id: id,
-        clientProfileId: clientProfile.id
-      }
-    })
-
-    if (!clientModule) {
-      return NextResponse.json({ error: 'Module not found' }, { status: 404 })
+    if (!clientProfile || !clientModule) {
+      return NextResponse.json({ error: 'Module or profile not found' }, { status: 404 })
     }
 
     if (
-      clientModule.status === 'LOCKED' ||
-      clientModule.status === 'APPROVED'
+      !isTeam &&
+      (clientModule.status === 'LOCKED' || clientModule.status === 'APPROVED')
     ) {
       return NextResponse.json({ error: 'Module cannot be submitted' }, { status: 403 })
     }

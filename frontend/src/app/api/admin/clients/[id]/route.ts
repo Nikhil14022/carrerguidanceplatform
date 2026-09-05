@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
+const ALLOWED_ROLES = ['SUPER_ADMIN', 'ADMIN', 'EXPERT', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY']
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,7 +16,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (session.user.role !== 'ADMIN' && session.user.role !== 'EXPERT') {
+    if (!ALLOWED_ROLES.includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -32,6 +34,7 @@ export async function GET(
         reports: {
           include: { careerOptions: true }
         },
+        parentData: true,
         stages: {
           orderBy: { stageNumber: 'asc' }
         }
@@ -53,6 +56,7 @@ export async function GET(
           reports: {
             include: { careerOptions: true }
           },
+          parentData: true,
           stages: {
             orderBy: { stageNumber: 'asc' }
           }

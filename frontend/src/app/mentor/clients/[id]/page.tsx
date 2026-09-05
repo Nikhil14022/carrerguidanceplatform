@@ -2,6 +2,7 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import StageManagementPanel from '@/components/StageManagementPanel';
+import ModuleEngine from '@/components/ModuleEngine';
 
 interface ModuleData {
     id: string;
@@ -32,6 +33,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
     const [client, setClient] = useState<ClientData | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedModule, setSelectedModule] = useState<ModuleData | null>(null);
+    const [selectedProxyModule, setSelectedProxyModule] = useState<ModuleData | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
     const [mentorNotes, setMentorNotes] = useState('');
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
@@ -497,6 +499,16 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                     <span className={`px-3 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-widest ${statusBadge(mod.status)}`}>
                                         {mod.status.replace('_', ' ')}
                                     </span>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedProxyModule(mod);
+                                        }}
+                                        className="px-3 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm mt-1"
+                                    >
+                                        <span>✏️</span> Answer / Edit Module
+                                    </button>
                                 </div>
                             </div>
                             {mod.response?.submittedAt && (
@@ -504,6 +516,38 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                             )}
                         </div>
                     ))}
+
+                    {/* Interactive Module Proxy Answering Modal */}
+                    {selectedProxyModule && (
+                        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 md:p-8 overflow-y-auto">
+                            <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+                                <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                            <span>✏️</span> Answer / Edit Module for {client.user.name || 'Client'}
+                                        </h3>
+                                        <p className="text-xs text-slate-400 mt-1">
+                                            Module #{selectedProxyModule.order}: <span className="text-slate-200 font-semibold">{selectedProxyModule.module?.title}</span>
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            setSelectedProxyModule(null);
+                                            fetchClient(clientId);
+                                        }}
+                                        className="px-4 py-2 bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors"
+                                    >
+                                        ✕ Close Modal
+                                    </button>
+                                </div>
+                                <ModuleEngine
+                                    moduleId={selectedProxyModule.id}
+                                    targetClientId={client.id}
+                                    isEditableByAdminOrMentor={true}
+                                />
+                            </div>
+                        </div>
+                    )}
 
                     {/* Generate Report widget */}
                     <div className="bg-white/5 rounded-2xl border border-white/10 shadow-sm p-6 space-y-6">

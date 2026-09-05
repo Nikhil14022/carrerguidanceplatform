@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { clientManageSchema } from '@/lib/validations'
 
+const ALLOWED_ROLES = ['SUPER_ADMIN', 'ADMIN', 'EXPERT', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY']
+
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,17 +17,24 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (session.user.role !== 'ADMIN' && session.user.role !== 'EXPERT') {
+    if (!ALLOWED_ROLES.includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const body = await request.json()
     const validatedData = clientManageSchema.parse(body)
 
-    const clientProfile = await prisma.clientProfile.findUnique({
+    let clientProfile = await prisma.clientProfile.findUnique({
       where: { id },
       include: { modules: true }
     })
+
+    if (!clientProfile) {
+      clientProfile = await prisma.clientProfile.findUnique({
+        where: { userId: id },
+        include: { modules: true }
+      })
+    }
 
     if (!clientProfile) {
       return NextResponse.json({ error: 'Client not found' }, { status: 404 })
@@ -77,7 +86,7 @@ export async function POST(
 
       await prisma.clientModule.create({
         data: {
-          clientProfileId: id,
+          clientProfileId: clientProfile.id,
           moduleId: validatedData.moduleId,
           status: 'UNLOCKED',
           order: maxOrder + 1
@@ -100,6 +109,15 @@ export async function POST(
           submittedAt: new Date()
         }
       })
+
+      // If requested status update or if module was LOCKED, set to SUBMITTED
+      const targetStatus = body.status || (module.status === 'LOCKED' ? 'SUBMITTED' : undefined);
+      if (targetStatus) {
+        await prisma.clientModule.update({
+          where: { id: validatedData.moduleId },
+          data: { status: targetStatus, filledBy: 'MENTOR' }
+        });
+      }
 
       return NextResponse.json({ success: true })
     }

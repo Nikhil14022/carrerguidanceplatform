@@ -144,7 +144,15 @@ function migrateAnswers(data: Record<string, any>) {
     return migrated;
 }
 
-export default function ModuleEngine({ moduleId }: { moduleId: string }) {
+export default function ModuleEngine({ 
+    moduleId, 
+    targetClientId, 
+    isEditableByAdminOrMentor = false 
+}: { 
+    moduleId: string; 
+    targetClientId?: string; 
+    isEditableByAdminOrMentor?: boolean;
+}) {
     const [currentStep, setCurrentStep] = useState(0);
     const [answers, originalSetAnswers] = useState<Record<string, any>>({});
     const [module, setModule] = useState<any>(null);
@@ -153,7 +161,7 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isDraggingFile, setIsDraggingFile] = useState(false);
 
-    const isReadOnly = module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false;
+    const isReadOnly = isEditableByAdminOrMentor ? false : (module ? ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(module.status) : false);
 
     const setAnswers = (val: any) => {
         if (isReadOnly) return;
@@ -541,7 +549,21 @@ export default function ModuleEngine({ moduleId }: { moduleId: string }) {
                 </div>
 
                 <div className="max-w-4xl mx-auto py-10">
-                    {isReadOnly && (
+                    {isEditableByAdminOrMentor && (
+                        <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 px-6 py-4 rounded-xl flex items-center justify-between gap-3 mb-6">
+                            <div className="flex items-center gap-3">
+                                <span className="text-xl">✏️</span>
+                                <div>
+                                    <p className="font-bold text-sm">Admin / Mentor Proxy Editing Active</p>
+                                    <p className="text-xs text-amber-400/80 mt-0.5">You are answering/editing this module on behalf of the client. All fields are interactive.</p>
+                                </div>
+                            </div>
+                            <span className="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 bg-amber-500/20 rounded-md border border-amber-500/30">
+                                Proxy Override
+                            </span>
+                        </div>
+                    )}
+                    {!isEditableByAdminOrMentor && isReadOnly && (
                         <div className="bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 px-6 py-4 rounded-xl flex items-center gap-3 mb-6">
                             <svg className="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />

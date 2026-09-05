@@ -67,10 +67,17 @@ export async function GET(
 
     // Admins, mentors, and the client themselves (or their parent) can view
     const isTeam = MENTOR_ROLES.includes(session.user.role);
-    const clientProfile = await prisma.clientProfile.findUnique({
+    let clientProfile = await prisma.clientProfile.findUnique({
       where: { id },
       select: { id: true, userId: true, parentId: true }
     });
+
+    if (!clientProfile) {
+      clientProfile = await prisma.clientProfile.findUnique({
+        where: { userId: id },
+        select: { id: true, userId: true, parentId: true }
+      });
+    }
 
     if (!clientProfile) {
       return NextResponse.json({ error: 'Client profile not found' }, { status: 404 });
@@ -82,7 +89,7 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const stages = await ensureClientStages(id);
+    const stages = await ensureClientStages(clientProfile.id);
     return NextResponse.json({ success: true, stages });
   } catch (error: any) {
     console.error('GET stages error:', error);
@@ -102,6 +109,22 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    let clientProfile = await prisma.clientProfile.findUnique({
+      where: { id },
+      select: { id: true }
+    });
+
+    if (!clientProfile) {
+      clientProfile = await prisma.clientProfile.findUnique({
+        where: { userId: id },
+        select: { id: true }
+      });
+    }
+
+    if (!clientProfile) {
+      return NextResponse.json({ error: 'Client profile not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const { stageNumber, status, notes, tasks, documents, meetingOutcomes } = body;
 
@@ -110,12 +133,12 @@ export async function POST(
     }
 
     // Ensure stages are initialized
-    await ensureClientStages(id);
+    await ensureClientStages(clientProfile.id);
 
     const updated = await prisma.clientStage.update({
       where: {
         clientProfileId_stageNumber: {
-          clientProfileId: id,
+          clientProfileId: clientProfile.id,
           stageNumber: parseInt(stageNumber)
         }
       },
@@ -130,7 +153,7 @@ export async function POST(
 
     // Update overall client profile journeyStatus based on stages completed/active
     const allStages = await prisma.clientStage.findMany({
-      where: { clientProfileId: id }
+      where: { clientProfileId: clientProfile.id }
     });
 
     const activeStages = allStages.filter(s => s.status === 'IN_PROGRESS');
@@ -151,7 +174,7 @@ export async function POST(
     }
 
     await prisma.clientProfile.update({
-      where: { id },
+      where: { id: clientProfile.id },
       data: { journeyStatus: nextJourneyStatus }
     });
 
