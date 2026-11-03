@@ -1233,34 +1233,44 @@ export async function GET(
   ${!isWordFormat ? `
   <script>
     var isGeneratingPdf = false;
-    function collectFullWidthBlocks(rootEl) {
-      var blocks = [];
-      var splitContainers = ['pdf-export-root', 'module-card', 'qa-list', 'parents-meeting-sections', 'sd-list', 'jf-categories', 'jf-cat-block'];
-      function hasSplitClass(el) {
-        if (!el) return false;
-        if (el.id === 'pdf-export-root') return true;
-        for (var i = 0; i < splitContainers.length; i++) {
-          if (el.classList && el.classList.contains(splitContainers[i])) return true;
-        }
-        return false;
-      }
-      function walk(node) {
-        if (!node || node.offsetHeight === 0) return;
-        // Keep short module cards together on a single page if they fit comfortably
-        if (node.id !== 'pdf-export-root' && node.offsetHeight <= 880) {
-          blocks.push(node);
-          return;
-        }
-        if (hasSplitClass(node) && node.children && node.children.length > 0) {
-          for (var c = 0; c < node.children.length; c++) {
-            walk(node.children[c]);
+
+    function buildRenderBatches(rootEl, maxBatchHeightPx) {
+      // Collect top-level sections; only split a single module-card if it alone exceeds maxBatchHeightPx
+      var topItems = [];
+      var children = Array.from(rootEl.children || []);
+      for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        if (!child || child.offsetHeight === 0) continue;
+        if (child.offsetHeight > maxBatchHeightPx && child.children && child.children.length > 1) {
+          var sub = Array.from(child.children);
+          for (var s = 0; s < sub.length; s++) {
+            if (sub[s].offsetHeight > 0) topItems.push(sub[s]);
           }
         } else {
-          blocks.push(node);
+          topItems.push(child);
         }
       }
-      walk(rootEl);
-      return blocks;
+
+      var batches = [];
+      var currentBatch = [];
+      var currentHeight = 0;
+
+      for (var j = 0; j < topItems.length; j++) {
+        var item = topItems[j];
+        var h = item.offsetHeight || 200;
+        if (currentBatch.length > 0 && currentHeight + h > maxBatchHeightPx) {
+          batches.push(currentBatch);
+          currentBatch = [item];
+          currentHeight = h;
+        } else {
+          currentBatch.push(item);
+          currentHeight += h;
+        }
+      }
+      if (currentBatch.length > 0) {
+        batches.push(currentBatch);
+      }
+      return batches;
     }
 
     async function downloadPdfFile() {
@@ -1269,10 +1279,11 @@ export async function GET(
       var element = document.getElementById('pdf-export-root');
       if (!element || typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
         if (statusEl) statusEl.innerText = '⚠️ PDF libraries still loading, retrying in a moment...';
-        setTimeout(downloadPdfFile, 500);
+        setTimeout(downloadPdfFile, 400);
         return;
       }
       isGeneratingPdf = true;
+      var batchHost = null;
       try {
         var jsPDF = window.jspdf.jsPDF;
         var pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
@@ -1283,62 +1294,106 @@ export async function GET(
         var pageContentHeight = pageHeight - margin * 2;
         var cursorY = margin;
 
-        var blocks = collectFullWidthBlocks(element);
-        for (var i = 0; i < blocks.length; i++) {
-          var block = blocks[i];
+        // Group modules into large ~4800px batches (typically 1 batch for selective modules, 3-4 batches for all 19 modules)
+        var batches = buildRenderBatches(element, 4800);
+        var rootWidth = element.offsetWidth || 850;
+
+        // Create an isolated host container and temporarily hide the main root so html2canvas only clones the active batch
+        batchHost = document.createElement('div');
+        batchHost.style.width = rootWidth + 'px';
+        batchHost.style.background = '#ffffff';
+        document.body.appendChild(batchHost);
+        element.style.display = 'none';
+
+        for (var b = 0; b < batches.length; b++) {
           if (statusEl) {
-            statusEl.innerText = '⏳ Generating PDF (' + (i + 1) + ' of ' + blocks.length + ' sections)...';
+            statusEl.innerText = '⏳ Generating PDF (Batch ' + (b + 1) + ' of ' + batches.length + ')...';
           }
-          var canvas = await html2canvas(block, {
-            scale: 2,
+          batchHost.innerHTML = '';
+          var batchItems = batches[b];
+          for (var k = 0; k < batchItems.length; k++) {
+            batchHost.appendChild(batchItems[k].cloneNode(true));
+          }
+
+          // Measure atomic element intervals inside batchHost so page slices never cut through text or rows
+          var hostRect = batchHost.getBoundingClientRect();
+          var atomicNodes = batchHost.querySelectorAll('.qa-item, .module-card-header, .mentor-notes-box, tr, .pf16-item, .riasec-card, .color-section-card, .smi-item, .smi-rank-card, .parent-field, .priority-item, .sd-question-item, .jf-item-row, h2, h3, h4, p, li');
+          var intervals = [];
+          for (var a = 0; a < atomicNodes.length; a++) {
+            var r = atomicNodes[a].getBoundingClientRect();
+            var topPx = r.top - hostRect.top;
+            var botPx = r.bottom - hostRect.top;
+            if (botPx > topPx && (botPx - topPx) <= 420) {
+              intervals.push({ top: topPx, bottom: botPx });
+            }
+          }
+
+          var canvas = await html2canvas(batchHost, {
+            scale: 1.5,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff'
           });
           if (!canvas || canvas.width === 0 || canvas.height === 0) continue;
 
+          var scaleRatio = canvas.height / (batchHost.offsetHeight || 1);
           var pxPerMm = canvas.width / contentWidth;
-          var imgHeightMm = canvas.height / pxPerMm;
+          var srcY = 0;
 
-          if (imgHeightMm <= pageContentHeight) {
-            if (cursorY + imgHeightMm > margin + pageContentHeight && cursorY > margin) {
+          while (srcY < canvas.height - 2) {
+            var availMm = (margin + pageContentHeight) - cursorY;
+            if (availMm < 40 && cursorY > margin) {
+              pdf.addPage();
+              cursorY = margin;
+              availMm = pageContentHeight;
+            }
+
+            var maxSlicePx = Math.floor(availMm * pxPerMm);
+            var sliceHeightPx = canvas.height - srcY;
+
+            if (sliceHeightPx > maxSlicePx) {
+              var idealDomCut = (srcY + maxSlicePx) / scaleRatio;
+              var minDomCut = (srcY / scaleRatio) + (maxSlicePx / scaleRatio) * 0.55;
+              var safeDomCut = idealDomCut;
+
+              for (var pass = 0; pass < 3; pass++) {
+                var adjusted = false;
+                for (var iv = 0; iv < intervals.length; iv++) {
+                  var box = intervals[iv];
+                  if (box.top < safeDomCut - 2 && box.bottom > safeDomCut + 2 && box.top >= minDomCut) {
+                    safeDomCut = box.top - 4;
+                    adjusted = true;
+                  }
+                }
+                if (!adjusted) break;
+              }
+              sliceHeightPx = Math.max(40, Math.min(maxSlicePx, Math.floor(safeDomCut * scaleRatio) - srcY));
+            }
+
+            var sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = sliceHeightPx;
+            var ctx = sliceCanvas.getContext('2d');
+            if (ctx) {
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+              ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+              var sliceMm = sliceHeightPx / pxPerMm;
+              pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.94), 'JPEG', margin, cursorY, contentWidth, sliceMm);
+              cursorY += sliceMm + 2;
+            }
+            srcY += sliceHeightPx;
+            if (srcY < canvas.height - 2) {
               pdf.addPage();
               cursorY = margin;
             }
-            var imgData = canvas.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(imgData, 'JPEG', margin, cursorY, contentWidth, imgHeightMm);
-            cursorY += imgHeightMm + 3;
-          } else {
-            // Block is taller than a single A4 page: slice vertically across pages
-            var srcY = 0;
-            while (srcY < canvas.height) {
-              var availMm = (margin + pageContentHeight) - cursorY;
-              if (availMm < 35 && cursorY > margin) {
-                pdf.addPage();
-                cursorY = margin;
-                availMm = pageContentHeight;
-              }
-              var sliceHeightPx = Math.min(canvas.height - srcY, Math.floor(availMm * pxPerMm));
-              if (sliceHeightPx <= 0) break;
-              var sliceCanvas = document.createElement('canvas');
-              sliceCanvas.width = canvas.width;
-              sliceCanvas.height = sliceHeightPx;
-              var ctx = sliceCanvas.getContext('2d');
-              if (ctx) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
-                var sliceMm = sliceHeightPx / pxPerMm;
-                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, sliceMm);
-                cursorY += sliceMm + 2;
-              }
-              srcY += sliceHeightPx;
-              if (srcY < canvas.height) {
-                pdf.addPage();
-                cursorY = margin;
-              }
-            }
           }
+        }
+
+        element.style.display = '';
+        if (batchHost && batchHost.parentNode) {
+          batchHost.parentNode.removeChild(batchHost);
+          batchHost = null;
         }
 
         pdf.save('${safeName}_Combined_Answers.pdf');
@@ -1347,11 +1402,15 @@ export async function GET(
         console.error('PDF generation error:', err);
         if (statusEl) statusEl.innerText = '⚠️ Could not auto-download PDF. Click Download PDF to retry.';
       } finally {
+        element.style.display = '';
+        if (batchHost && batchHost.parentNode) {
+          batchHost.parentNode.removeChild(batchHost);
+        }
         isGeneratingPdf = false;
       }
     }
     window.onload = function() {
-      setTimeout(downloadPdfFile, 400);
+      setTimeout(downloadPdfFile, 250);
     };
   </script>
   ` : ''}

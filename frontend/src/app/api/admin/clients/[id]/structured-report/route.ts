@@ -1022,10 +1022,11 @@ export async function GET(
       var rootEl = document.getElementById('structured-report-root');
       if (!rootEl || typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
         if (msgEl) msgEl.innerText = '⏳ Loading PDF generator...';
-        setTimeout(downloadReportPdf, 500);
+        setTimeout(downloadReportPdf, 400);
         return;
       }
       isGeneratingReportPdf = true;
+      var batchHost = null;
       try {
         var jsPDF = window.jspdf.jsPDF;
         var pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
@@ -1037,59 +1038,114 @@ export async function GET(
         var cursorY = margin;
 
         var children = Array.from(rootEl.children || []).filter(function(el) { return el.offsetHeight > 0; });
+        var batches = [];
+        var curBatch = [];
+        var curH = 0;
         for (var i = 0; i < children.length; i++) {
-          var block = children[i];
-          if (msgEl) {
-            msgEl.innerText = '⏳ Generating ${safeName}_Career_Report.pdf (' + (i + 1) + '/' + children.length + ')...';
+          var h = children[i].offsetHeight || 100;
+          if (curBatch.length > 0 && curH + h > 4800) {
+            batches.push(curBatch);
+            curBatch = [children[i]];
+            curH = h;
+          } else {
+            curBatch.push(children[i]);
+            curH += h;
           }
-          var canvas = await html2canvas(block, {
-            scale: 2,
+        }
+        if (curBatch.length > 0) batches.push(curBatch);
+
+        var rootWidth = rootEl.offsetWidth || 820;
+        batchHost = document.createElement('div');
+        batchHost.style.width = rootWidth + 'px';
+        batchHost.style.background = '#ffffff';
+        document.body.appendChild(batchHost);
+        rootEl.style.display = 'none';
+
+        for (var b = 0; b < batches.length; b++) {
+          if (msgEl) {
+            msgEl.innerText = '⏳ Generating ${safeName}_Career_Report.pdf (Batch ' + (b + 1) + '/' + batches.length + ')...';
+          }
+          batchHost.innerHTML = '';
+          for (var k = 0; k < batches[b].length; k++) {
+            batchHost.appendChild(batches[b][k].cloneNode(true));
+          }
+
+          var hostRect = batchHost.getBoundingClientRect();
+          var atomicNodes = batchHost.querySelectorAll('tr, p, h1, h2, h3, div');
+          var intervals = [];
+          for (var a = 0; a < atomicNodes.length; a++) {
+            var r = atomicNodes[a].getBoundingClientRect();
+            var topPx = r.top - hostRect.top;
+            var botPx = r.bottom - hostRect.top;
+            if (botPx > topPx && (botPx - topPx) <= 380) {
+              intervals.push({ top: topPx, bottom: botPx });
+            }
+          }
+
+          var canvas = await html2canvas(batchHost, {
+            scale: 1.5,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff'
           });
           if (!canvas || canvas.width === 0 || canvas.height === 0) continue;
 
+          var scaleRatio = canvas.height / (batchHost.offsetHeight || 1);
           var pxPerMm = canvas.width / contentWidth;
-          var imgHeightMm = canvas.height / pxPerMm;
+          var srcY = 0;
 
-          if (imgHeightMm <= pageContentHeight) {
-            if (cursorY + imgHeightMm > margin + pageContentHeight && cursorY > margin) {
+          while (srcY < canvas.height - 2) {
+            var availMm = (margin + pageContentHeight) - cursorY;
+            if (availMm < 40 && cursorY > margin) {
+              pdf.addPage();
+              cursorY = margin;
+              availMm = pageContentHeight;
+            }
+            var maxSlicePx = Math.floor(availMm * pxPerMm);
+            var sliceHeightPx = canvas.height - srcY;
+
+            if (sliceHeightPx > maxSlicePx) {
+              var idealDomCut = (srcY + maxSlicePx) / scaleRatio;
+              var minDomCut = (srcY / scaleRatio) + (maxSlicePx / scaleRatio) * 0.55;
+              var safeDomCut = idealDomCut;
+              for (var pass = 0; pass < 3; pass++) {
+                var adjusted = false;
+                for (var iv = 0; iv < intervals.length; iv++) {
+                  var box = intervals[iv];
+                  if (box.top < safeDomCut - 2 && box.bottom > safeDomCut + 2 && box.top >= minDomCut) {
+                    safeDomCut = box.top - 4;
+                    adjusted = true;
+                  }
+                }
+                if (!adjusted) break;
+              }
+              sliceHeightPx = Math.max(40, Math.min(maxSlicePx, Math.floor(safeDomCut * scaleRatio) - srcY));
+            }
+
+            var sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = sliceHeightPx;
+            var ctx = sliceCanvas.getContext('2d');
+            if (ctx) {
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+              ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+              var sliceMm = sliceHeightPx / pxPerMm;
+              pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.94), 'JPEG', margin, cursorY, contentWidth, sliceMm);
+              cursorY += sliceMm + 2;
+            }
+            srcY += sliceHeightPx;
+            if (srcY < canvas.height - 2) {
               pdf.addPage();
               cursorY = margin;
             }
-            pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, imgHeightMm);
-            cursorY += imgHeightMm + 2.5;
-          } else {
-            var srcY = 0;
-            while (srcY < canvas.height) {
-              var availMm = (margin + pageContentHeight) - cursorY;
-              if (availMm < 35 && cursorY > margin) {
-                pdf.addPage();
-                cursorY = margin;
-                availMm = pageContentHeight;
-              }
-              var sliceHeightPx = Math.min(canvas.height - srcY, Math.floor(availMm * pxPerMm));
-              if (sliceHeightPx <= 0) break;
-              var sliceCanvas = document.createElement('canvas');
-              sliceCanvas.width = canvas.width;
-              sliceCanvas.height = sliceHeightPx;
-              var ctx = sliceCanvas.getContext('2d');
-              if (ctx) {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
-                var sliceMm = sliceHeightPx / pxPerMm;
-                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, sliceMm);
-                cursorY += sliceMm + 2;
-              }
-              srcY += sliceHeightPx;
-              if (srcY < canvas.height) {
-                pdf.addPage();
-                cursorY = margin;
-              }
-            }
           }
+        }
+
+        rootEl.style.display = '';
+        if (batchHost && batchHost.parentNode) {
+          batchHost.parentNode.removeChild(batchHost);
+          batchHost = null;
         }
 
         pdf.save('${safeName}_Career_Report.pdf');
@@ -1098,10 +1154,14 @@ export async function GET(
         console.error('Report PDF generation error:', err);
         if (msgEl) msgEl.innerText = '⚠️ Error generating PDF. Click Download PDF to retry.';
       } finally {
+        rootEl.style.display = '';
+        if (batchHost && batchHost.parentNode) {
+          batchHost.parentNode.removeChild(batchHost);
+        }
         isGeneratingReportPdf = false;
       }
     }
-    ${format === 'pdf' ? 'window.onload = function() { setTimeout(downloadReportPdf, 400); };' : ''}
+    ${format === 'pdf' ? 'window.onload = function() { setTimeout(downloadReportPdf, 250); };' : ''}
   </script>
   ` : ''}
 </body>
