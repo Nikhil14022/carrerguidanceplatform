@@ -435,15 +435,15 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                     <button
                         onClick={() => {
                             const modParam = filteredModules.map(m => m.id).join(',');
-                            window.open(`/api/mentor/clients/${clientId}/combined-answers/download?format=doc&modules=${encodeURIComponent(modParam)}`, '_blank');
+                            window.open(`/api/mentor/clients/${clientId}/combined-answers/download?format=docx&modules=${encodeURIComponent(modParam)}`, '_blank');
                         }}
                         className="px-4 py-2.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-500/20 transition-all flex items-center gap-2"
-                        title="Download filtered modules as a clean Word (.doc) file with Mentor Notes"
+                        title="Download filtered modules as a modern Word (.docx) file with Mentor Notes"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Download Word ({filteredModules.length})
+                        Download Word (.docx) ({filteredModules.length})
                     </button>
                     <button
                         onClick={() => {
@@ -459,14 +459,14 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                         Download PDF ({filteredModules.length})
                     </button>
                     <button
-                        onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                        onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                         className="px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500/20 transition-all flex items-center gap-2"
-                        title="Download full structured Career Report in the exact Vanya Career Report Word format"
+                        title="Download full structured Career Report in the exact Vanya Career Report Word (.docx) format"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Vanya Format Report (.doc)
+                        Vanya Format Report (.docx)
                     </button>
                 </div>
             </div>

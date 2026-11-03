@@ -12,6 +12,7 @@ import {
   JF_SECTIONS,
 } from '@/lib/testQuestions';
 import { testScoringService } from '@/services/TestScoringService';
+import { generateModernDocxFromHtml } from '@/lib/docxGenerator';
 
 const MENTOR_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY', 'EXPERT'];
 
@@ -812,15 +813,17 @@ export async function GET(
 
     const reportDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
     const safeName = (client.user.name || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const htmlHeader = format === 'doc'
-      ? `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>`
-      : `<!DOCTYPE html><html>`;
+    const isWordFormat = format === 'doc' || format === 'docx' || format === 'word';
+    const htmlHeader = `<!DOCTYPE html><html>`;
 
     const html = `${htmlHeader}
 <head>
   <meta charset="utf-8">
   <title>Assessment Responses - ${client.user.name || 'Client'}</title>
-  ${format !== 'doc' ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>' : ''}
+  ${!isWordFormat ? `
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  ` : ''}
   <style>
     * {
       box-sizing: border-box;
@@ -1097,12 +1100,12 @@ export async function GET(
   </style>
 </head>
 <body>
-  ${format !== 'doc' ? `
+  ${!isWordFormat ? `
   <div id="pdf-action-bar" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;margin-bottom:20px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:'Inter',sans-serif;">
     <div id="pdf-status-text" style="font-size:13px;font-weight:600;">⏳ Preparing your PDF download (${safeName}_Combined_Answers.pdf)...</div>
     <div style="display:flex;gap:10px;">
       <button onclick="downloadPdfFile()" style="background:#4f46e5;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📥 Download PDF</button>
-      <a href="/api/mentor/clients/${id}/combined-answers/download?format=doc${modulesParam ? `&modules=${encodeURIComponent(modulesParam)}` : ''}" style="background:#059669;color:#ffffff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;">📄 Download Word (.doc)</a>
+      <a href="/api/mentor/clients/${id}/combined-answers/download?format=docx${modulesParam ? `&modules=${encodeURIComponent(modulesParam)}` : ''}" style="background:#059669;color:#ffffff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;">📄 Download Word (.docx)</a>
     </div>
   </div>
   ` : ''}
@@ -1227,30 +1230,125 @@ export async function GET(
   }).join('')}
   </div>
 
-  ${format !== 'doc' ? `
+  ${!isWordFormat ? `
   <script>
-    function downloadPdfFile() {
+    var isGeneratingPdf = false;
+    function collectFullWidthBlocks(rootEl) {
+      var blocks = [];
+      var splitContainers = ['pdf-export-root', 'module-card', 'qa-list', 'parents-meeting-sections', 'sd-list', 'jf-categories', 'jf-cat-block'];
+      function hasSplitClass(el) {
+        if (!el) return false;
+        if (el.id === 'pdf-export-root') return true;
+        for (var i = 0; i < splitContainers.length; i++) {
+          if (el.classList && el.classList.contains(splitContainers[i])) return true;
+        }
+        return false;
+      }
+      function walk(node) {
+        if (!node || node.offsetHeight === 0) return;
+        // Keep short module cards together on a single page if they fit comfortably
+        if (node.id !== 'pdf-export-root' && node.offsetHeight <= 880) {
+          blocks.push(node);
+          return;
+        }
+        if (hasSplitClass(node) && node.children && node.children.length > 0) {
+          for (var c = 0; c < node.children.length; c++) {
+            walk(node.children[c]);
+          }
+        } else {
+          blocks.push(node);
+        }
+      }
+      walk(rootEl);
+      return blocks;
+    }
+
+    async function downloadPdfFile() {
+      if (isGeneratingPdf) return;
       var statusEl = document.getElementById('pdf-status-text');
-      if (statusEl) statusEl.innerText = '⏳ Generating & downloading ${safeName}_Combined_Answers.pdf...';
       var element = document.getElementById('pdf-export-root');
-      if (!element || typeof html2pdf === 'undefined') {
-        if (statusEl) statusEl.innerText = '⚠️ PDF generator loading, please try clicking Download PDF in a moment.';
+      if (!element || typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+        if (statusEl) statusEl.innerText = '⚠️ PDF libraries still loading, retrying in a moment...';
+        setTimeout(downloadPdfFile, 500);
         return;
       }
-      var opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     '${safeName}_Combined_Answers.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-      };
-      html2pdf().set(opt).from(element).save().then(function() {
+      isGeneratingPdf = true;
+      try {
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        var pageWidth = 210;
+        var pageHeight = 297;
+        var margin = 10;
+        var contentWidth = pageWidth - margin * 2;
+        var pageContentHeight = pageHeight - margin * 2;
+        var cursorY = margin;
+
+        var blocks = collectFullWidthBlocks(element);
+        for (var i = 0; i < blocks.length; i++) {
+          var block = blocks[i];
+          if (statusEl) {
+            statusEl.innerText = '⏳ Generating PDF (' + (i + 1) + ' of ' + blocks.length + ' sections)...';
+          }
+          var canvas = await html2canvas(block, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          });
+          if (!canvas || canvas.width === 0 || canvas.height === 0) continue;
+
+          var pxPerMm = canvas.width / contentWidth;
+          var imgHeightMm = canvas.height / pxPerMm;
+
+          if (imgHeightMm <= pageContentHeight) {
+            if (cursorY + imgHeightMm > margin + pageContentHeight && cursorY > margin) {
+              pdf.addPage();
+              cursorY = margin;
+            }
+            var imgData = canvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(imgData, 'JPEG', margin, cursorY, contentWidth, imgHeightMm);
+            cursorY += imgHeightMm + 3;
+          } else {
+            // Block is taller than a single A4 page: slice vertically across pages
+            var srcY = 0;
+            while (srcY < canvas.height) {
+              var availMm = (margin + pageContentHeight) - cursorY;
+              if (availMm < 35 && cursorY > margin) {
+                pdf.addPage();
+                cursorY = margin;
+                availMm = pageContentHeight;
+              }
+              var sliceHeightPx = Math.min(canvas.height - srcY, Math.floor(availMm * pxPerMm));
+              if (sliceHeightPx <= 0) break;
+              var sliceCanvas = document.createElement('canvas');
+              sliceCanvas.width = canvas.width;
+              sliceCanvas.height = sliceHeightPx;
+              var ctx = sliceCanvas.getContext('2d');
+              if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+                var sliceMm = sliceHeightPx / pxPerMm;
+                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, sliceMm);
+                cursorY += sliceMm + 2;
+              }
+              srcY += sliceHeightPx;
+              if (srcY < canvas.height) {
+                pdf.addPage();
+                cursorY = margin;
+              }
+            }
+          }
+        }
+
+        pdf.save('${safeName}_Combined_Answers.pdf');
         if (statusEl) statusEl.innerText = '✅ PDF Downloaded (${safeName}_Combined_Answers.pdf)!';
-      }).catch(function(err) {
-        console.error(err);
+      } catch (err) {
+        console.error('PDF generation error:', err);
         if (statusEl) statusEl.innerText = '⚠️ Could not auto-download PDF. Click Download PDF to retry.';
-      });
+      } finally {
+        isGeneratingPdf = false;
+      }
     }
     window.onload = function() {
       setTimeout(downloadPdfFile, 400);
@@ -1260,11 +1358,12 @@ export async function GET(
 </body>
 </html>`;
 
-    if (format === 'doc') {
-      return new NextResponse('\ufeff' + html, {
+    if (isWordFormat) {
+      const docxBuffer = generateModernDocxFromHtml(html);
+      return new NextResponse(new Uint8Array(docxBuffer), {
         headers: {
-          'Content-Type': 'application/msword; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${safeName}_Combined_Answers.doc"`
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'Content-Disposition': `attachment; filename="${safeName}_Combined_Answers.docx"`
         }
       });
     }

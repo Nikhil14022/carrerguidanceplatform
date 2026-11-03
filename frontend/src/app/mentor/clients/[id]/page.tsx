@@ -413,11 +413,11 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                             View Combined Answers Feed
                         </button>
                         <button
-                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                             className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors inline-flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-600/10"
-                            title="Download full client Career Report in the exact Vanya Career Report Word (.doc) structure"
+                            title="Download full client Career Report in the exact Vanya Career Report Word (.docx) structure"
                         >
-                            📥 Download Vanya Career Report (.doc)
+                            📥 Download Vanya Career Report (.docx)
                         </button>
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}

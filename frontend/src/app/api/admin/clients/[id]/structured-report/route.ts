@@ -7,6 +7,7 @@ import {
   SMI_INTERPRETATIONS,
 } from '@/data/test-interpretations'
 import { testScoringService } from '@/services/TestScoringService'
+import { generateModernDocxFromHtml } from '@/lib/docxGenerator'
 
 const ALLOWED_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY', 'EXPERT']
 
@@ -669,13 +670,17 @@ export async function GET(
     const maxNeedsRows = Math.max(thingsINeedList.length, thingsIWantList.length, 1)
 
     const safeName = clientName.replace(/[^a-z0-9]/gi, '_')
+    const isWordFormat = format === 'doc' || format === 'docx' || format === 'word'
 
     const html = `<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
   <title>${escapeHtml(clientName)} - Career Report</title>
-  ${format !== 'doc' && format !== 'word' ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>' : ''}
+  ${!isWordFormat ? `
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  ` : ''}
   <style>
     body {
       font-family: 'Calibri', 'Arial', sans-serif;
@@ -753,7 +758,7 @@ export async function GET(
   <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #e5e7eb;">
     <div id="pdf-status-msg" style="font-size:13px;font-weight:bold;color:#374151;">${format === 'pdf' ? `⏳ Downloading ${safeName}_Career_Report.pdf...` : `${escapeHtml(clientName)} — Structured Career Report`}</div>
     <div style="display:flex;gap:10px;">
-      <a href="/api/admin/clients/${id}/structured-report?format=doc" style="background:#2563eb;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">📥 Download Word (.doc)</a>
+      <a href="/api/admin/clients/${id}/structured-report?format=docx" style="background:#2563eb;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">📥 Download Word (.docx)</a>
       <button onclick="downloadReportPdf()" style="background:#111827;color:#fff;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;font-size:13px;">📥 Download PDF (.pdf)</button>
     </div>
   </div>
@@ -1008,24 +1013,93 @@ export async function GET(
   ` : ''}
   </div>
 
-  ${format !== 'doc' && format !== 'word' ? `
+  ${!isWordFormat ? `
   <script>
-    function downloadReportPdf() {
+    var isGeneratingReportPdf = false;
+    async function downloadReportPdf() {
+      if (isGeneratingReportPdf) return;
       var msgEl = document.getElementById('pdf-status-msg');
-      if (msgEl) msgEl.innerText = '⏳ Generating & downloading ${safeName}_Career_Report.pdf...';
       var rootEl = document.getElementById('structured-report-root');
-      if (!rootEl || typeof html2pdf === 'undefined') return;
-      var opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     '${safeName}_Career_Report.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['css', 'legacy'] }
-      };
-      html2pdf().set(opt).from(rootEl).save().then(function() {
+      if (!rootEl || typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+        if (msgEl) msgEl.innerText = '⏳ Loading PDF generator...';
+        setTimeout(downloadReportPdf, 500);
+        return;
+      }
+      isGeneratingReportPdf = true;
+      try {
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+        var pageWidth = 210;
+        var pageHeight = 297;
+        var margin = 10;
+        var contentWidth = pageWidth - margin * 2;
+        var pageContentHeight = pageHeight - margin * 2;
+        var cursorY = margin;
+
+        var children = Array.from(rootEl.children || []).filter(function(el) { return el.offsetHeight > 0; });
+        for (var i = 0; i < children.length; i++) {
+          var block = children[i];
+          if (msgEl) {
+            msgEl.innerText = '⏳ Generating ${safeName}_Career_Report.pdf (' + (i + 1) + '/' + children.length + ')...';
+          }
+          var canvas = await html2canvas(block, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+          });
+          if (!canvas || canvas.width === 0 || canvas.height === 0) continue;
+
+          var pxPerMm = canvas.width / contentWidth;
+          var imgHeightMm = canvas.height / pxPerMm;
+
+          if (imgHeightMm <= pageContentHeight) {
+            if (cursorY + imgHeightMm > margin + pageContentHeight && cursorY > margin) {
+              pdf.addPage();
+              cursorY = margin;
+            }
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, imgHeightMm);
+            cursorY += imgHeightMm + 2.5;
+          } else {
+            var srcY = 0;
+            while (srcY < canvas.height) {
+              var availMm = (margin + pageContentHeight) - cursorY;
+              if (availMm < 35 && cursorY > margin) {
+                pdf.addPage();
+                cursorY = margin;
+                availMm = pageContentHeight;
+              }
+              var sliceHeightPx = Math.min(canvas.height - srcY, Math.floor(availMm * pxPerMm));
+              if (sliceHeightPx <= 0) break;
+              var sliceCanvas = document.createElement('canvas');
+              sliceCanvas.width = canvas.width;
+              sliceCanvas.height = sliceHeightPx;
+              var ctx = sliceCanvas.getContext('2d');
+              if (ctx) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+                var sliceMm = sliceHeightPx / pxPerMm;
+                pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, cursorY, contentWidth, sliceMm);
+                cursorY += sliceMm + 2;
+              }
+              srcY += sliceHeightPx;
+              if (srcY < canvas.height) {
+                pdf.addPage();
+                cursorY = margin;
+              }
+            }
+          }
+        }
+
+        pdf.save('${safeName}_Career_Report.pdf');
         if (msgEl) msgEl.innerText = '✅ PDF Downloaded (${safeName}_Career_Report.pdf)!';
-      });
+      } catch (err) {
+        console.error('Report PDF generation error:', err);
+        if (msgEl) msgEl.innerText = '⚠️ Error generating PDF. Click Download PDF to retry.';
+      } finally {
+        isGeneratingReportPdf = false;
+      }
     }
     ${format === 'pdf' ? 'window.onload = function() { setTimeout(downloadReportPdf, 400); };' : ''}
   </script>
@@ -1037,11 +1111,12 @@ export async function GET(
       return NextResponse.json({ html, clientName })
     }
 
-    if (format === 'doc' || format === 'word') {
-      return new Response('\ufeff' + html, {
+    if (isWordFormat) {
+      const docxBuffer = generateModernDocxFromHtml(html)
+      return new Response(new Uint8Array(docxBuffer), {
         headers: {
-          'Content-Type': 'application/msword; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${safeName}_Career_Report.doc"`
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'Content-Disposition': `attachment; filename="${safeName}_Career_Report.docx"`
         }
       })
     }

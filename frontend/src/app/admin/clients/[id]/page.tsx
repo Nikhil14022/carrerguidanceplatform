@@ -932,14 +932,14 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                             View Combined Answers Feed
                         </button>
                         <button
-                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                             className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors inline-flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-600/10"
-                            title="Download full client Career Report in the exact Vanya Career Report Word (.doc) structure"
+                            title="Download full client Career Report in the exact Vanya Career Report Word (.docx) structure"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Download Vanya Career Report (.doc)
+                            Download Vanya Career Report (.docx)
                         </button>
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
@@ -1238,10 +1238,10 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             </div>
                                             <div className="flex gap-2 shrink-0">
                                                 <button
-                                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                                                     className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-all"
                                                 >
-                                                    📥 Download Word (.doc)
+                                                    📥 Download Word (.docx)
                                                 </button>
                                                 <button
                                                     onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
