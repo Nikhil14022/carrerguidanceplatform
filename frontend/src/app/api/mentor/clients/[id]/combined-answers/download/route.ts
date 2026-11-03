@@ -82,7 +82,7 @@ export async function GET(
     const modulesParam = url.searchParams.get('modules');
     const format = (url.searchParams.get('format') || 'pdf').toLowerCase();
 
-    const client = await prisma.clientProfile.findUnique({
+    let client = await prisma.clientProfile.findUnique({
       where: { id },
       include: {
         user: { select: { id: true, email: true, name: true } },
@@ -96,6 +96,23 @@ export async function GET(
         parentData: true
       }
     });
+
+    if (!client) {
+      client = await prisma.clientProfile.findUnique({
+        where: { userId: id },
+        include: {
+          user: { select: { id: true, email: true, name: true } },
+          modules: {
+            orderBy: { order: 'asc' },
+            include: {
+              module: true,
+              response: { select: { data: true, submittedAt: true, approvedAt: true } }
+            }
+          },
+          parentData: true
+        }
+      });
+    }
 
     if (!client) {
       return new NextResponse('Client not found', { status: 404 });
@@ -794,6 +811,7 @@ export async function GET(
     };
 
     const reportDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+    const safeName = (client.user.name || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
     const htmlHeader = format === 'doc'
       ? `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>`
       : `<!DOCTYPE html><html>`;
@@ -802,6 +820,7 @@ export async function GET(
 <head>
   <meta charset="utf-8">
   <title>Assessment Responses - ${client.user.name || 'Client'}</title>
+  ${format !== 'doc' ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>' : ''}
   <style>
     * {
       box-sizing: border-box;
@@ -1078,6 +1097,16 @@ export async function GET(
   </style>
 </head>
 <body>
+  ${format !== 'doc' ? `
+  <div id="pdf-action-bar" style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;margin-bottom:20px;background:#0f172a;color:#f8fafc;border-radius:10px;font-family:'Inter',sans-serif;">
+    <div id="pdf-status-text" style="font-size:13px;font-weight:600;">⏳ Preparing your PDF download (${safeName}_Combined_Answers.pdf)...</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="downloadPdfFile()" style="background:#4f46e5;color:#ffffff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📥 Download PDF</button>
+      <a href="/api/mentor/clients/${id}/combined-answers/download?format=doc${modulesParam ? `&modules=${encodeURIComponent(modulesParam)}` : ''}" style="background:#059669;color:#ffffff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:700;">📄 Download Word (.doc)</a>
+    </div>
+  </div>
+  ` : ''}
+  <div id="pdf-export-root">
   <div class="print-header">
     <div class="logo-area">
       <h1>HOLISTREE</h1>
@@ -1196,22 +1225,43 @@ export async function GET(
       </div>
     `;
   }).join('')}
+  </div>
 
   ${format !== 'doc' ? `
   <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 500);
+    function downloadPdfFile() {
+      var statusEl = document.getElementById('pdf-status-text');
+      if (statusEl) statusEl.innerText = '⏳ Generating & downloading ${safeName}_Combined_Answers.pdf...';
+      var element = document.getElementById('pdf-export-root');
+      if (!element || typeof html2pdf === 'undefined') {
+        if (statusEl) statusEl.innerText = '⚠️ PDF generator loading, please try clicking Download PDF in a moment.';
+        return;
+      }
+      var opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     '${safeName}_Combined_Answers.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+      };
+      html2pdf().set(opt).from(element).save().then(function() {
+        if (statusEl) statusEl.innerText = '✅ PDF Downloaded (${safeName}_Combined_Answers.pdf)!';
+      }).catch(function(err) {
+        console.error(err);
+        if (statusEl) statusEl.innerText = '⚠️ Could not auto-download PDF. Click Download PDF to retry.';
+      });
     }
+    window.onload = function() {
+      setTimeout(downloadPdfFile, 400);
+    };
   </script>
   ` : ''}
 </body>
 </html>`;
 
     if (format === 'doc') {
-      const safeName = (client.user.name || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
-      return new NextResponse(html, {
+      return new NextResponse('\ufeff' + html, {
         headers: {
           'Content-Type': 'application/msword; charset=utf-8',
           'Content-Disposition': `attachment; filename="${safeName}_Combined_Answers.doc"`

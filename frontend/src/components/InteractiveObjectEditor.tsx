@@ -1,22 +1,173 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 
 interface InteractiveObjectEditorProps {
     value: any;
     onChange: (newValue: any) => void;
     accentColor?: 'indigo' | 'orange';
+    questionType?: string;
+}
+
+function isFilePathUrl(v: any): boolean {
+    if (typeof v !== 'string') return false;
+    return v.startsWith('/api/upload/') || v.startsWith('/uploads/');
+}
+
+function getCleanFileName(filepath: string): string {
+    try {
+        const raw = decodeURIComponent(filepath.split('/').pop() || filepath);
+        return raw.replace(/^\d{10,14}-/, '');
+    } catch {
+        return filepath.split('/').pop() || filepath;
+    }
 }
 
 export default function InteractiveObjectEditor({
     value,
     onChange,
-    accentColor = 'indigo'
+    accentColor = 'indigo',
+    questionType
 }: InteractiveObjectEditorProps) {
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+
     const focusBorderClass = accentColor === 'orange' ? 'focus:border-orange-500' : 'focus:border-indigo-500';
     const badgeClass = accentColor === 'orange' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
 
+    // Helper: File Upload Question or File URL list
+    const isFileMode =
+        questionType === 'file' ||
+        (Array.isArray(value) && value.length > 0 && value.every(isFilePathUrl)) ||
+        isFilePathUrl(value);
+
+    if (isFileMode) {
+        const filesList: string[] = Array.isArray(value)
+            ? value.filter((item: any) => typeof item === 'string' && item.trim() !== '')
+            : typeof value === 'string' && value.trim() !== ''
+            ? [value]
+            : [];
+
+        const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const selected = e.target.files;
+            if (!selected || selected.length === 0) return;
+            setUploading(true);
+            setUploadError(null);
+            const newUrls: string[] = [];
+            try {
+                const formData = new FormData();
+                for (const file of Array.from(selected)) {
+                    formData.append('files', file);
+                }
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                const returnedUrls: string[] = Array.isArray(data.files)
+                    ? data.files
+                    : data.url
+                    ? [data.url]
+                    : [];
+                if (!res.ok || returnedUrls.length === 0) {
+                    throw new Error(data.message || data.error || 'Failed to upload file(s)');
+                }
+                newUrls.push(...returnedUrls);
+                onChange([...filesList, ...newUrls]);
+            } catch (err: any) {
+                setUploadError(err.message || 'Failed to upload file');
+            } finally {
+                setUploading(false);
+                e.target.value = '';
+            }
+        };
+
+        const handleRemoveFile = (idx: number) => {
+            onChange(filesList.filter((_, i) => i !== idx));
+        };
+
+        return (
+            <div className="space-y-3 bg-slate-950 p-4 border border-slate-800 rounded-2xl max-w-4xl">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Uploaded Documents / Marksheets ({filesList.length})
+                </div>
+
+                {filesList.length === 0 ? (
+                    <div className="text-xs text-slate-500 italic py-2">
+                        No files uploaded yet. Click the button below to upload PDFs or images.
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        {filesList.map((fileUrl, idx) => (
+                            <div
+                                key={idx}
+                                className="flex items-center justify-between gap-3 p-2.5 bg-slate-900 border border-slate-800 rounded-xl"
+                            >
+                                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                    <span className="text-base shrink-0">📄</span>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-xs font-semibold text-slate-200 truncate">
+                                            {getCleanFileName(fileUrl)}
+                                        </div>
+                                        <div className="text-[10px] text-slate-500 truncate">{fileUrl}</div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <a
+                                        href={fileUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold uppercase tracking-wider transition-all"
+                                    >
+                                        View
+                                    </a>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveFile(idx)}
+                                        className="px-2 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[10px] font-bold uppercase tracking-wider transition-all"
+                                        title="Remove file"
+                                    >
+                                        ✕ Remove
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {uploadError && (
+                    <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
+                        ⚠️ {uploadError}
+                    </div>
+                )}
+
+                <div className="pt-1">
+                    <label
+                        className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-wider cursor-pointer transition-all ${
+                            uploading ? 'opacity-60 cursor-wait' : 'hover:opacity-90'
+                        } ${badgeClass}`}
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <span>{uploading ? 'Uploading File(s)...' : '+ Upload Marksheet / File (PDF or Image)'}</span>
+                        <input
+                            type="file"
+                            multiple
+                            accept=".pdf,image/*,.doc,.docx"
+                            onChange={handleFilesSelected}
+                            disabled={uploading}
+                            className="hidden"
+                        />
+                    </label>
+                </div>
+            </div>
+        );
+    }
+
     // Helper: Educational background specific structure
-    const isEduBg = value && typeof value === 'object' && !Array.isArray(value) && (value.school || value.college || value.university);
+    const isEduBg =
+        questionType === 'education_history' ||
+        (value && typeof value === 'object' && !Array.isArray(value) && (value.school || value.college || value.university));
 
     if (isEduBg) {
         const edu = typeof value === 'object' && value !== null ? value : {};

@@ -6,7 +6,9 @@ import prisma from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const data = await request.formData();
-    const files = data.getAll('files') as File[];
+    const filesFromPlural = data.getAll('files') as File[];
+    const filesFromSingular = data.getAll('file') as File[];
+    const files = [...filesFromPlural, ...filesFromSingular].filter(Boolean);
 
     if (!files || files.length === 0) {
       return NextResponse.json({ success: false, message: 'No files uploaded' }, { status: 400 });
@@ -42,7 +44,7 @@ export async function POST(request: Request) {
       uploadedPaths.push(`/api/upload/${dbFile.id}/${safeFilename}`);
     }
 
-    return NextResponse.json({ success: true, files: uploadedPaths });
+    return NextResponse.json({ success: true, files: uploadedPaths, url: uploadedPaths[0] || null });
   } catch (error) {
     console.error('Error uploading files:', error);
     return NextResponse.json({ success: false, message: 'Error uploading files' }, { status: 500 });

@@ -184,7 +184,8 @@ export class TestScoringService extends BaseService {
   // ──────────────────────────────────────────────────────────
   // 16 Personality Factors (Supports both 129-question pf16_1..129 and manual summary)
   // ──────────────────────────────────────────────────────────
-  score16PF(data: any): PF16Score {
+  score16PF(rawInput: any): PF16Score {
+    const data = rawInput?.__testData || rawInput;
     if (!data || typeof data !== 'object') {
       return {
         type: 'INFJ-T',
@@ -391,7 +392,8 @@ export class TestScoringService extends BaseService {
   // ──────────────────────────────────────────────────────────
   // Values
   // ──────────────────────────────────────────────────────────
-  scoreValues(data: any): ValuesScore {
+  scoreValues(rawInput: any): ValuesScore {
+    const data = rawInput?.__testData || rawInput;
     const normalizedSelected: Record<string, string[]> = {};
     for (const [key, val] of Object.entries(data?.selected || {})) {
       normalizedSelected[key.toLowerCase()] = val as string[];
@@ -435,7 +437,8 @@ export class TestScoringService extends BaseService {
   // ──────────────────────────────────────────────────────────
   // RIASEC (Computes I Am, I Can, I Like breakdown + Totals)
   // ──────────────────────────────────────────────────────────
-  scoreRIASEC(data: any): RIASECScore {
+  scoreRIASEC(rawInput: any): RIASECScore {
+    const data = rawInput?.__testData || rawInput;
     const letters: RIASECLetter[] = ['R', 'I', 'A', 'S', 'E', 'C'];
     const totals: Record<string, number> = {};
     const subScores: Record<RIASECLetter, { iAm: number; iCan: number; iLike: number; total: number }> = {
@@ -490,7 +493,8 @@ export class TestScoringService extends BaseService {
   // ──────────────────────────────────────────────────────────
   // Color Test
   // ──────────────────────────────────────────────────────────
-  scoreColorTest(data: any): ColorTestScore {
+  scoreColorTest(rawInput: any): ColorTestScore {
+    const data = rawInput?.__testData || rawInput;
     const countFromArray = (section: any[], optA: string, optB: string) => {
       let a = 0, b = 0;
       (section || []).forEach((v: any) => {
@@ -551,7 +555,8 @@ export class TestScoringService extends BaseService {
   // ──────────────────────────────────────────────────────────
   // Subject Matter Interest
   // ──────────────────────────────────────────────────────────
-  scoreSMI(data: any): SMIScore {
+  scoreSMI(rawInput: any): SMIScore {
+    const data = rawInput?.__testData || rawInput;
     const columns: SMIColumn[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
     const columnTotals: Record<string, number> = {};
     columns.forEach(c => columnTotals[c] = 0);

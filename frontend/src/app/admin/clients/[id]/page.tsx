@@ -792,6 +792,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             value={value}
                                             onChange={handleValueChange}
                                             accentColor="orange"
+                                            questionType={q.type}
                                         />
                                     )}
 

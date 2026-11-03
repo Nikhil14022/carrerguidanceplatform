@@ -177,63 +177,117 @@ export async function GET(
     const clientName = demoAns.demo_name || client.user.name || 'Client'
     const clientAge = demoAns.demo_age ? `${demoAns.demo_age} years` : '—'
     const clientDob = demoAns.demo_dob || '—'
-    const clientResidence = demoAns.demo_location || '—'
-    const clientStream = demoAns.demo_current_stream || '—'
+    const clientResidence = demoAns.demo_residence || demoAns.demo_location || '—'
+    const clientStream = demoAns.demo_current_stream || ''
 
     let schoolNameStr = '—'
     let currentAcademicYearStr = '—'
-    const eduVal = demoAns.demo_education_level
+    const eduVal = demoAns.demo_education || demoAns.demo_education_level
     if (eduVal && typeof eduVal === 'object') {
       const schoolNames: string[] = []
       const gradeNames: string[] = []
       ;['school', 'college', 'university'].forEach(level => {
         const d = eduVal[level]
-        if (d?.active) {
+        const levelLabel = level.charAt(0).toUpperCase() + level.slice(1)
+        if (d && (d.active || d.name || d.grade || (Array.isArray(d.entries) && d.entries.length > 0))) {
           const entries = Array.isArray(d.entries) && d.entries.length > 0
             ? d.entries
-            : [{ name: d.name, grade: d.grade }]
+            : [{ name: d.name, grade: d.grade || d.percentage || d.stream || d.degree }]
           entries.forEach((e: any) => {
-            if (e.name) schoolNames.push(`${e.name} (${level.charAt(0).toUpperCase() + level.slice(1)})`)
-            if (e.grade) gradeNames.push(`${e.grade}`)
+            if (e?.name && String(e.name).trim()) {
+              schoolNames.push(`${levelLabel}: ${String(e.name).trim()}`)
+            }
+            if (e?.grade && String(e.grade).trim()) {
+              gradeNames.push(`${levelLabel}: ${String(e.grade).trim()}`)
+            }
           })
         }
       })
-      if (schoolNames.length > 0) schoolNameStr = schoolNames.join('; ')
-      if (gradeNames.length > 0) currentAcademicYearStr = gradeNames.join('; ')
+      if (schoolNames.length > 0) schoolNameStr = schoolNames.join(' | ')
+      if (gradeNames.length > 0) currentAcademicYearStr = gradeNames.join(' | ')
     }
 
-    const livesWithQ = getQuestion(modFamily, 'family_lives_with')
-    const livesWithStr = familyAns.family_lives_with
-      ? formatOptionValue(livesWithQ, familyAns.family_lives_with, familyAns)
-      : '—'
+    const demoLivesWith = demoAns.demo_lives_with
+      ? formatOptionValue(getQuestion(modDemo, 'demo_lives_with'), demoAns.demo_lives_with, demoAns)
+      : ''
+    const famLivesWith = familyAns.family_lives_with
+      ? formatOptionValue(getQuestion(modFamily, 'family_lives_with'), familyAns.family_lives_with, familyAns)
+      : ''
+    const livesWithParts = [
+      demoLivesWith && demoLivesWith !== '—' ? demoLivesWith : '',
+      famLivesWith && famLivesWith !== '—' && famLivesWith !== demoLivesWith ? famLivesWith : ''
+    ].filter(Boolean)
+    const livesWithStr = livesWithParts.length > 0 ? livesWithParts.join(' | ') : '—'
 
-    let subjectsStr = clientStream
-    if (Array.isArray(demoAns.demo_subjects_RATINGS) && demoAns.demo_subjects_RATINGS.length > 0) {
-      const subItems = demoAns.demo_subjects_RATINGS
-        .map((r: any) => r.col1 ? `${r.col1}${r.col2 ? ` (${r.col2})` : ''}` : '')
+    let subjectsStr = clientStream || '—'
+    const rawAcademicOverview = demoAns.demo_academic_overview || demoAns.demo_subjects || demoAns.demo_subjects_RATINGS
+    if (Array.isArray(rawAcademicOverview) && rawAcademicOverview.length > 0) {
+      const subItems = rawAcademicOverview
+        .map((r: any) => r?.col1 && String(r.col1).trim() ? `${String(r.col1).trim()}${r.col2 ? ` (${r.col2})` : ''}` : '')
         .filter(Boolean)
       if (subItems.length > 0) {
-        subjectsStr = `${clientStream !== '—' ? clientStream + ' — ' : ''}${subItems.join(', ')}`
+        subjectsStr = `${clientStream ? clientStream + ' — ' : ''}${subItems.join(', ')}`
       }
+    }
+
+    const demoExamsStr = formatOptionValue(getQuestion(modDemo, 'demo_exams'), demoAns.demo_exams, demoAns)
+    const demoExtracurricularStr = formatOptionValue(getQuestion(modDemo, 'demo_extracurricular'), demoAns.demo_extracurricular, demoAns)
+    const demoThoughtsAcademicsStr = formatOptionValue(getQuestion(modDemo, 'demo_thoughts_academics'), demoAns.demo_thoughts_academics, demoAns)
+    const demoHobbiesBaseStr = formatOptionValue(getQuestion(modDemo, 'demo_hobbies'), demoAns.demo_hobbies, demoAns)
+    const demoHobbiesNotesStr = demoAns.demo_hobbies_notes || demoAns.demo_hobbies_open_text || ''
+    const demoHobbiesFullStr = [
+      demoHobbiesBaseStr !== '—' ? demoHobbiesBaseStr : '',
+      demoHobbiesNotesStr ? `Notes: ${demoHobbiesNotesStr}` : ''
+    ].filter(Boolean).join(' | ') || '—'
+
+    let demoRoutineStr = '—'
+    if (Array.isArray(demoAns.demo_routine) && demoAns.demo_routine.length > 0) {
+      const schedParts = demoAns.demo_routine.map((s: any) => {
+        const days = Array.isArray(s.days) ? s.days.join(', ') : (s.days || 'Schedule')
+        const slots = Array.isArray(s.slots)
+          ? s.slots.filter((sl: any) => sl?.time || sl?.activity).map((sl: any) => `${sl.time || ''} ${sl.activity || ''}`.trim()).join(', ')
+          : ''
+        return slots ? `${days}: ${slots}` : ''
+      }).filter(Boolean)
+      if (schedParts.length > 0) demoRoutineStr = schedParts.join(' ; ')
+    } else if (demoAns.demo_routine && typeof demoAns.demo_routine === 'object') {
+      const entries = Object.entries(demoAns.demo_routine)
+        .filter(([k, v]) => k && v)
+        .map(([k, v]) => `${k}: ${v}`)
+      if (entries.length > 0) demoRoutineStr = entries.join(', ')
     }
 
     // -----------------------------------------------------------------
     // 2. MOST IMPORTANT VALUES
     // -----------------------------------------------------------------
-    const modValues = findModByTestType('VALUES') || findModByTitle('values test')
+    const modValues = findModByTestType('VALUES') || findModByTitle('value system') || findModByTitle('values')
     const valuesAns = getModAnswers(modValues)
-    const valuesScored = valuesAns.__scored?.scores || (Object.keys(valuesAns).length > 0 ? testScoringService.scoreValues(valuesAns) : null)
+    const valuesScored = Object.keys(valuesAns).length > 0
+      ? testScoringService.scoreValues(valuesAns)
+      : valuesAns.__scored?.scores || null
     let topValuesRows: { rank: number; label: string; category: string }[] = []
 
     const mapCatCode = (cat: string): string => {
       const c = String(cat || '').toLowerCase()
       if (c.includes('ideal') || c === 'id') return 'ID'
       if (c.includes('standard') || c === 's') return 'S'
-      if (c.includes('want') || c.includes('pref') || c === 'wpv') return 'WPV'
+      if (c.includes('want') || c.includes('pref') || c === 'wpv' || c === 'wp') return 'WPV'
       return 'ID'
     }
 
-    if (Array.isArray(valuesScored?.topValues) && valuesScored.topValues.length > 0) {
+    const rawValuesRanked = valuesAns.__testData?.ranked || valuesAns.ranked
+    const rawValuesCategorized = valuesAns.__testData?.categorized || valuesAns.categorized || {}
+
+    if (Array.isArray(rawValuesRanked) && rawValuesRanked.length > 0) {
+      rawValuesRanked.forEach((valStr: string, idx: number) => {
+        const cat = rawValuesCategorized[valStr] || 'Ideal'
+        topValuesRows.push({
+          rank: idx + 1,
+          label: valStr,
+          category: mapCatCode(cat)
+        })
+      })
+    } else if (Array.isArray(valuesScored?.topValues) && valuesScored.topValues.length > 0) {
       valuesScored.topValues.forEach((v: any, idx: number) => {
         topValuesRows.push({
           rank: v.rank || idx + 1,
@@ -241,13 +295,12 @@ export async function GET(
           category: mapCatCode(v.category)
         })
       })
-    } else if (Array.isArray(valuesAns.ranked) && valuesAns.ranked.length > 0) {
-      valuesAns.ranked.forEach((valStr: string, idx: number) => {
-        const cat = valuesAns.categorized?.[valStr] || 'Ideal'
+    } else if (Array.isArray(valuesAns.__scored?.scores?.topValues) && valuesAns.__scored.scores.topValues.length > 0) {
+      valuesAns.__scored.scores.topValues.forEach((v: any, idx: number) => {
         topValuesRows.push({
-          rank: idx + 1,
-          label: valStr,
-          category: mapCatCode(cat)
+          rank: v.rank || idx + 1,
+          label: v.value || String(v),
+          category: mapCatCode(v.category)
         })
       })
     }
@@ -265,18 +318,31 @@ export async function GET(
         if (rawVal !== undefined && rawVal !== null && rawVal !== '') {
           const num = Number(rawVal)
           if (!isNaN(num)) {
-            fearRows.push(`${q.question} - ${num} ${getScoreBand(num)}`)
+            const note = fearsAns[`${q.id}_open_text`] ? ` (${fearsAns[`${q.id}_open_text`]})` : ''
+            fearRows.push(`${q.question} - ${num} ${getScoreBand(num)}${note}`)
           }
         }
       }
     })
+    if (Array.isArray(fearsAns.fears_other) && fearsAns.fears_other.length > 0) {
+      fearsAns.fears_other.forEach((row: any) => {
+        if (row?.col1 && String(row.col1).trim()) {
+          const num = Number(row.col2 || 5)
+          const band = !isNaN(num) ? `${num} ${getScoreBand(num)}` : String(row.col2 || '')
+          fearRows.push(`${String(row.col1).trim()} - ${band}`)
+        }
+      })
+    }
 
     // -----------------------------------------------------------------
     // 4. 16 PERSONALITY FACTOR
     // -----------------------------------------------------------------
     const mod16pf = findModByTestType('16PF') || findModByTitle('16pf') || findModByTitle('personality')
     const pf16Ans = getModAnswers(mod16pf)
-    const pf16Scored = pf16Ans.__scored?.scores || (Object.keys(pf16Ans).some(k => k.startsWith('pf16_')) ? testScoringService.score16PF(pf16Ans) : null)
+    const hasPf16Raw = Object.keys(pf16Ans).some(k => k.startsWith('pf16_')) || (pf16Ans.__testData && Object.keys(pf16Ans.__testData).some(k => k.startsWith('pf16_')))
+    const pf16Scored = hasPf16Raw
+      ? testScoringService.score16PF(pf16Ans)
+      : pf16Ans.__scored?.scores || (Object.keys(pf16Ans).length > 0 ? testScoringService.score16PF(pf16Ans) : null)
 
     const pf16Header = pf16Scored?.roleName && (pf16Scored?.personalityType || pf16Scored?.type)
       ? `${pf16Scored.roleName} (${pf16Scored.personalityType || pf16Scored.type})`
@@ -289,7 +355,10 @@ export async function GET(
     // -----------------------------------------------------------------
     const modRiasec = findModByTestType('RIASEC') || findModByTitle('riasec')
     const riasecAns = getModAnswers(modRiasec)
-    const riasecScored = riasecAns.__scored?.scores || (Object.keys(riasecAns).length > 0 ? testScoringService.scoreRIASEC(riasecAns) : null)
+    const riasecLiveScored = Object.keys(riasecAns).length > 0 ? testScoringService.scoreRIASEC(riasecAns) : null
+    const riasecScored = (riasecLiveScored && Object.values(riasecLiveScored.totals || {}).some(v => v > 0))
+      ? riasecLiveScored
+      : (riasecAns.__scored?.scores || riasecLiveScored)
 
     const riasecNameMap: Record<string, string> = {
       R: 'Realistic',
@@ -310,7 +379,9 @@ export async function GET(
       C: { iAm: 0, iCan: 0, iLike: 0, total: 0 }
     }
 
-    if (riasecAns.__riasecSubScores) {
+    if (riasecLiveScored?.subScores && Object.values(riasecLiveScored.subScores).some(s => s.total > 0)) {
+      Object.assign(riasecSubScores, riasecLiveScored.subScores)
+    } else if (riasecAns.__riasecSubScores) {
       Object.assign(riasecSubScores, riasecAns.__riasecSubScores)
     } else if (riasecScored?.subScores) {
       Object.assign(riasecSubScores, riasecScored.subScores)
@@ -321,7 +392,12 @@ export async function GET(
         code,
         name: riasecNameMap[code],
         ...riasecSubScores[code],
-        total: riasecScored?.columnTotals?.[code] ?? riasecScored?.scores?.[code] ?? riasecSubScores[code]?.total ?? 0
+        total:
+          riasecSubScores[code]?.total ||
+          riasecScored?.totals?.[code] ||
+          riasecScored?.columnTotals?.[code] ||
+          riasecScored?.scores?.[code] ||
+          0
       }))
       .sort((a, b) => b.total - a.total)
 
@@ -335,11 +411,17 @@ export async function GET(
     // -----------------------------------------------------------------
     const modColor = findModByTestType('COLOR') || findModByTitle('color') || findModByTitle('colour')
     const colorAns = getModAnswers(modColor)
-    const colorScored = colorAns.__scored?.scores || (Object.keys(colorAns).length > 0 ? testScoringService.scoreColorTest(colorAns) : null)
-    const colorComboKey = colorScored?.primaryColor
-      ? `${colorScored.primaryColor} ${colorScored.secondaryColor} ${colorScored.energyType}`
-      : '—'
-    const colorInterpretation = COLOR_INTERPRETATIONS[colorComboKey] || colorScored?.interpretation || colorAns.__scored?.interpretation || 'Not yet completed.'
+    const colorLiveScored = Object.keys(colorAns).length > 0 ? testScoringService.scoreColorTest(colorAns) : null
+    const colorScored = colorAns.__scored?.scores || colorLiveScored
+    const colorComboKey =
+      colorAns.__testData?.result ||
+      colorScored?.colorCode ||
+      (colorScored?.primaryColor ? `${colorScored.primaryColor} ${colorScored.secondaryColor} ${colorScored.energyType}` : '—')
+    const colorInterpretation =
+      COLOR_INTERPRETATIONS[colorComboKey] ||
+      colorScored?.interpretation ||
+      colorAns.__scored?.interpretation ||
+      'Not yet completed.'
 
     // -----------------------------------------------------------------
     // 7. STRENGTHS AND WEAKNESSES
@@ -377,6 +459,20 @@ export async function GET(
         }
       }
     })
+    if (Array.isArray(swAns.sw_grid) && swAns.sw_grid.length > 0 && strengthItems.length === 0 && weaknessItems.length === 0) {
+      swAns.sw_grid.forEach((item: any) => {
+        if (!item) return
+        const rating = Number(item.rating ?? 5)
+        const band = getScoreBand(rating)
+        const label = item.trait || item.rightLabel || item.leftLabel || 'Trait'
+        const itemStr = `${label} - ${rating} ${band}`
+        if (item.type === 'weakness' || (!item.type && rating < 5)) {
+          weaknessItems.push(itemStr)
+        } else {
+          strengthItems.push(itemStr)
+        }
+      })
+    }
     if (swAns.sw_open_strengths) {
       strengthItems.push(`Additional Strengths: ${swAns.sw_open_strengths}`)
     }
@@ -389,11 +485,14 @@ export async function GET(
     // -----------------------------------------------------------------
     const modSmi = findModByTestType('SMI') || findModByTitle('subject matter')
     const smiAns = getModAnswers(modSmi)
-    const smiScored = smiAns.__scored?.scores || (Object.keys(smiAns).length > 0 ? testScoringService.scoreSMI(smiAns) : null)
+    const smiLiveScored = Object.keys(smiAns).length > 0 ? testScoringService.scoreSMI(smiAns) : null
+    const smiScored = (smiLiveScored && Object.values(smiLiveScored.columnTotals || {}).some(v => v > 0))
+      ? smiLiveScored
+      : (smiAns.__scored?.scores || smiLiveScored)
     const smiCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as const
     const smiTotals: Record<string, number> = {}
     smiCols.forEach(c => {
-      smiTotals[c] = smiScored?.columnTotals?.[c] ?? 0
+      smiTotals[c] = smiScored?.columnTotals?.[c] ?? smiAns.__testData?.columnTotals?.[c] ?? 0
     })
     const top2Smi = [...smiCols]
       .map(c => ({ code: c, score: smiTotals[c] }))
@@ -406,25 +505,60 @@ export async function GET(
     // -----------------------------------------------------------------
     const modVisual = findModByTitle('movies') || findModByTitle('visual world')
     const visualAns = getModAnswers(modVisual)
-    const movieGenresStr = formatOptionValue(getQuestion(modVisual, 'visual_1'), visualAns.visual_1, visualAns)
+    const movieGenresRaw = visualAns.visual_genres ?? visualAns.visual_1
+    const movieGenresQ = getQuestion(modVisual, 'visual_genres') || getQuestion(modVisual, 'visual_1')
+    const movieGenresStr = formatOptionValue(movieGenresQ, movieGenresRaw, visualAns)
+
     const seriesGenresStr = formatOptionValue(getQuestion(modVisual, 'visual_series_genres'), visualAns.visual_series_genres, visualAns)
     const combinedGenresStr = [
       movieGenresStr !== '—' ? `Movies: ${movieGenresStr}` : '',
       seriesGenresStr !== '—' ? `Series: ${seriesGenresStr}` : ''
     ].filter(Boolean).join(' | ') || '—'
 
-    const favMoviesStr = formatOptionValue(getQuestion(modVisual, 'visual_2'), visualAns.visual_2, visualAns)
-    const favSeriesStr = formatOptionValue(getQuestion(modVisual, 'visual_series_fav'), visualAns.visual_series_fav, visualAns)
-    const favBooksStr = formatOptionValue(getQuestion(modVisual, 'visual_books'), visualAns.visual_books, visualAns)
-    const favGamesStr = formatOptionValue(getQuestion(modVisual, 'visual_games'), visualAns.visual_games, visualAns)
+    const favMoviesRaw = visualAns.visual_fav_movies ?? visualAns.visual_2
+    const favMoviesQ = getQuestion(modVisual, 'visual_fav_movies') || getQuestion(modVisual, 'visual_2')
+    const favMoviesStr = formatOptionValue(favMoviesQ, favMoviesRaw, visualAns)
+
+    const favSeriesRaw = visualAns.visual_fav_series ?? visualAns.visual_series_fav
+    const favSeriesQ = getQuestion(modVisual, 'visual_fav_series') || getQuestion(modVisual, 'visual_series_fav')
+    const favSeriesStr = formatOptionValue(favSeriesQ, favSeriesRaw, visualAns)
+
+    const likesBooksStr = formatOptionValue(getQuestion(modVisual, 'visual_books'), visualAns.visual_books, visualAns)
+    const bookGenresStr = formatOptionValue(getQuestion(modVisual, 'visual_book_genres'), visualAns.visual_book_genres, visualAns)
+    const bookNamesStr = visualAns.visual_book_genres_open_text || ''
+    const favBooksStr = [
+      likesBooksStr !== '—' ? `Likes Books: ${likesBooksStr}` : '',
+      bookGenresStr !== '—' ? `Genres: ${bookGenresStr}` : '',
+      bookNamesStr ? `Books: ${bookNamesStr}` : ''
+    ].filter(Boolean).join(' | ') || '—'
+
+    const favGamesBase = formatOptionValue(getQuestion(modVisual, 'visual_games'), visualAns.visual_games, visualAns)
+    const favGamesOtherGenre = visualAns.visual_games_genre_other ? ` (Other Genre: ${visualAns.visual_games_genre_other})` : ''
+    const favGamesStr = favGamesBase !== '—' ? `${favGamesBase}${favGamesOtherGenre}` : '—'
+
     const favMusicStr = formatOptionValue(getQuestion(modVisual, 'visual_music'), visualAns.visual_music, visualAns)
-    const favYoutubeStr = formatOptionValue(getQuestion(modVisual, 'visual_3'), visualAns.visual_3, visualAns)
+
+    const youtubeRaw = visualAns.visual_youtube_insta ?? visualAns.visual_3
+    const youtubeQ = getQuestion(modVisual, 'visual_youtube_insta') || getQuestion(modVisual, 'visual_3')
+    const favYoutubeStr = formatOptionValue(youtubeQ, youtubeRaw, visualAns)
+
+    const contentGenresStr = formatOptionValue(getQuestion(modVisual, 'visual_content_genres'), visualAns.visual_content_genres, visualAns)
+
+    const superpowerRaw = visualAns.visual_superpower ?? visualAns.visual_4
+    const superpowerQ = getQuestion(modVisual, 'visual_superpower') || getQuestion(modVisual, 'visual_4')
     const superpowerStr = [
-      formatOptionValue(getQuestion(modVisual, 'visual_4'), visualAns.visual_4, visualAns),
-      visualAns.visual_4_open_text ? `(${visualAns.visual_4_open_text})` : ''
+      formatOptionValue(superpowerQ, superpowerRaw, visualAns),
+      visualAns.visual_superpower_open_text || visualAns.visual_4_open_text
+        ? `(${visualAns.visual_superpower_open_text || visualAns.visual_4_open_text})`
+        : ''
     ].filter(s => s && s !== '—').join(' ') || '—'
-    const charactersStr = formatOptionValue(getQuestion(modVisual, 'visual_5'), visualAns.visual_5, visualAns)
+
+    const charactersRaw = visualAns.visual_characters ?? visualAns.visual_5
+    const charactersQ = getQuestion(modVisual, 'visual_characters') || getQuestion(modVisual, 'visual_5')
+    const charactersStr = formatOptionValue(charactersQ, charactersRaw, visualAns)
+
     const screenTimeStr = [
+      contentGenresStr !== '—' ? `Online Content Genres: ${contentGenresStr}` : '',
       visualAns.visual_screen_hours ? `Hours/day: ${visualAns.visual_screen_hours}` : '',
       visualAns.visual_screen_activity ? `Activity: ${formatOptionValue(getQuestion(modVisual, 'visual_screen_activity'), visualAns.visual_screen_activity, visualAns)}` : '',
       visualAns.visual_search_history ? `Search History: ${formatOptionValue(getQuestion(modVisual, 'visual_search_history'), visualAns.visual_search_history, visualAns)}` : ''
@@ -433,7 +567,7 @@ export async function GET(
     // -----------------------------------------------------------------
     // 10. LIFESTYLE EXPECTANCIES & NEEDS AND WANTS
     // -----------------------------------------------------------------
-    const modLifeExp = findModByTitle('lifestyle expectancies')
+    const modLifeExp = findModByTitle('lifestyle expectancies') || findModByTitle('lifestyle')
     const lifeExpAns = getModAnswers(modLifeExp)
     const lifeExpQuestions = getModQuestions(modLifeExp)
 
@@ -447,6 +581,16 @@ export async function GET(
 
     const thingsINeedList: string[] = []
     const thingsIWantList: string[] = []
+
+    // Extract from Module 8 question `lifestyle_8` (table with col1 = Things I Need, col2 = Things I Want/Desire)
+    if (Array.isArray(lifeExpAns.lifestyle_8) && lifeExpAns.lifestyle_8.length > 0) {
+      lifeExpAns.lifestyle_8.forEach((row: any) => {
+        if (row?.col1 && String(row.col1).trim()) thingsINeedList.push(String(row.col1).trim())
+        if (row?.col2 && String(row.col2).trim()) thingsIWantList.push(String(row.col2).trim())
+      })
+    }
+
+    // Also support standalone needs & wants module if present
     needsQuestions.forEach((q: any) => {
       const val = needsAns[q.id]
       if (!val) return
@@ -469,26 +613,33 @@ export async function GET(
     const riskQuestions = getModQuestions(modRisk)
 
     // -----------------------------------------------------------------
-    // 12. OVERVIEW (Aim & Vision, Friends, Family, Body/Self Image)
+    // 12. OVERVIEW (Aim & Vision, Career Perspective, Friends, Family, Body/Self Image)
     // -----------------------------------------------------------------
-    const modCareerExp = findModByTitle('career exploration')
-    const careerExpAns = getModAnswers(modCareerExp)
-    const careerExpQuestions = getModQuestions(modCareerExp)
+    const modAim = findModByTitle('aim and vision') || findModByTitle('aim') || findModByTitle('career exploration')
+    const aimAns = getModAnswers(modAim)
+    const aimQuestions = getModQuestions(modAim)
 
-    const modWorkStyle = findModByTitle('life style and work style') || findModByTitle('work style')
-    const workStyleAns = getModAnswers(modWorkStyle)
-    const workStyleQuestions = getModQuestions(modWorkStyle)
-
-    const modSelfDisc = findModByTestType('SELF_DISCOVERY') || findModByTitle('self discovery')
-    const selfDiscAns = getModAnswers(modSelfDisc)
+    const modCareerPersp = findModByTitle('career perspective') || findModByTitle('life style and work style') || findModByTitle('work style')
+    const careerPerspAns = getModAnswers(modCareerPersp)
+    const careerPerspQuestions = getModQuestions(modCareerPersp)
 
     const modFriends = findModByTitle('friends')
     const friendsAns = getModAnswers(modFriends)
     const friendsQuestions = getModQuestions(modFriends)
 
-    const familyQuestions = getModQuestions(modFamily)
+    const extraFamilyQuestions = [
+      { id: 'family_lives_with', type: 'textarea', question: 'Who all do you currently live with at home?' },
+      { id: 'family_arguments', type: 'textarea', question: 'What kind of arguments or disagreements do you usually have at home, and how are they resolved?' },
+      { id: 'family_repeated_statements', type: 'textarea', question: 'What are some statements or phrases your family members keep repeating to you (can be good or bad)?' }
+    ]
+    const baseFamilyQuestions = getModQuestions(modFamily)
+    const existingFamIds = new Set(baseFamilyQuestions.map((q: any) => q.id))
+    const familyQuestions = [
+      ...baseFamilyQuestions,
+      ...extraFamilyQuestions.filter(fq => !existingFamIds.has(fq.id))
+    ]
 
-    const modBody = findModByTitle('body and self image') || findModByTitle('self image')
+    const modBody = findModByTitle('body image') || findModByTitle('body and self image') || findModByTitle('self image')
     const bodyAns = getModAnswers(modBody)
     const bodyQuestions = getModQuestions(modBody)
 
@@ -517,11 +668,14 @@ export async function GET(
     // Max rows for Needs vs Wants table
     const maxNeedsRows = Math.max(thingsINeedList.length, thingsIWantList.length, 1)
 
+    const safeName = clientName.replace(/[^a-z0-9]/gi, '_')
+
     const html = `<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
   <title>${escapeHtml(clientName)} - Career Report</title>
+  ${format !== 'doc' && format !== 'word' ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>' : ''}
   <style>
     body {
       font-family: 'Calibri', 'Arial', sans-serif;
@@ -595,13 +749,17 @@ export async function GET(
   </style>
 </head>
 <body>
-  ${format === 'html' ? `
-  <div class="no-print" style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #e5e7eb;">
-    <a href="/api/admin/clients/${id}/structured-report?format=doc" style="background:#2563eb;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">Download Word (.doc)</a>
-    <button onclick="window.print()" style="background:#111827;color:#fff;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;font-size:13px;">Print / Save as PDF</button>
+  ${format === 'html' || format === 'pdf' ? `
+  <div class="no-print" style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #e5e7eb;">
+    <div id="pdf-status-msg" style="font-size:13px;font-weight:bold;color:#374151;">${format === 'pdf' ? `⏳ Downloading ${safeName}_Career_Report.pdf...` : `${escapeHtml(clientName)} — Structured Career Report`}</div>
+    <div style="display:flex;gap:10px;">
+      <a href="/api/admin/clients/${id}/structured-report?format=doc" style="background:#2563eb;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;">📥 Download Word (.doc)</a>
+      <button onclick="downloadReportPdf()" style="background:#111827;color:#fff;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;font-size:13px;">📥 Download PDF (.pdf)</button>
+    </div>
   </div>
   ` : ''}
 
+  <div id="structured-report-root">
   <h1>${escapeHtml(clientName)} — CAREER REPORT</h1>
 
   <h3>Index</h3>
@@ -634,6 +792,11 @@ export async function GET(
       <tr><td style="font-weight:bold;">Residence</td><td>${escapeHtml(clientResidence)}</td></tr>
       <tr><td style="font-weight:bold;">Lives with</td><td>${escapeHtml(livesWithStr)}</td></tr>
       <tr><td style="font-weight:bold;">Subjects (current)</td><td>${escapeHtml(subjectsStr)}</td></tr>
+      ${demoExamsStr !== '—' ? `<tr><td style="font-weight:bold;">Additional Exams</td><td>${escapeHtml(demoExamsStr)}</td></tr>` : ''}
+      ${demoExtracurricularStr !== '—' ? `<tr><td style="font-weight:bold;">Extracurricular Activities</td><td>${escapeHtml(demoExtracurricularStr)}</td></tr>` : ''}
+      ${demoThoughtsAcademicsStr !== '—' ? `<tr><td style="font-weight:bold;">Thoughts on Academics</td><td>${escapeHtml(demoThoughtsAcademicsStr)}</td></tr>` : ''}
+      ${demoHobbiesFullStr !== '—' ? `<tr><td style="font-weight:bold;">Hobbies &amp; Free-Time Interests</td><td>${escapeHtml(demoHobbiesFullStr)}</td></tr>` : ''}
+      ${demoRoutineStr !== '—' ? `<tr><td style="font-weight:bold;">Daily Routine</td><td>${escapeHtml(demoRoutineStr)}</td></tr>` : ''}
     </tbody>
   </table>
 
@@ -704,7 +867,7 @@ export async function GET(
     <tbody>
       ${(['R', 'I', 'A', 'S', 'E', 'C'] as const).map(code => {
         const s = riasecSubScores[code] || { iAm: 0, iCan: 0, iLike: 0, total: 0 }
-        const tot = riasecScored?.scores?.[code] ?? s.total
+        const tot = riasecScored?.totals?.[code] ?? riasecScored?.columnTotals?.[code] ?? riasecScored?.scores?.[code] ?? s.total
         return `<tr>
           <td><strong>${escapeHtml(riasecNameMap[code])} (${code})</strong></td>
           <td>${s.iAm}</td>
@@ -783,7 +946,7 @@ export async function GET(
 
   <!-- 10. LIFESTYLE EXPECTANCIES & NEEDS AND WANTS -->
   <h2>10. LIFESTYLE EXPECTANCIES</h2>
-  ${renderModuleQAParagraphs(lifeExpQuestions, lifeExpAns)}
+  ${renderModuleQAParagraphs(lifeExpQuestions.filter((q: any) => q.id !== 'lifestyle_8'), lifeExpAns)}
   ${Object.keys(valExpAns).length > 0 ? `
     <h3>Values &amp; Career Expectancies</h3>
     ${renderModuleQAParagraphs(valExpQuestions, valExpAns)}
@@ -819,8 +982,11 @@ export async function GET(
   <h2>12. OVERVIEW</h2>
 
   <h3>Aim and Vision</h3>
-  ${renderModuleQAParagraphs(careerExpQuestions, careerExpAns)}
-  ${Object.keys(workStyleAns).length > 0 ? renderModuleQAParagraphs(workStyleQuestions, workStyleAns) : ''}
+  ${renderModuleQAParagraphs(aimQuestions, aimAns)}
+  ${Object.keys(careerPerspAns).length > 0 ? `
+    <h3>Career Perspective</h3>
+    ${renderModuleQAParagraphs(careerPerspQuestions, careerPerspAns)}
+  ` : ''}
 
   <h3>Friends and Relationships (friends)</h3>
   ${renderModuleQAParagraphs(friendsQuestions, friendsAns)}
@@ -840,6 +1006,30 @@ export async function GET(
       </div>
     `).join('\n')}
   ` : ''}
+  </div>
+
+  ${format !== 'doc' && format !== 'word' ? `
+  <script>
+    function downloadReportPdf() {
+      var msgEl = document.getElementById('pdf-status-msg');
+      if (msgEl) msgEl.innerText = '⏳ Generating & downloading ${safeName}_Career_Report.pdf...';
+      var rootEl = document.getElementById('structured-report-root');
+      if (!rootEl || typeof html2pdf === 'undefined') return;
+      var opt = {
+        margin:       [10, 10, 10, 10],
+        filename:     '${safeName}_Career_Report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'] }
+      };
+      html2pdf().set(opt).from(rootEl).save().then(function() {
+        if (msgEl) msgEl.innerText = '✅ PDF Downloaded (${safeName}_Career_Report.pdf)!';
+      });
+    }
+    ${format === 'pdf' ? 'window.onload = function() { setTimeout(downloadReportPdf, 400); };' : ''}
+  </script>
+  ` : ''}
 </body>
 </html>`
 
@@ -848,7 +1038,6 @@ export async function GET(
     }
 
     if (format === 'doc' || format === 'word') {
-      const safeName = clientName.replace(/[^a-z0-9]/gi, '_')
       return new Response('\ufeff' + html, {
         headers: {
           'Content-Type': 'application/msword; charset=utf-8',

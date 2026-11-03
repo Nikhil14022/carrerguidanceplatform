@@ -908,6 +908,7 @@ export default function CombinedAnswersPage({ params }: { params: Promise<{ id: 
                                                                             value={editingValue}
                                                                             onChange={setEditingValue}
                                                                             accentColor="indigo"
+                                                                            questionType={q.type}
                                                                         />
                                                                     )}
 

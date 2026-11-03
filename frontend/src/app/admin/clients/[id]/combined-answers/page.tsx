@@ -932,6 +932,7 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                             value={editingValue}
                                                                             onChange={setEditingValue}
                                                                             accentColor="orange"
+                                                                            questionType={q.type}
                                                                         />
                                                                     )}
 

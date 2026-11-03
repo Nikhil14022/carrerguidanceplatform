@@ -248,11 +248,14 @@ export async function GET(
       </div>
     `).join('');
 
+    const safeReportName = userName.replace(/[^a-zA-Z0-9_-]/g, '_');
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>${userName} - Comprehensive Career Design Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap');
   
@@ -444,7 +447,11 @@ export async function GET(
 </style>
 </head>
 <body>
-<div class="page">
+<div id="pdf-action-bar" style="display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:#0f172a;color:#f8fafc;font-family:'Inter',sans-serif;">
+  <div id="pdf-status-text" style="font-size:13px;font-weight:600;">⏳ Preparing your PDF download (${safeReportName}_Career_Report.pdf)...</div>
+  <button onclick="downloadReportPdfFile()" style="background:#4f46e5;color:#ffffff;border:none;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">📥 Download PDF</button>
+</div>
+<div class="page" id="report-pdf-root">
   <div class="cover-header">
     <div class="subtitle">Holistree Career Design</div>
     <h1>Career Design Report</h1>
@@ -1222,11 +1229,26 @@ export async function GET(
   </div>
 </div>
 <script>
-  window.onload = function() {
-    setTimeout(function() {
-      window.print();
-    }, 400);
+  function downloadReportPdfFile() {
+    var statusEl = document.getElementById('pdf-status-text');
+    if (statusEl) statusEl.innerText = '⏳ Generating & downloading ${safeReportName}_Career_Report.pdf...';
+    var element = document.getElementById('report-pdf-root');
+    if (!element || typeof html2pdf === 'undefined') return;
+    var opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     '${safeReportName}_Career_Report.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['css', 'legacy'] }
+    };
+    html2pdf().set(opt).from(element).save().then(function() {
+      if (statusEl) statusEl.innerText = '✅ PDF Downloaded (${safeReportName}_Career_Report.pdf)!';
+    });
   }
+  window.onload = function() {
+    setTimeout(downloadReportPdfFile, 400);
+  };
 </script>
 </body>
 </html>`;
