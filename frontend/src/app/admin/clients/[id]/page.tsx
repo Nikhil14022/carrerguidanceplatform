@@ -48,7 +48,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
     const [chatInput, setChatInput] = useState('');
     const [chatLoading, setChatLoading] = useState(false);
     const [customPrompt, setCustomPrompt] = useState('');
-    const [aiTab, setAiTab] = useState<'standard' | 'chat'>('standard');
+    const [aiTab, setAiTab] = useState<'standard' | 'chat' | 'vanya'>('standard');
 
     // Stage Management States
     const [editingStage, setEditingStage] = useState<any>(null);
@@ -257,7 +257,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
         const map: Record<string, string> = {
             LOCKED: 'bg-slate-800 text-slate-500 border-slate-700',
             UNLOCKED: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-            IN_PROGRESS: 'bg-blue-500/100/10 text-blue-400 border-blue-500/20',
+            IN_PROGRESS: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
             SUBMITTED: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
             UNDER_REVIEW: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
             APPROVED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -267,9 +267,9 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
 
     const isFileUrl = (val: any): boolean => {
         if (typeof val !== 'string') return false;
-        return val.startsWith('/uploads/') || val.startsWith('http') && (
-            val.match(/\.(pdf|png|jpg|jpeg|gif|webp|doc|docx)$/i) !== null || val.includes('/uploads/')
-        );
+        return val.startsWith('/uploads/') || val.startsWith('/api/upload/') || (val.startsWith('http') && (
+            val.match(/\.(pdf|png|jpg|jpeg|gif|webp|doc|docx)$/i) !== null || val.includes('/uploads/') || val.includes('/api/upload/')
+        ));
     };
 
     const renderValue = (value: any, key?: string): React.ReactNode => {
@@ -307,11 +307,23 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                     {value.map((row: any, i: number) => (
                         <div key={i} className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
                             <span className="text-sm text-slate-300 font-medium">{row.trait}</span>
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${row.rating >= 7 ? 'bg-emerald-500/20 text-emerald-400' : row.rating <= 3 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
-                                {row.rating}/10
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded-lg ${row.type === 'strength' || row.rating >= 7 ? 'bg-emerald-500/20 text-emerald-400' : row.type === 'weakness' || row.rating <= 3 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                                {row.type ? `[${String(row.type).toUpperCase()}] ` : ''}{row.rating}/10
                             </span>
                         </div>
                     ))}
+                </div>
+            );
+        }
+
+        // Strength / Weakness single object
+        if (typeof value === 'object' && !Array.isArray(value) && (value.type === 'strength' || value.type === 'weakness' || value.rating !== undefined)) {
+            return (
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg text-xs">
+                    <span className={`font-bold uppercase ${value.type === 'strength' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {value.type === 'strength' ? '✓ Strength' : value.type === 'weakness' ? '⚠ Weakness' : 'Trait'}
+                    </span>
+                    <span className="text-slate-300">Rating: <strong>{value.rating ?? 'N/A'}/10</strong></span>
                 </div>
             );
         }
@@ -393,12 +405,15 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                     {['school', 'college', 'university'].map(level => {
                         const d = value[level];
                         if (!d?.active) return null;
-                        return (
-                            <div key={level} className="p-2.5 bg-white/5 rounded-lg text-sm text-slate-300">
-                                <span className="font-bold text-indigo-400 capitalize">{level}: </span>
-                                {d.name || 'N/A'} — Grade: {d.grade || 'N/A'}
+                        const entries = Array.isArray(d.entries) && d.entries.length > 0
+                            ? d.entries
+                            : [{ name: d.name, grade: d.grade }];
+                        return entries.map((entry: any, eIdx: number) => (
+                            <div key={`${level}-${eIdx}`} className="p-2.5 bg-white/5 rounded-lg text-sm text-slate-300">
+                                <span className="font-bold text-indigo-400 capitalize">{level}{entries.length > 1 ? ` #${eIdx + 1}` : ''}: </span>
+                                {entry.name || 'N/A'} — Grade/Program: {entry.grade || 'N/A'}
                             </div>
-                        );
+                        ));
                     })}
                 </div>
             );
@@ -905,15 +920,33 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                     </button>
                     <h1 className="text-3xl font-bold tracking-tight">{client.user.name || 'Unnamed Client'}</h1>
                     <p className="text-slate-500 mt-1 mb-4">{client.user.email} · Joined {new Date(client.user.createdAt).toLocaleDateString()}</p>
-                    <button
-                        onClick={() => router.push(`/admin/clients/${clientId}/combined-answers`)}
-                        className="px-4 py-2.5 bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-colors inline-flex items-center gap-2 border border-orange-500/20 shadow-lg shadow-orange-600/10 mb-4"
-                    >
-                        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        View Combined Answers Feed
-                    </button>
+                    <div className="flex flex-wrap gap-3 mb-4">
+                        <button
+                            onClick={() => router.push(`/admin/clients/${clientId}/combined-answers`)}
+                            className="px-4 py-2.5 bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-colors inline-flex items-center gap-2 border border-orange-500/20 shadow-lg shadow-orange-600/10"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            View Combined Answers Feed
+                        </button>
+                        <button
+                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                            className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors inline-flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-600/10"
+                            title="Download full client Career Report in the exact Vanya Career Report Word (.doc) structure"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Download Vanya Career Report (.doc)
+                        </button>
+                        <button
+                            onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
+                            className="px-4 py-2.5 bg-slate-800 text-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors inline-flex items-center gap-2 border border-slate-700"
+                        >
+                            📄 Preview Vanya Report
+                        </button>
+                    </div>
                 </div>
                 <div className="flex gap-3">
                     {pendingReview.length > 0 && (
@@ -1097,10 +1130,10 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
 
                     {/* Generate Report & Chat widget */}
                     <div className="glass-card p-6 border-purple-500/20 bg-purple-500/5 space-y-6">
-                        <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/5 pb-3 gap-3">
                             <div>
                                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                                    <span>🤖 AI Report & Counselor Chat</span>
+                                    <span>🤖 Report Generation &amp; Structured Vanya Format</span>
                                     {approvedCount < client.modules.length && (
                                         <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded animate-pulse">
                                             Incomplete Data Warning
@@ -1108,8 +1141,22 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                     )}
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-1">
-                                    Ask questions about module answers, refine recommendations, or compile the report.
+                                    Generate AI Career Reports, download the structured Vanya Career Report (.doc), or chat with AI Counselor.
                                 </p>
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                                <button
+                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                                    className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md"
+                                >
+                                    📥 Vanya Report (.doc)
+                                </button>
+                                <button
+                                    onClick={() => setAiTab('vanya')}
+                                    className="px-3 py-2 rounded-xl bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 text-blue-300 text-[11px] font-bold uppercase tracking-wider transition-all"
+                                >
+                                    👁️ Preview Vanya Report
+                                </button>
                             </div>
                         </div>
 
@@ -1123,7 +1170,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                         )}
 
                         <div className="space-y-4">
-                            <div className="flex bg-slate-950 p-1.5 rounded-xl border border-white/5 gap-1 self-start inline-flex">
+                            <div className="flex flex-wrap bg-slate-950 p-1.5 rounded-xl border border-white/5 gap-1 self-start inline-flex">
                                 <button
                                     onClick={() => setAiTab('standard')}
                                     className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
@@ -1132,7 +1179,17 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             : 'text-slate-400 hover:text-slate-200'
                                     }`}
                                 >
-                                    Standard Generator
+                                    Standard AI Generator
+                                </button>
+                                <button
+                                    onClick={() => setAiTab('vanya')}
+                                    className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                                        aiTab === 'vanya' 
+                                            ? 'bg-emerald-600 text-white' 
+                                            : 'text-slate-400 hover:text-slate-200'
+                                    }`}
+                                >
+                                    Vanya Career Report Format
                                 </button>
                                 <button
                                     onClick={() => setAiTab('chat')}
@@ -1165,8 +1222,42 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                         disabled={actionLoading}
                                         className="w-full py-2.5 rounded-xl bg-orange-600 text-white text-xs font-bold uppercase tracking-widest hover:bg-orange-700 transition-all disabled:opacity-50"
                                     >
-                                        {actionLoading ? 'Generating...' : 'Generate Career Report'}
+                                        {actionLoading ? 'Generating...' : 'Generate AI Career Report'}
                                     </button>
+                                </div>
+                            ) : aiTab === 'vanya' ? (
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-slate-950 border border-emerald-500/30 rounded-2xl space-y-3">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                            <div>
+                                                <h4 className="text-sm font-bold text-emerald-300">Structured Career Report (Vanya Report Format)</h4>
+                                                <p className="text-xs text-slate-400 mt-0.5">
+                                                    Compiles all 12 sections (Index, Demographics, Values, Fears, 16PF, RIASEC, Color Test, Strengths &amp; Weaknesses, SMI, Movies &amp; Visual World, Lifestyle &amp; Needs/Wants, Risk Taking, and Overview) in the exact Vanya Career Report structure.
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-2 shrink-0">
+                                                <button
+                                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                                                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-all"
+                                                >
+                                                    📥 Download Word (.doc)
+                                                </button>
+                                                <button
+                                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
+                                                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold uppercase tracking-wider transition-all border border-slate-700"
+                                                >
+                                                    🖨️ Open Full Page / Print
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="rounded-xl overflow-hidden border border-slate-800 bg-white h-[520px]">
+                                            <iframe
+                                                src={`/api/admin/clients/${clientId}/structured-report?format=html`}
+                                                className="w-full h-full border-0"
+                                                title="Vanya Career Report Preview"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -1397,7 +1488,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                 </div>
             </div>
 
-                                                {/* Stage Editing Modal */}
+            {/* Stage Editing Modal */}
             {editingStage && (
                 <div className="fixed inset-0 bg-slate-955/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="rounded-2xl p-6 w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl" style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #e2e8f0' }}>

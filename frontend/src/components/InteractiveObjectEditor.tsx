@@ -26,16 +26,28 @@ export default function InteractiveObjectEditor({
             { key: 'university', label: 'University / Higher Education' }
         ];
 
-        const handleEduChange = (levelKey: string, fieldKey: string, val: any) => {
+        const getEntries = (levelData: any): { name: string; grade: string }[] => {
+            if (Array.isArray(levelData?.entries) && levelData.entries.length > 0) {
+                return levelData.entries;
+            }
+            return [{ name: levelData?.name || '', grade: levelData?.grade || levelData?.percentage || levelData?.stream || levelData?.degree || '' }];
+        };
+
+        const updateEntries = (levelKey: string, nextEntries: { name: string; grade: string }[], activeOverride?: boolean) => {
             const currentLevel = edu[levelKey] || { active: false, name: '', grade: '' };
-            const updated = {
+            const isActive = activeOverride !== undefined ? activeOverride : currentLevel.active;
+            const summaryName = nextEntries.map(e => e.name).filter(Boolean).join('; ');
+            const summaryGrade = nextEntries.map(e => e.grade).filter(Boolean).join('; ');
+            onChange({
                 ...edu,
                 [levelKey]: {
                     ...currentLevel,
-                    [fieldKey]: val
+                    active: isActive,
+                    name: summaryName,
+                    grade: summaryGrade,
+                    entries: nextEntries
                 }
-            };
-            onChange(updated);
+            });
         };
 
         return (
@@ -43,42 +55,82 @@ export default function InteractiveObjectEditor({
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Educational Background Form</div>
                 {levels.map(({ key, label }) => {
                     const levelData = edu[key] || { active: false, name: '', grade: '' };
+                    const entries = getEntries(levelData);
                     return (
                         <div key={key} className="p-3 bg-slate-900/60 border border-slate-800 rounded-xl space-y-3">
                             <div className="flex justify-between items-center">
-                                <span className="text-xs font-bold text-slate-300">{label}</span>
-                                <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={!!levelData.active}
-                                        onChange={e => handleEduChange(key, 'active', e.target.checked)}
-                                        className="w-3.5 h-3.5 rounded bg-slate-950 border-slate-700 accent-indigo-500"
-                                    />
-                                    <span>Active / Attended</span>
-                                </label>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Institution Name</label>
-                                    <input
-                                        type="text"
-                                        value={levelData.name || ''}
-                                        placeholder="e.g. Delhi Public School / Mumbai Univ"
-                                        onChange={e => handleEduChange(key, 'name', e.target.value)}
-                                        className={`w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 outline-none ${focusBorderClass}`}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Grade / Stream / Percentage</label>
-                                    <input
-                                        type="text"
-                                        value={levelData.grade || levelData.percentage || levelData.stream || levelData.degree || ''}
-                                        placeholder="e.g. 92% / Science / B.Tech"
-                                        onChange={e => handleEduChange(key, 'grade', e.target.value)}
-                                        className={`w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 outline-none ${focusBorderClass}`}
-                                    />
+                                <span className="text-xs font-bold text-slate-200">{label}</span>
+                                <div className="flex items-center gap-3">
+                                    <label className="flex items-center gap-2 text-[10px] font-bold text-slate-400 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!levelData.active}
+                                            onChange={e => updateEntries(key, entries, e.target.checked)}
+                                            className="w-3.5 h-3.5 rounded bg-slate-950 border-slate-700 accent-indigo-500"
+                                        />
+                                        <span>Active / Attended</span>
+                                    </label>
+                                    {levelData.active && (
+                                        <button
+                                            type="button"
+                                            onClick={() => updateEntries(key, [...entries, { name: '', grade: '' }], true)}
+                                            className="px-2 py-1 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 text-[10px] font-bold hover:bg-indigo-500/25"
+                                        >
+                                            + Add Another
+                                        </button>
+                                    )}
                                 </div>
                             </div>
+                            {levelData.active && (
+                                <div className="space-y-2.5">
+                                    {entries.map((entry, idx) => (
+                                        <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                                            <div>
+                                                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                                                    Institution Name {entries.length > 1 ? `#${idx + 1}` : ''}
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.name || ''}
+                                                    placeholder="e.g. Delhi Public School / Mumbai Univ"
+                                                    onChange={e => {
+                                                        const next = [...entries];
+                                                        next[idx] = { ...next[idx], name: e.target.value };
+                                                        updateEntries(key, next);
+                                                    }}
+                                                    className={`w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 outline-none ${focusBorderClass}`}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                                                    Grade / Stream / Percentage
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={entry.grade || ''}
+                                                    placeholder="e.g. 92% / Science / B.Tech"
+                                                    onChange={e => {
+                                                        const next = [...entries];
+                                                        next[idx] = { ...next[idx], grade: e.target.value };
+                                                        updateEntries(key, next);
+                                                    }}
+                                                    className={`w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 outline-none ${focusBorderClass}`}
+                                                />
+                                            </div>
+                                            {entries.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateEntries(key, entries.filter((_, i) => i !== idx))}
+                                                    className="px-2 py-2 text-red-500 hover:text-red-400 text-xs font-bold"
+                                                    title="Remove entry"
+                                                >
+                                                    ✕
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     );
                 })}

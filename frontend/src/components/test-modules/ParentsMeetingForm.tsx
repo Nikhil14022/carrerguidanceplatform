@@ -127,6 +127,23 @@ interface TestData {
   q14_qualities_from_dad: string;
   // Q15
   q15_anything_else: string;
+  // Counsellor Notes per section + overall
+  q1_notes?: string;
+  q2_notes?: string;
+  q3_notes?: string;
+  q4_notes?: string;
+  q5_notes?: string;
+  q6_notes?: string;
+  q7_notes?: string;
+  q8_notes?: string;
+  q9_notes?: string;
+  q10_notes?: string;
+  q11_notes?: string;
+  q12_notes?: string;
+  q13_notes?: string;
+  q14_notes?: string;
+  counsellor_notes?: string;
+  [key: string]: any;
 }
 
 const TOTAL_QUESTIONS = 14;
@@ -492,7 +509,9 @@ function Textarea({
       disabled={readOnly}
       placeholder={placeholder}
       rows={rows}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+      spellCheck={true}
+      autoCorrect="on"
+      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed resize-y"
     />
   );
 }
@@ -514,7 +533,9 @@ function TextInput({
       onChange={(e) => !readOnly && onChange(e.target.value)}
       disabled={readOnly}
       placeholder={placeholder}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+      spellCheck={true}
+      autoCorrect="on"
+      className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
     />
   );
 }
@@ -673,7 +694,7 @@ export default function ParentsMeetingForm({
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-slate-100">
                 Q1. Which words best describe your child today?
               </h3>
               <p className="text-xs text-slate-400 mt-1">
@@ -710,6 +731,27 @@ export default function ParentsMeetingForm({
                 </div>
               ))}
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-800">
+              <div>
+                <Label>Mother&apos;s Description / Observations (Optional)</Label>
+                <Textarea
+                  value={testData.q1_mother_description || ""}
+                  onChange={(v) => update("q1_mother_description", v)}
+                  placeholder="Write mother's perspective or words used..."
+                  rows={3}
+                />
+              </div>
+              <div>
+                <Label>Father&apos;s Description / Observations (Optional)</Label>
+                <Textarea
+                  value={testData.q1_father_description || ""}
+                  onChange={(v) => update("q1_father_description", v)}
+                  placeholder="Write father's perspective or words used..."
+                  rows={3}
+                />
+              </div>
+            </div>
           </div>
         );
       }
@@ -718,7 +760,7 @@ export default function ParentsMeetingForm({
       case 1:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q2. What kind of relationship do you share with your child?
             </h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -746,7 +788,7 @@ export default function ParentsMeetingForm({
       case 2:
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q3. Your child&apos;s school journey
             </h3>
             {[
@@ -778,7 +820,7 @@ export default function ParentsMeetingForm({
       case 3:
         return (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q4. Describe their routine
             </h3>
             {[
@@ -837,7 +879,7 @@ export default function ParentsMeetingForm({
       case 4:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q5. How much do the following matter to your child?
             </h3>
             {[
@@ -892,7 +934,7 @@ export default function ParentsMeetingForm({
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-white">
+              <h3 className="text-lg font-semibold text-slate-100">
                 Q6. How does your child usually spend their free time?
               </h3>
               <p className="text-xs text-slate-400 mt-1">
@@ -974,7 +1016,7 @@ export default function ParentsMeetingForm({
 
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q7. How is your child in different social spaces?
             </h3>
             <div className="overflow-x-auto">
@@ -1023,7 +1065,7 @@ export default function ParentsMeetingForm({
       case 7:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q8a. How much are they influenced by?
             </h3>
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-4 space-y-4">
@@ -1066,7 +1108,7 @@ export default function ParentsMeetingForm({
 
             <hr className="border-slate-800" />
 
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q8b. Any incidents/events that impacted or changed them as a person?
             </h3>
             <Textarea
@@ -1082,7 +1124,7 @@ export default function ParentsMeetingForm({
       case 8:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q9. Thoughts on career
             </h3>
             <p className="text-sm text-slate-400">
@@ -1114,7 +1156,7 @@ export default function ParentsMeetingForm({
 
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q10. Stance on where to study
             </h3>
             <div className="overflow-x-auto">
@@ -1173,7 +1215,7 @@ export default function ParentsMeetingForm({
       case 10:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q11. Their expectations related to
             </h3>
             <div>
@@ -1210,7 +1252,7 @@ export default function ParentsMeetingForm({
       case 11:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q12. Parents&apos; risk-taking behaviour
             </h3>
             <p className="text-sm text-slate-400">
@@ -1251,7 +1293,7 @@ export default function ParentsMeetingForm({
       case 12:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q13. Non-conventional questions
             </h3>
             <div>
@@ -1299,7 +1341,7 @@ export default function ParentsMeetingForm({
       case 13:
         return (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-slate-100">
               Q14. Anything else we should know?
             </h3>
             <Textarea
@@ -1362,8 +1404,34 @@ export default function ParentsMeetingForm({
       </div>
 
       {/* Question content */}
-      <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 md:p-6">
+      <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 md:p-6 space-y-6">
         {renderQuestion()}
+
+        {/* Section-specific Add Notes for Counsellor / Parent */}
+        <div className="pt-5 border-t border-slate-800 space-y-2">
+          <label className="block text-xs font-bold uppercase tracking-widest text-indigo-400">
+            📝 Add Notes / Counsellor Observations for Q{page + 1} (Optional)
+          </label>
+          <Textarea
+            value={(testData[`q${page + 1}_notes`] as string) || ""}
+            onChange={(v) => update(`q${page + 1}_notes`, v)}
+            placeholder={`Write observations, examples, or additional notes for Question ${page + 1} here...`}
+            rows={4}
+          />
+        </div>
+
+        {/* Overall Counsellor Notes (Always accessible at the bottom of the form) */}
+        <div className="pt-4 border-t border-slate-800/60 space-y-2">
+          <label className="block text-xs font-bold uppercase tracking-widest text-emerald-400">
+            📌 Overall Counsellor Summary &amp; Meeting Notes (Saved Across All Pages)
+          </label>
+          <Textarea
+            value={(testData.counsellor_notes as string) || ""}
+            onChange={(v) => update("counsellor_notes", v)}
+            placeholder="General observations from the parent meeting, family dynamics, or key takeaways..."
+            rows={4}
+          />
+        </div>
       </div>
 
       {/* Navigation */}

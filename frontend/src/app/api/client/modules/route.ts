@@ -31,17 +31,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    const modules = clientProfile.modules.map(m => ({
-      id: m.id,
-      moduleId: m.moduleId,
-      title: m.module.title,
-      description: m.module.description,
-      status: m.status,
-      order: m.order,
-      filledBy: m.filledBy,
-      submittedAt: m.response?.submittedAt,
-      hasDraft: !!m.response && !m.response.submittedAt
-    }))
+    const modules = clientProfile.modules.map(m => {
+      const effectiveStatus = m.response?.approvedAt && m.status === 'UNLOCKED' ? 'APPROVED' : m.status;
+      return {
+        id: m.id,
+        moduleId: m.moduleId,
+        title: m.module.title,
+        description: m.module.description,
+        status: effectiveStatus,
+        order: m.order,
+        filledBy: m.filledBy,
+        submittedAt: m.response?.submittedAt,
+        approvedAt: m.response?.approvedAt,
+        hasDraft: !!m.response && !m.response.submittedAt
+      }
+    })
 
     return NextResponse.json({ modules })
   } catch (error) {

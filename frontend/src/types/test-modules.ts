@@ -9,14 +9,25 @@ export interface PF16Response {
   identity: 'assertive' | 'turbulent';
 }
 
+export interface PF16DimensionScore {
+  label: string;
+  value: string;
+  leftLabel?: string;
+  rightLabel?: string;
+  leftPct?: number;
+  rightPct?: number;
+}
+
 export interface PF16Score {
-  type: string; // e.g. "ENTJ-A"
+  type: string; // e.g. "INFJ-T"
+  roleName?: string; // e.g. "Advocate"
+  narrative?: string;
   dimensions: {
-    mind: { label: string; value: string };
-    energy: { label: string; value: string };
-    nature: { label: string; value: string };
-    tactics: { label: string; value: string };
-    identity: { label: string; value: string };
+    mind: PF16DimensionScore;
+    energy: PF16DimensionScore;
+    nature: PF16DimensionScore;
+    tactics: PF16DimensionScore;
+    identity: PF16DimensionScore;
   };
 }
 
@@ -55,6 +66,7 @@ export interface RIASECResponse {
 
 export interface RIASECScore {
   totals: Record<RIASECLetter, number>;
+  subScores?: Record<RIASECLetter, { iAm: number; iCan: number; iLike: number; total: number }>;
   hollandCode: string; // top 3 letters e.g. "SAE"
   top3: { letter: RIASECLetter; score: number; label: string; interpretation: string }[];
   descriptions: Record<RIASECLetter, string>;
@@ -118,7 +130,7 @@ export interface ParentsMeetingResponse {
 // ══════════════════════════════════════════════════════════════
 // Unified test result
 // ══════════════════════════════════════════════════════════════
-export type TestType = '16PF' | 'VALUES' | 'RIASEC' | 'COLOR' | 'SMI' | 'PARENTS_MEETING' | 'SELF_DISCOVERY';
+export type TestType = '16PF' | 'VALUES' | 'RIASEC' | 'COLOR' | 'SMI' | 'PARENTS_MEETING' | 'SELF_DISCOVERY' | 'JOB_FUNCTIONS';
 
 export interface TestModuleResult {
   testType: TestType;

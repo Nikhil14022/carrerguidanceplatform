@@ -11,10 +11,46 @@ import {
   SD_ADULT,
   JF_SECTIONS,
 } from '@/lib/testQuestions';
+import { testScoringService } from '@/services/TestScoringService';
 
 const MENTOR_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MENTOR_PERMANENT', 'MENTOR_TEMPORARY', 'EXPERT'];
 
 export const dynamic = 'force-dynamic';
+
+const EXTRA_FAMILY_QUESTIONS = [
+  {
+    id: 'family_lives_with',
+    type: 'textarea',
+    question: 'Who all do you currently live with at home?'
+  },
+  {
+    id: 'family_arguments',
+    type: 'textarea',
+    question: 'What kind of arguments or disagreements do you usually have at home, and how are they resolved?'
+  },
+  {
+    id: 'family_repeated_statements',
+    type: 'textarea',
+    question: 'What are some statements or phrases your family members keep repeating to you (can be good or bad)?'
+  }
+];
+
+function isFilePath(val: any): boolean {
+  if (typeof val !== 'string') return false;
+  return val.startsWith('/uploads/') || val.startsWith('/api/upload/');
+}
+
+function cleanFileName(filepath: string): string {
+  const raw = decodeURIComponent(filepath.split('/').pop() || filepath);
+  // Strip leading timestamp prefix if present (e.g. "1793551234-marksheet.pdf" -> "marksheet.pdf")
+  return raw.replace(/^\d{10,14}-/, '');
+}
+
+function getIntensityBand(score: number): string {
+  if (score <= 4) return 'Not very high';
+  if (score <= 7) return 'High';
+  return 'Very high';
+}
 
 export async function GET(
   request: Request,
@@ -32,7 +68,6 @@ export async function GET(
     const role = session.user.role;
     const mentorProfileId = session.user.mentorProfileId;
 
-    // Verify assignment for non-admins
     if (role !== 'SUPER_ADMIN' && role !== 'ADMIN') {
       if (!mentorProfileId) return new NextResponse('Forbidden', { status: 403 });
       const assignment = await (prisma as any).mentorAssignment.findFirst({
@@ -42,6 +77,10 @@ export async function GET(
         return new NextResponse('Forbidden', { status: 403 });
       }
     }
+
+    const url = new URL(request.url);
+    const modulesParam = url.searchParams.get('modules');
+    const format = (url.searchParams.get('format') || 'pdf').toLowerCase();
 
     const client = await prisma.clientProfile.findUnique({
       where: { id },
@@ -62,90 +101,183 @@ export async function GET(
       return new NextResponse('Client not found', { status: 404 });
     }
 
+    // Filter modules if ?modules= query param is provided
+    let filteredModules = client.modules;
+    if (modulesParam && modulesParam.trim() !== '') {
+      const requestedIds = new Set(
+        modulesParam
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+      );
+      filteredModules = client.modules.filter(
+        m =>
+          requestedIds.has(m.id) ||
+          requestedIds.has(m.moduleId) ||
+          requestedIds.has(String(m.order))
+      );
+    }
+
     const formatResponseValue = (q: any, val: any): string => {
-      if (val === undefined || val === null) return '—';
-      
-      // 1. Array of values or objects
+      if (val === undefined || val === null || val === '') return '—';
+
+      // File URL array or single file URL
+      if (isFilePath(val)) {
+        return `Attached File: ${cleanFileName(val)}`;
+      }
+      if (Array.isArray(val) && val.length > 0 && val.every(item => isFilePath(item))) {
+        return val.map(item => `Attached File: ${cleanFileName(item)}`).join('\n');
+      }
+
+      // Strength / Weakness object { type: 'strength' | 'weakness', rating: number }
+      if (val && typeof val === 'object' && ('type' in val) && ('rating' in val) && (val.type === 'strength' || val.type === 'weakness')) {
+        const label = val.type === 'weakness' ? 'Weakness' : 'Strength';
+        const r = Number(val.rating) || 5;
+        return `${label} — Rating: ${r}/10 (${getIntensityBand(r)})`;
+      }
+
+      // Scale rating for sw_* (legacy numeric) or fear_*
+      if (typeof val === 'number' && q?.id?.startsWith('sw_')) {
+        const label = val < 5 ? 'Weakness' : 'Strength';
+        return `${label} — Rating: ${val}/10 (${getIntensityBand(val)})`;
+      }
+      if (typeof val === 'number' && q?.id?.startsWith('fear_')) {
+        return `${val}/10 (${getIntensityBand(val)})`;
+      }
+
+      // choice_with_rating { option: 'id', rating: 7 }
+      if (val && typeof val === 'object' && 'option' in val && 'rating' in val && !Array.isArray(val)) {
+        const optObj = q?.options?.find((o: any) => o.id === val.option || o.text === val.option);
+        const optText = optObj ? optObj.text : String(val.option || '—');
+        return `${optText} (Rating: ${val.rating}/10)`;
+      }
+
+      // multiselect_with_rank { selected: [...], ranked: [...] }
+      if (val && typeof val === 'object' && (Array.isArray((val as any).ranked) || Array.isArray((val as any).selected))) {
+        const list = Array.isArray((val as any).ranked) && (val as any).ranked.length > 0
+          ? (val as any).ranked
+          : (val as any).selected || [];
+        return list.map((valItem: any, idx: number) => {
+          if (q?.options) {
+            const opt = q.options.find((o: any) => o.id === valItem || o.text === valItem);
+            if (opt) return `${idx + 1}. ${opt.text}`;
+          }
+          return `${idx + 1}. ${valItem}`;
+        }).join('\n');
+      }
+
+      // Education block object (school/college/university with optional multi-entries)
+      if (val && typeof val === 'object' && (val.school || val.college || val.university)) {
+        const parts: string[] = [];
+        const levelNames: Record<string, string> = {
+          school: 'School',
+          college: 'College',
+          university: 'University'
+        };
+        ['school', 'college', 'university'].forEach(level => {
+          const d = (val as any)[level];
+          if (d?.active) {
+            if (Array.isArray(d.entries) && d.entries.length > 0) {
+              const entryStrs = d.entries
+                .filter((e: any) => e && (e.name || e.grade))
+                .map((e: any) => `${e.name || 'N/A'}${e.grade ? ` (Year/Grade: ${e.grade})` : ''}`);
+              if (entryStrs.length > 0) {
+                parts.push(`${levelNames[level]}: ${entryStrs.join('; ')}`);
+              }
+            } else if (d.name || d.grade) {
+              parts.push(`${levelNames[level]}: ${d.name || 'N/A'}${d.grade ? ` (Year/Grade: ${d.grade})` : ''}`);
+            }
+          }
+        });
+        return parts.length > 0 ? parts.join('\n') : '—';
+      }
+
+      // Array of values or objects (e.g. table rows, rank items, schedule blocks, trait_grid, multiselect)
       if (Array.isArray(val)) {
-        const items = val.map((valItem: any) => {
+        const items = val.map((valItem: any, idx: number) => {
           if (valItem && typeof valItem === 'object') {
-            // Check if it has time and activity (slots)
-            if (valItem.time || valItem.activity) {
+            // Rank item { option: '...' }
+            if ('option' in valItem && Object.keys(valItem).length <= 2) {
+              if (!valItem.option) return '';
+              const opt = q?.options?.find((o: any) => o.id === valItem.option || o.text === valItem.option);
+              return `Rank ${idx + 1}: ${opt ? opt.text : valItem.option}`;
+            }
+            // Trait grid item { trait, isStrength, isWeakness, rating }
+            if ('trait' in valItem && 'rating' in valItem) {
+              const kind = valItem.isWeakness ? 'Weakness' : 'Strength';
+              return `${valItem.trait}: ${kind} (${valItem.rating}/10)`;
+            }
+            // Schedule slot { time, activity }
+            if ('time' in valItem || 'activity' in valItem) {
+              if (!valItem.time && !valItem.activity) return '';
               return `${valItem.time || '—'}: ${valItem.activity || '—'}`;
             }
-            // Check if it's a schedule block
+            // Schedule block { days, slots }
             if (valItem.days && Array.isArray(valItem.slots)) {
-              const slotsStr = valItem.slots.map((s: any) => `${s.time || '—'}: ${s.activity || '—'}`).join(', ');
-              return `Days: ${valItem.days.join(', ')} [${slotsStr}]`;
+              const slotsStr = valItem.slots
+                .filter((s: any) => s && (s.time || s.activity))
+                .map((s: any) => `${s.time || '—'}: ${s.activity || '—'}`)
+                .join(' | ');
+              return slotsStr ? `${valItem.days.join(', ')}: ${slotsStr}` : '';
             }
-            // Default object values extraction
-            const values = Object.values(valItem)
-              .map(v => typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
-              .filter(v => v !== '');
-            return values.length > 0 ? values.join(' - ') : '';
+            // Table row { col1, col2, col3, col4 }
+            if ('col1' in valItem || 'col2' in valItem || 'col3' in valItem || 'col4' in valItem) {
+              const cols = [valItem.col1, valItem.col2, valItem.col3, valItem.col4]
+                .map(c => (typeof c === 'string' ? c.trim() : c !== undefined && c !== null ? String(c) : ''))
+                .filter(Boolean);
+              return cols.length > 0 ? cols.join(' — ') : '';
+            }
+            // Generic object inside array
+            const values = Object.entries(valItem)
+              .filter(([k, v]) => v !== undefined && v !== null && v !== '' && k !== 'isOther')
+              .map(([, v]) => String(v).trim())
+              .filter(Boolean);
+            return values.join(' — ');
           }
-          if (q.options) {
-            const opt = q.options.find((o: any) => o.id === valItem);
+          if (q?.options) {
+            const opt = q.options.find((o: any) => o.id === valItem || o.text === valItem);
             if (opt) return opt.text;
           }
           return String(valItem);
         }).filter(Boolean);
 
-        return items.length > 0 ? items.join(', ') : '—';
+        return items.length > 0 ? items.join('\n') : '—';
       }
-      
-      // 2. Ranked lists
-      if (val && typeof val === 'object' && Array.isArray((val as any).ranked)) {
-        return (val as any).ranked.map((valItem: any, idx: number) => {
-          if (q.options) {
-            const opt = q.options.find((o: any) => o.id === valItem);
-            if (opt) return `${idx + 1}. ${opt.text}`;
-          }
-          return `${idx + 1}. ${valItem}`;
-        }).join(', ');
-      }
-      
-      // 3. Education block object (school/college/university)
-      if (val && typeof val === 'object' && (val.school || val.college || val.university)) {
-        const parts: string[] = [];
-        ['school', 'college', 'university'].forEach(level => {
-          const d = (val as any)[level];
-          if (d?.active) {
-            parts.push(`${level.toUpperCase()}: ${d.name || 'N/A'} (Grade: ${d.grade || 'N/A'})`);
-          }
-        });
-        return parts.join(' | ');
-      }
-      
-      // 4. Time-activity schedule object
+
+      // Time-activity schedule object
       if (val && typeof val === 'object' && Object.keys(val).some(k => k.includes('AM') || k.includes('PM'))) {
         return Object.entries(val)
+          .filter(([, activity]) => activity)
           .map(([time, activity]) => `${time}: ${activity}`)
-          .join(', ');
+          .join('\n');
       }
-      
-      // 5. Generic object formatting
+
+      // Generic object formatting (no JSON.stringify)
       if (val && typeof val === 'object') {
-        const keys = Object.keys(val);
-        if (keys.length === 0) return '—';
-        const formatted = keys
-          .map(k => {
+        const entries = Object.entries(val)
+          .filter(([, v]) => v !== undefined && v !== null && v !== '')
+          .map(([k, v]) => {
             const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, ' ');
-            const v = val[k];
-            if (v && typeof v === 'object') return `${label}: ${JSON.stringify(v)}`;
-            if (v === undefined || v === null || v === '') return '';
+            if (Array.isArray(v)) return `${label}: ${v.join(', ')}`;
+            if (v && typeof v === 'object') {
+              const inner = Object.entries(v)
+                .filter(([, iv]) => iv !== undefined && iv !== null && iv !== '')
+                .map(([ik, iv]) => `${ik}: ${iv}`)
+                .join(', ');
+              return inner ? `${label} (${inner})` : '';
+            }
             return `${label}: ${v}`;
           })
           .filter(Boolean);
-        return formatted.length > 0 ? formatted.join(' | ') : '—';
+        return entries.length > 0 ? entries.join('\n') : '—';
       }
-      
-      // 6. Options mapping for primitives
-      if (q.options) {
-        const opt = q.options.find((o: any) => o.id === val);
+
+      // Options mapping for primitive values
+      if (q?.options) {
+        const opt = q.options.find((o: any) => o.id === val || o.text === val);
         return opt ? opt.text : String(val);
       }
-      
+
       return String(val);
     };
 
@@ -155,44 +287,72 @@ export async function GET(
         return '<p class="no-response">No responses recorded for this test.</p>';
       }
 
+      const clientNotesHtml = answers.__clientNotes
+        ? `<div class="qa-item" style="margin-top: 14px;"><div class="q-text">Client / Section Notes</div><div class="a-text">${String(answers.__clientNotes)}</div></div>`
+        : '';
+
       if (testType === '16PF') {
+        const pfScore = testScoringService.score16PF(answers.__testData || answers);
         const render16PFValue = (val: any) => {
           const num = Number(val);
           if (isNaN(num)) return String(val);
           const labels: Record<number, string> = {
-            1: "Strongly Disagree (1)",
-            2: "Disagree (2)",
-            3: "Slightly Disagree (3)",
-            4: "Slightly Agree (4)",
-            5: "Agree (5)",
-            6: "Strongly Agree (6)",
+            1: 'Strongly Disagree (1)',
+            2: 'Disagree (2)',
+            3: 'Slightly Disagree (3)',
+            4: 'Slightly Agree (4)',
+            5: 'Agree (5)',
+            6: 'Strongly Agree (6)',
           };
           return labels[num] || `Rating: ${num}`;
         };
 
         return `
-          <div class="test-header">16PF Personality Factors Test</div>
+          <div class="test-header">16PF Personality Factors Test — ${pfScore.roleName || ''} (${pfScore.type})</div>
+          ${pfScore.narrative ? `<p style="margin-bottom: 12px; font-size: 12px; color: #334155;">${pfScore.narrative.replace(/\n/g, '<br/>')}</p>` : ''}
+          <table class="values-table" style="margin-bottom: 16px;">
+            <thead>
+              <tr>
+                <th>MIND</th>
+                <th>ENERGY</th>
+                <th>NATURE</th>
+                <th>TACTICS</th>
+                <th>IDENTITY</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${pfScore.dimensions.mind.leftPct ?? 50}% Extraverted<br/>${pfScore.dimensions.mind.rightPct ?? 50}% Introverted</td>
+                <td>${pfScore.dimensions.energy.leftPct ?? 50}% Intuitive<br/>${pfScore.dimensions.energy.rightPct ?? 50}% Observant</td>
+                <td>${pfScore.dimensions.nature.leftPct ?? 50}% Thinking<br/>${pfScore.dimensions.nature.rightPct ?? 50}% Feeling</td>
+                <td>${pfScore.dimensions.tactics.leftPct ?? 50}% Judging<br/>${pfScore.dimensions.tactics.rightPct ?? 50}% Prospecting</td>
+                <td>${pfScore.dimensions.identity.leftPct ?? 50}% Assertive<br/>${pfScore.dimensions.identity.rightPct ?? 50}% Turbulent</td>
+              </tr>
+            </tbody>
+          </table>
           <div class="pf16-grid">
             ${pf16Questions.map((q: any) => {
               const val = answers[q.id];
               if (val === undefined) return '';
               return `
                 <div class="pf16-item">
-                  <div class="pf16-num">Question ${q.id.split("_")[1]}</div>
-                  ${q.type === "statement" ? `
+                  <div class="pf16-num">Question ${q.id.split('_')[1]}</div>
+                  ${q.type === 'statement' ? `
                     <p class="pf16-text">${q.text}</p>
                     <p class="pf16-val">${render16PFValue(val)}</p>
                   ` : `
                     <div class="pf16-between">
                       <span>${q.left}</span>
+                      <span> vs </span>
                       <span>${q.right}</span>
                     </div>
-                    <div class="pf16-val center">Rating: ${val} (Preference: ${val <= 3 ? 'Left' : 'Right'})</div>
+                    <div class="pf16-val center">Rating: ${val} (Preference: ${val <= 3 ? 'Left Statement' : 'Right Statement'})</div>
                   `}
                 </div>
               `;
             }).join('')}
           </div>
+          ${clientNotesHtml}
         `;
       }
 
@@ -218,30 +378,57 @@ export async function GET(
                 <tr>
                   <td class="center font-bold">${i + 1}</td>
                   <td><strong>${v}</strong></td>
-                  <td><span class="badge badge-values">${categorized[v] || "Want & Preference"}</span></td>
+                  <td><span class="badge badge-values">${categorized[v] || 'Want & Preference'}</span></td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
+          ${clientNotesHtml}
         `;
       }
 
       if (testType === 'RIASEC') {
         const testData = answers.__testData || answers;
+        const riasecScored = testScoringService.scoreRIASEC(testData);
         const categories: Record<string, string> = {
-          R: "Realistic (Practical, Hands-on, Physical)",
-          I: "Investigative (Analytical, Scientific, Logical)",
-          A: "Artistic (Creative, Expressive, Unstructured)",
-          S: "Social (Empathetic, Helping, Teamwork)",
-          E: "Enterprising (Ambitious, Leading, Influencing)",
-          C: "Conventional (Organized, Detail-oriented, Precise)",
+          R: 'Realistic (Practical, Hands-on, Physical)',
+          I: 'Investigative (Analytical, Scientific, Logical)',
+          A: 'Artistic (Creative, Expressive, Unstructured)',
+          S: 'Social (Empathetic, Helping, Teamwork)',
+          E: 'Enterprising (Ambitious, Leading, Influencing)',
+          C: 'Conventional (Organized, Detail-oriented, Precise)',
         };
 
         return `
-          <div class="test-header">RIASEC Occupational Interests</div>
+          <div class="test-header">RIASEC Occupational Interests — Holland Code: ${riasecScored.hollandCode}</div>
+          <table class="values-table" style="margin-bottom: 16px;">
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>I Am</th>
+                <th>I Can</th>
+                <th>I Like</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(['R', 'I', 'A', 'S', 'E', 'C'] as const).map(code => {
+                const sub = riasecScored.subScores?.[code] || { iAm: 0, iCan: 0, iLike: 0, total: 0 };
+                return `
+                  <tr>
+                    <td><strong>${categories[code]}</strong></td>
+                    <td>${sub.iAm}</td>
+                    <td>${sub.iCan}</td>
+                    <td>${sub.iLike}</td>
+                    <td><strong>${sub.total}</strong></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
           <div class="riasec-grid">
             ${Object.entries(categories).map(([code, label]) => {
-              const list = (testData[code] as string[]) || [];
+              const list = Array.isArray(testData[code]) ? (testData[code] as string[]) : [];
               return `
                 <div class="riasec-card">
                   <div class="riasec-card-header">
@@ -257,12 +444,14 @@ export async function GET(
               `;
             }).join('')}
           </div>
+          ${clientNotesHtml}
         `;
       }
 
       if (testType === 'COLOR') {
         const testData = answers.__testData || answers;
-        const result = testData.result || "N/A";
+        const colorScored = testScoringService.scoreColorTest(testData);
+        const result = testData.result || colorScored.colorCode || 'N/A';
 
         return `
           <div class="test-header">Colour Test (Working Style Profile)</div>
@@ -273,6 +462,7 @@ export async function GET(
               <div class="large-result">${result}</div>
             </div>
           </div>
+          <p style="margin-bottom: 14px; font-size: 12px; color: #334155;">${colorScored.interpretation}</p>
           <div class="color-sections">
             ${COLOR_SECTIONS.map((sec, secIdx) => {
               const userSelections = (testData[`section${secIdx + 1}`] as (string | null)[]) || [];
@@ -283,7 +473,7 @@ export async function GET(
                     <tbody>
                       ${sec.questions.map((q, qIdx) => {
                         const sel = userSelections[qIdx];
-                        const selectedText = sel === "a" ? q.a : sel === "b" ? q.b : "—";
+                        const selectedText = sel === 'a' ? q.a : sel === 'b' ? q.b : '—';
                         return `
                           <tr>
                             <td class="color-q-text">Q${qIdx + 1}: ${q.a} vs ${q.b}</td>
@@ -297,6 +487,7 @@ export async function GET(
               `;
             }).join('')}
           </div>
+          ${clientNotesHtml}
         `;
       }
 
@@ -328,7 +519,7 @@ export async function GET(
             <div class="smi-scenarios-section">
               <h4 class="sub-section-title">Top Preferred Scenarios</h4>
               <ol class="scenario-list">
-                ${top3Scenarios.map((id, index) => {
+                ${top3Scenarios.map((id) => {
                   const sc = SMI_SCENARIOS.find((s) => s.id === id);
                   return `
                     <li>
@@ -364,6 +555,7 @@ export async function GET(
               }).join('')}
             </div>
           </div>
+          ${clientNotesHtml}
         `;
       }
 
@@ -371,11 +563,12 @@ export async function GET(
         const testData = answers.__testData || answers;
 
         const renderField = (label: string, value: any): string => {
-          if (value === undefined || value === null || value === "") return '';
+          if (value === undefined || value === null || value === '') return '';
+          if (Array.isArray(value) && value.length === 0) return '';
           return `
             <div class="parent-field">
               <div class="parent-label">${label}</div>
-              <div class="parent-value">${Array.isArray(value) ? value.join(", ") : String(value)}</div>
+              <div class="parent-value">${Array.isArray(value) ? value.join(', ') : String(value)}</div>
             </div>
           `;
         };
@@ -385,39 +578,42 @@ export async function GET(
           <div class="parents-meeting-sections">
             <div class="parents-card">
               <h5 class="parents-card-title">1. Describe the Child</h5>
-              ${renderField("Selected Personality Descriptors", testData.q1_described_words)}
+              ${renderField('Selected Personality Descriptors', testData.q1_described_words)}
               ${renderField("Mother's Description", testData.q1_mother_description)}
               ${renderField("Father's Description", testData.q1_father_description)}
+              ${renderField('Counsellor Notes (Q1)', testData.q1_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">2. Relationship with Child</h5>
               ${renderField("Father's Relationship", testData.q2_dad_relationship)}
               ${renderField("Mother's Relationship", testData.q2_mom_relationship)}
+              ${renderField('Counsellor Notes (Q2)', testData.q2_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">3. School Journey</h5>
-              ${renderField("Favourite Subject", testData.q3_favourite_subject)}
-              ${renderField("Subject They Hate", testData.q3_hated_subject)}
-              ${renderField("Kind of Learner", testData.q3_kind_of_learner)}
-              ${renderField("Learning Style", testData.q3_learning_style)}
-              ${renderField("Relationship with Teachers", testData.q3_relationship_teachers)}
-              ${renderField("Relationship with Friends", testData.q3_relationship_friends)}
-              ${renderField("Relationship with Opposite Gender", testData.q3_relationship_opposite_gender)}
-              ${renderField("Bullying/Harassment Incidents", testData.q3_bullied_or_harassed)}
-              ${renderField("Academic Grades & Performance", testData.q3_marks_scoring)}
-              ${renderField("Won / Appreciated Awards", testData.q3_won_appreciated)}
-              ${renderField("Extracurricular Activities", testData.q3_extracurriculars)}
+              ${renderField('Favourite Subject', testData.q3_favourite_subject)}
+              ${renderField('Subject They Hate', testData.q3_hated_subject)}
+              ${renderField('Kind of Learner', testData.q3_kind_of_learner)}
+              ${renderField('Learning Style', testData.q3_learning_style)}
+              ${renderField('Relationship with Teachers', testData.q3_relationship_teachers)}
+              ${renderField('Relationship with Friends', testData.q3_relationship_friends)}
+              ${renderField('Relationship with Opposite Gender', testData.q3_relationship_opposite_gender)}
+              ${renderField('Bullying/Harassment Incidents', testData.q3_bullied_or_harassed)}
+              ${renderField('Academic Grades & Performance', testData.q3_marks_scoring)}
+              ${renderField('Won / Appreciated Awards', testData.q3_won_appreciated)}
+              ${renderField('Extracurricular Activities', testData.q3_extracurriculars)}
+              ${renderField('Counsellor Notes (Q3)', testData.q3_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">4. Routine & Traits Ratings</h5>
-              ${renderField("Waking & Sleeping Schedule", testData.q4_waking_sleeping)}
-              ${renderField("Eating Habits", testData.q4_eating_habits)}
-              ${renderField("Studying Habits", testData.q4_studying_habits)}
-              ${renderField("Approach to Deadlines", testData.q4_deadlines_approach)}
-              ${renderField("Traveling Habits", testData.q4_traveling)}
+              ${renderField('Waking & Sleeping Schedule', testData.q4_waking_sleeping)}
+              ${renderField('Eating Habits', testData.q4_eating_habits)}
+              ${renderField('Studying Habits', testData.q4_studying_habits)}
+              ${renderField('Approach to Deadlines', testData.q4_deadlines_approach)}
+              ${renderField('Traveling Habits', testData.q4_traveling)}
               
               <div class="ratings-block">
                 <div class="rating-box">
@@ -441,16 +637,17 @@ export async function GET(
                   <div class="r-val">${testData.q4_rate_time_management || 5}/10</div>
                 </div>
               </div>
+              ${renderField('Counsellor Notes (Q4)', testData.q4_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">5. Core Priorities (Out of 10)</h5>
               ${[
-                { label: "Money", rating: testData.q5_money_rating, exp: testData.q5_money_explanation },
-                { label: "Creative Expression", rating: testData.q5_creative_expression_rating, exp: testData.q5_creative_expression_explanation },
-                { label: "Passion", rating: testData.q5_passion_rating, exp: testData.q5_passion_explanation },
-                { label: "Satisfaction", rating: testData.q5_satisfaction_rating, exp: testData.q5_satisfaction_explanation },
-                { label: "Giving Back", rating: testData.q5_giving_back_rating, exp: testData.q5_giving_back_explanation },
+                { label: 'Money', rating: testData.q5_money_rating, exp: testData.q5_money_explanation },
+                { label: 'Creative Expression', rating: testData.q5_creative_expression_rating, exp: testData.q5_creative_expression_explanation },
+                { label: 'Passion', rating: testData.q5_passion_rating, exp: testData.q5_passion_explanation },
+                { label: 'Satisfaction', rating: testData.q5_satisfaction_rating, exp: testData.q5_satisfaction_explanation },
+                { label: 'Giving Back', rating: testData.q5_giving_back_rating, exp: testData.q5_giving_back_explanation },
               ].map(({ label, rating, exp }) => `
                 <div class="priority-item">
                   <div class="priority-top">
@@ -460,13 +657,16 @@ export async function GET(
                   ${exp ? `<p class="priority-exp">"${exp}"</p>` : ''}
                 </div>
               `).join('')}
+              ${renderField('Counsellor Notes (Q5)', testData.q5_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">6. Social Spaces & Influences</h5>
-              ${renderField("Selected Free Time Activities", testData.q6_free_time_activities)}
-              ${renderField("Social Media Usage", testData.q6_social_media_usage)}
-              ${renderField("Other Free Time Details", testData.q6_free_time)}
+              ${renderField('Selected Free Time Activities', testData.q6_free_time_activities)}
+              ${renderField('Social Media Usage', testData.q6_social_media_usage)}
+              ${renderField('Other Free Time Details', testData.q6_free_time)}
+              ${renderField('Counsellor Notes (Q6)', testData.q6_notes)}
+              ${renderField('Counsellor Notes (Q7)', testData.q7_notes)}
               
               <div class="ratings-block" style="margin-top: 15px;">
                 <div class="rating-box">
@@ -483,35 +683,44 @@ export async function GET(
                 </div>
               </div>
               
-              ${renderField("Media Content Watched", testData.q9_media_content)}
-              ${renderField("Other Influences", testData.q9_anything_else_influence)}
-              ${renderField("Significant Life Events/Incidents", testData.q9b_incidents)}
+              ${renderField('Media Content Watched', testData.q9_media_content)}
+              ${renderField('Other Influences', testData.q9_anything_else_influence)}
+              ${renderField('Significant Life Events/Incidents', testData.q9b_incidents)}
+              ${renderField('Counsellor Notes (Q8)', testData.q8_notes)}
             </div>
 
             <div class="parents-card">
               <h5 class="parents-card-title">7. Independence, Risk & Career Stances</h5>
-              ${renderField("Career Path Thoughts", testData.q10_career_thoughts)}
-              ${renderField("Marriage Stance", testData.q12_marriage)}
-              ${renderField("Independence Timeline", testData.q12_independence_time)}
-              ${renderField("Financial Support Limit (Age)", testData.q12_financial_support_age)}
-              ${renderField("Risk Behavior Inclinations", testData.q13_risk_behaviour)}
-              ${renderField("Hidden Talents Identified", testData.q14_hidden_talents)}
-              ${renderField("Path if No Constraints", testData.q14_if_no_constraints)}
-              ${renderField("Qualities Inherited from Mom", testData.q14_qualities_from_mom)}
-              ${renderField("Qualities Inherited from Dad", testData.q14_qualities_from_dad)}
-              ${renderField("Additional Notes", testData.q15_anything_else)}
+              ${renderField('Career Path Thoughts', testData.q10_career_thoughts)}
+              ${renderField('Counsellor Notes (Q9)', testData.q9_notes)}
+              ${renderField('Counsellor Notes (Q10)', testData.q10_notes)}
+              ${renderField('Marriage Stance', testData.q12_marriage)}
+              ${renderField('Independence Timeline', testData.q12_independence_time)}
+              ${renderField('Financial Support Limit (Age)', testData.q12_financial_support_age)}
+              ${renderField('Counsellor Notes (Q11)', testData.q11_notes)}
+              ${renderField('Risk Behavior Inclinations', testData.q13_risk_behaviour)}
+              ${renderField('Counsellor Notes (Q12)', testData.q12_notes)}
+              ${renderField('Hidden Talents Identified', testData.q14_hidden_talents)}
+              ${renderField('Path if No Constraints', testData.q14_if_no_constraints)}
+              ${renderField('Qualities Inherited from Mom', testData.q14_qualities_from_mom)}
+              ${renderField('Qualities Inherited from Dad', testData.q14_qualities_from_dad)}
+              ${renderField('Counsellor Notes (Q13)', testData.q13_notes)}
+              ${renderField('Additional Notes', testData.q15_anything_else)}
+              ${renderField('Counsellor Notes (Q14)', testData.q14_notes)}
+              ${renderField('Overall Counsellor Summary & Observations', testData.counsellor_notes)}
             </div>
           </div>
+          ${clientNotesHtml}
         `;
       }
 
       if (testType === 'SELF_DISCOVERY') {
-        const ageGroup = answers.sd_age_group || "";
-        const round2Questions = ageGroup === "13-18" ? SD_TEEN : SD_ADULT;
+        const ageGroup = answers.sd_age_group || '';
+        const round2Questions = ageGroup === '13-18' ? SD_TEEN : SD_ADULT;
         const questions = [...SD_ROUND1, ...round2Questions];
 
         return `
-          <div class="test-header">Self Discovery (Age Group: ${ageGroup || "All"})</div>
+          <div class="test-header">Self Discovery (Age Group: ${ageGroup || 'All'})</div>
           <div class="sd-list">
             ${questions.map((q: any) => {
               const val = answers[q.id];
@@ -519,11 +728,12 @@ export async function GET(
               return `
                 <div class="sd-question-item">
                   <div class="sd-q-title">Q${q.num}. ${q.text}</div>
-                  <div class="sd-a-box">"${val.trim() ? val : '(No answer provided)'}"</div>
+                  <div class="sd-a-box">"${String(val).trim() ? val : '(No answer provided)'}"</div>
                 </div>
               `;
             }).join('')}
           </div>
+          ${clientNotesHtml}
         `;
       }
 
@@ -536,7 +746,7 @@ export async function GET(
           return `<span class="jf-badge low">${num}/5 — Low Interest</span>`;
         };
 
-        const categories = ["People-Oriented (One-on-One)", "People-Oriented (Groups & Public)", "Information & Ideas", "Things & Physical World"];
+        const categories = ['People-Oriented (One-on-One)', 'People-Oriented (Groups & Public)', 'Information & Ideas', 'Things & Physical World'];
         return `
           <div class="test-header">Job Functions Identification</div>
           <div class="jf-categories">
@@ -565,685 +775,316 @@ export async function GET(
               `;
             }).join('')}
           </div>
+          ${clientNotesHtml}
         `;
       }
 
-      // Default fallback
+      // Clean human-readable fallback table (never raw JSON)
+      const entries = Object.entries(answers).filter(([k, v]) => !k.startsWith('__') && v !== undefined && v !== null && v !== '');
       return `
-        <pre class="fallback-json">${JSON.stringify(answers, null, 2)}</pre>
+        <div class="qa-list">
+          ${entries.map(([k, v]) => `
+            <div class="qa-item">
+              <div class="q-text">${k.replace(/_/g, ' ').toUpperCase()}</div>
+              <div class="a-text">${formatResponseValue({}, v)}</div>
+            </div>
+          `).join('')}
+        </div>
       `;
     };
 
-    // Build layout HTML
     const reportDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
-    const html = `<!DOCTYPE html>
-<html>
+    const htmlHeader = format === 'doc'
+      ? `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>`
+      : `<!DOCTYPE html><html>`;
+
+    const html = `${htmlHeader}
 <head>
   <meta charset="utf-8">
   <title>Assessment Responses - ${client.user.name || 'Client'}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
-    
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: 'Calibri', 'Inter', system-ui, -apple-system, sans-serif;
       color: #1e293b;
       background-color: #ffffff;
       line-height: 1.5;
-      font-size: 13px;
-      padding: 40px;
+      font-size: 12pt;
+      padding: 32px;
     }
-    
     .print-header {
       border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 20px;
-      margin-bottom: 30px;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
       display: flex;
-      justify-between;
+      justify-content: space-between;
       align-items: flex-end;
     }
-    
     .logo-area h1 {
-      font-size: 22px;
+      font-size: 20pt;
       font-weight: 900;
       color: #4f46e5;
-      letter-spacing: -0.05em;
     }
-    
     .logo-area p {
-      font-size: 11px;
+      font-size: 10pt;
       color: #64748b;
-      margin-top: 2px;
     }
-    
     .meta-area {
       text-align: right;
-      font-size: 11px;
+      font-size: 10pt;
       color: #64748b;
     }
-    
     .meta-area strong {
       color: #1e293b;
     }
-    
     .demographics-box {
       background-color: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 35px;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 28px;
     }
-    
     .demo-title {
-      font-size: 13px;
+      font-size: 11pt;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: #4f46e5;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       border-bottom: 1px dashed #cbd5e1;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
     }
-    
     .demo-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+      gap: 12px;
     }
-    
-    .demo-item {
-      font-size: 12px;
-    }
-    
     .demo-item span {
       color: #64748b;
-      font-weight: 500;
+      font-size: 10pt;
       display: block;
-      margin-bottom: 2px;
     }
-    
     .demo-item strong {
       color: #0f172a;
-      font-size: 13px;
+      font-size: 11pt;
     }
-    
     .module-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 30px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 26px;
       page-break-inside: avoid;
       break-inside: avoid;
     }
-    
     .module-card-header {
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 12px;
-      margin-bottom: 18px;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
     .module-card-header h2 {
-      font-size: 16px;
-      font-weight: 750;
+      font-size: 14pt;
+      font-weight: 700;
       color: #0f172a;
     }
-    
     .module-badges {
       display: flex;
       gap: 8px;
     }
-    
     .badge {
-      font-size: 10px;
+      font-size: 9pt;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid transparent;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
     }
-    
     .badge-submitted {
       background-color: #ecfdf5;
       color: #047857;
       border-color: #a7f3d0;
     }
-    
     .badge-locked {
       background-color: #f1f5f9;
       color: #64748b;
-      border-color: #cbd5e1;
     }
-    
     .badge-filled {
       background-color: #eff6ff;
       color: #1d4ed8;
-      border-color: #bfdbfe;
     }
-    
     .badge-values {
       background-color: #f0fdf4;
       color: #166534;
-      border-color: #bbf7d0;
-      font-size: 9px;
     }
-    
     .no-response {
       color: #64748b;
       font-style: italic;
-      font-size: 12px;
-      text-align: center;
-      padding: 20px 0;
+      font-size: 11pt;
+      padding: 12px 0;
     }
-    
-    /* Standard Q&A styling */
     .qa-list {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 14px;
     }
-    
     .qa-item {
-      border-bottom: 1px dashed #f1f5f9;
-      padding-bottom: 12px;
+      border-bottom: 1px dashed #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 8px;
     }
-    
-    .qa-item:last-child {
-      border-bottom: 0;
-      padding-bottom: 0;
-    }
-    
     .q-text {
-      font-weight: 600;
-      color: #334155;
-      font-size: 12.5px;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 11pt;
       margin-bottom: 4px;
     }
-    
     .q-desc {
-      font-size: 10px;
-      color: #94a3b8;
-      margin-bottom: 6px;
+      font-size: 9.5pt;
+      color: #64748b;
+      margin-bottom: 4px;
     }
-    
     .a-text {
       color: #0f172a;
-      font-size: 13px;
+      font-size: 11pt;
       background-color: #f8fafc;
       padding: 8px 12px;
-      border-radius: 8px;
-      border-left: 3px solid #6366f1;
+      border-radius: 6px;
+      border-left: 3px solid #4f46e5;
       white-space: pre-wrap;
     }
-    
-    /* Psychometric Test Layouts */
-    .test-header {
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #4f46e5;
-      margin-bottom: 15px;
-    }
-    
-    .pf16-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    
-    .pf16-item {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 11px;
-    }
-    
-    .pf16-num {
-      color: #64748b;
-      font-weight: 600;
-      margin-bottom: 3px;
-      font-size: 9px;
-      text-transform: uppercase;
-    }
-    
-    .pf16-text {
-      font-weight: 500;
+    .sub-note {
+      margin-top: 6px;
+      font-size: 10pt;
       color: #334155;
-      margin-bottom: 4px;
-    }
-    
-    .pf16-val {
-      font-weight: 700;
-      color: #4f46e5;
-    }
-    
-    .pf16-val.center {
-      text-align: center;
-      background-color: #eff6ff;
-      padding: 4px;
+      background-color: #eef2ff;
+      padding: 6px 10px;
       border-radius: 6px;
-      margin-top: 5px;
+      border-left: 3px solid #818cf8;
+      white-space: pre-wrap;
     }
-    
-    .pf16-between {
-      display: flex;
-      justify-content: space-between;
-      color: #64748b;
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    
-    .values-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-    
-    .values-table th, .values-table td {
-      border: 1px solid #e2e8f0;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    
-    .values-table th {
-      background-color: #f8fafc;
-      color: #475569;
-      font-weight: 600;
-    }
-    
-    .riasec-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
-    
-    .riasec-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-    }
-    
-    .riasec-card-header {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 700;
-      font-size: 11px;
-      color: #0f172a;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    
-    .riasec-count {
-      color: #4f46e5;
-    }
-    
-    .riasec-card ul {
-      list-style-type: square;
-      padding-left: 15px;
-      font-size: 11px;
-      color: #334155;
-    }
-    
-    .color-result-banner {
-      background-color: #f5f3ff;
-      border: 1px solid #ddd6fe;
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-    
-    .color-badge {
-      font-size: 22px;
-    }
-    
-    .small-label {
-      font-size: 9px;
-      font-weight: 700;
-      color: #6d28d9;
-    }
-    
-    .large-result {
-      font-size: 14px;
-      font-weight: 800;
-      color: #4f46e5;
-    }
-    
-    .color-sections {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
-    
-    .color-section-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-    }
-    
-    .color-section-title {
-      font-weight: 700;
-      font-size: 11px;
-      color: #475569;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 4px;
-    }
-    
-    .color-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 10.5px;
-    }
-    
-    .color-table td {
-      padding: 4px 0;
-      border-bottom: 1px dashed #f1f5f9;
-    }
-    
-    .color-q-text {
-      color: #64748b;
-    }
-    
-    .color-ans {
-      color: #4f46e5;
-    }
-    
-    .smi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-    
-    .smi-item {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
+    .mentor-notes-box {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background-color: #fffbeb;
+      border: 1.5px solid #f59e0b;
       border-radius: 8px;
-      padding: 8px 12px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
     }
-    
-    .smi-badge {
-      color: #4f46e5;
-    }
-    
-    .sub-section-title {
-      font-size: 11px;
-      font-weight: 700;
+    .mentor-notes-title {
+      font-size: 10.5pt;
+      font-weight: 800;
       text-transform: uppercase;
-      color: #475569;
-      margin-bottom: 8px;
-    }
-    
-    .scenario-list {
-      padding-left: 20px;
-      font-size: 11px;
-      margin-bottom: 15px;
-    }
-    
-    .smi-rankings-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    
-    .smi-rank-card {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 10px;
-    }
-    
-    .smi-rank-title {
-      font-weight: 700;
-      font-size: 11px;
-      color: #4f46e5;
+      color: #b45309;
       margin-bottom: 6px;
     }
-    
-    .smi-rank-ol {
-      padding-left: 15px;
-      font-size: 10.5px;
-      color: #334155;
+    .mentor-notes-body {
+      font-size: 11pt;
+      color: #1e293b;
+      white-space: pre-wrap;
     }
-    
-    .column-indicator {
-      color: #888;
-      font-weight: 600;
+    .test-header {
+      font-size: 12pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #4f46e5;
+      margin-bottom: 12px;
     }
-    
-    .parents-meeting-sections {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .pf16-grid, .riasec-grid, .color-sections, .smi-grid, .smi-rankings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
-    
-    .parents-card {
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-      background-color: #fcfcfc;
+    .pf16-item, .riasec-card, .color-section-card, .smi-item, .smi-rank-card, .parents-card, .jf-sec-card {
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
     }
-    
-    .parents-card-title {
-      font-size: 12px;
+    .values-table, .color-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5pt;
+      margin-bottom: 12px;
+    }
+    .values-table th, .values-table td, .color-table td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    .values-table th {
+      background-color: #f1f5f9;
+      font-weight: 700;
+    }
+    .parents-card-title, .jf-cat-title {
+      font-size: 11pt;
       font-weight: 700;
       color: #0f172a;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
       text-transform: uppercase;
     }
-    
     .parent-field {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    
-    .parent-field:last-child {
-      margin-bottom: 0;
-    }
-    
     .parent-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: #64748b;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #475569;
       text-transform: uppercase;
     }
-    
     .parent-value {
-      font-size: 12px;
-      color: #1e293b;
-      margin-top: 2px;
+      font-size: 11pt;
+      color: #0f172a;
     }
-    
     .ratings-block {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin: 8px 0;
     }
-    
     .rating-box {
-      flex: 1;
-      min-width: 80px;
-      background-color: #f1f5f9;
-      border-radius: 8px;
-      padding: 8px;
+      background-color: #e2e8f0;
+      border-radius: 6px;
+      padding: 6px 10px;
       text-align: center;
     }
-    
-    .r-label {
-      font-size: 8px;
-      font-weight: 700;
-      color: #64748b;
-      text-transform: uppercase;
-    }
-    
-    .r-val {
-      font-size: 12px;
-      font-weight: 900;
-      color: #4f46e5;
-    }
-    
-    .priority-item {
-      border-bottom: 1px dashed #e2e8f0;
-      padding: 6px 0;
-    }
-    
-    .priority-top {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    
-    .priority-exp {
-      font-size: 10px;
-      color: #64748b;
-      font-style: italic;
-    }
-    
     .sd-question-item {
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
     }
-    
     .sd-q-title {
-      font-weight: 600;
-      color: #334155;
-      font-size: 12px;
+      font-weight: 700;
+      color: #1e293b;
     }
-    
     .sd-a-box {
-      font-size: 12px;
-      color: #4f46e5;
-      font-style: italic;
+      color: #334155;
       margin-top: 4px;
       padding-left: 8px;
-      border-left: 2px solid #ddd6fe;
+      border-left: 2px solid #6366f1;
     }
-    
-    .jf-cat-block {
-      margin-bottom: 20px;
-    }
-    
-    .jf-cat-title {
-      font-size: 12px;
-      font-weight: 800;
-      color: #4f46e5;
-      border-bottom: 1.5px solid #cbd5e1;
-      padding-bottom: 4px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-    
-    .jf-sec-card {
-      border: 1px solid #f1f5f9;
-      background-color: #fcfcfc;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-    }
-    
-    .jf-sec-title {
-      font-weight: 600;
-      font-size: 11px;
-      color: #475569;
-      margin-bottom: 8px;
-    }
-    
     .jf-item-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       padding: 4px 0;
-      font-size: 10.5px;
-      border-bottom: 1px dashed #f1f5f9;
-    }
-    
-    .jf-badge {
-      font-size: 8px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    
-    .jf-badge.high {
-      background-color: #ecfdf5;
-      color: #047857;
-    }
-    
-    .jf-badge.medium {
-      background-color: #fffbeb;
-      color: #b45309;
-    }
-    
-    .jf-badge.low {
-      background-color: #fdf2f2;
-      color: #b91c1c;
-    }
-    
-    .empty-text {
-      color: #94a3b8;
-      font-style: italic;
-    }
-    
-    .fallback-json {
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 11px;
-    }
-    
-    .center {
-      text-align: center;
-    }
-    .font-bold {
-      font-weight: 700;
-    }
-    .text-right {
-      text-align: right;
-    }
-    
-    @media print {
-      body {
-        padding: 0;
-        font-size: 11px;
-      }
-      .module-card {
-        border-color: #ccc;
-        margin-bottom: 20px;
-        page-break-after: always;
-      }
+      border-bottom: 1px dashed #e2e8f0;
     }
   </style>
 </head>
 <body>
-  
   <div class="print-header">
     <div class="logo-area">
       <h1>HOLISTREE</h1>
-      <p>Career Guidance & Assessment Portal</p>
+      <p>Career Guidance &amp; Assessment Portal</p>
     </div>
     <div class="meta-area">
-      <p>Report Type: <strong>Assessment Survey Responses</strong></p>
+      <p>Report Type: <strong>Assessment Survey Responses (${filteredModules.length} Module${filteredModules.length === 1 ? '' : 's'})</strong></p>
       <p>Date Generated: <strong>${reportDate}</strong></p>
     </div>
   </div>
@@ -1262,9 +1103,11 @@ export async function GET(
     </div>
   </div>
 
-  ${client.modules.map(m => {
+  ${filteredModules.map(m => {
     const responseData = m.response?.data as any;
     const hasResponse = m.response && responseData && Object.keys(responseData).length > 0;
+    const mentorNotesText = m.mentorNotes && m.mentorNotes.trim() !== '' ? m.mentorNotes.trim() : '';
+
     return `
       <div class="module-card">
         <div class="module-card-header">
@@ -1282,7 +1125,14 @@ export async function GET(
           const answers = responseData || {};
           const schema = (m.module.schema || {}) as any;
           const testType = schema.testType;
-          const questions = schema.questions || [];
+          let questions = Array.isArray(schema.questions) ? [...schema.questions] : [];
+
+          if (m.module.title?.toLowerCase().includes('family')) {
+            const existingIds = new Set(questions.map((q: any) => q.id));
+            EXTRA_FAMILY_QUESTIONS.forEach(fq => {
+              if (!existingIds.has(fq.id)) questions.push(fq);
+            });
+          }
 
           if (testType) {
             return renderScoredTestHTML(testType, answers);
@@ -1293,12 +1143,30 @@ export async function GET(
               <div class="qa-list">
                 ${questions.map((q: any) => {
                   const val = answers[q.id];
-                  if (val === undefined || val === null) return '';
+                  const otherVal = answers[`${q.id}_other`];
+                  const openTextVal = answers[`${q.id}_open_text`];
+                  const hobbiesNotesVal = q.id === 'demo_hobbies' ? answers.demo_hobbies_notes : undefined;
+                  const attachedFiles = Array.isArray(answers[`${q.id}_files`]) ? answers[`${q.id}_files`] : [];
+
+                  if (
+                    (val === undefined || val === null || val === '') &&
+                    !otherVal &&
+                    !openTextVal &&
+                    !hobbiesNotesVal &&
+                    attachedFiles.length === 0
+                  ) {
+                    return '';
+                  }
+
                   return `
                     <div class="qa-item">
                       <div class="q-text">${q.question}</div>
                       ${q.description ? `<div class="q-desc">${q.description}</div>` : ''}
                       <div class="a-text">${formatResponseValue(q, val)}</div>
+                      ${otherVal ? `<div class="sub-note"><strong>Other (Specified):</strong> ${otherVal}</div>` : ''}
+                      ${hobbiesNotesVal ? `<div class="sub-note"><strong>Hobbies Additional Info:</strong> ${hobbiesNotesVal}</div>` : ''}
+                      ${openTextVal ? `<div class="sub-note"><strong>Additional Notes / Details:</strong> ${openTextVal}</div>` : ''}
+                      ${attachedFiles.length > 0 ? `<div class="sub-note"><strong>Attached Files:</strong> ${attachedFiles.map((f: string) => cleanFileName(f)).join(', ')}</div>` : ''}
                     </div>
                   `;
                 }).join('')}
@@ -1306,15 +1174,30 @@ export async function GET(
             `;
           }
 
-          // Fallback if no questions schema but data exists
+          const cleanEntries = Object.entries(answers).filter(([k, v]) => !k.startsWith('__') && v !== undefined && v !== null && v !== '');
           return `
-            <pre class="fallback-json">${JSON.stringify(answers, null, 2)}</pre>
+            <div class="qa-list">
+              ${cleanEntries.map(([k, v]) => `
+                <div class="qa-item">
+                  <div class="q-text">${k.replace(/_/g, ' ').toUpperCase()}</div>
+                  <div class="a-text">${formatResponseValue({}, v)}</div>
+                </div>
+              `).join('')}
+            </div>
           `;
         })()}
+
+        ${mentorNotesText ? `
+          <div class="mentor-notes-box">
+            <div class="mentor-notes-title">📌 Mentor / Counsellor Notes for ${m.module.title}</div>
+            <div class="mentor-notes-body">${mentorNotesText}</div>
+          </div>
+        ` : ''}
       </div>
     `;
   }).join('')}
 
+  ${format !== 'doc' ? `
   <script>
     window.onload = function() {
       setTimeout(function() {
@@ -1322,15 +1205,26 @@ export async function GET(
       }, 500);
     }
   </script>
+  ` : ''}
 </body>
 </html>`;
+
+    if (format === 'doc') {
+      const safeName = (client.user.name || 'Client').replace(/[^a-zA-Z0-9_-]/g, '_');
+      return new NextResponse(html, {
+        headers: {
+          'Content-Type': 'application/msword; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${safeName}_Combined_Answers.doc"`
+        }
+      });
+    }
 
     return new NextResponse(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' }
     });
 
   } catch (error: any) {
-    console.error('PDF Combined Answers generation error:', error);
-    return new NextResponse(`Error generating combined answers PDF: ${error.message}`, { status: 500 });
+    console.error('Combined Answers download error:', error);
+    return new NextResponse(`Error generating combined answers: ${error.message}`, { status: 500 });
   }
 }

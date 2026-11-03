@@ -64,6 +64,12 @@ export async function POST(
           mentorNotes: notes || 'Please revise and resubmit.'
         }
       })
+      if (clientModule.response) {
+        await prisma.moduleResponse.update({
+          where: { clientModuleId: id },
+          data: { approvedAt: null, submittedAt: null }
+        })
+      }
       return NextResponse.json({ success: true, action: 'REJECT' })
     }
 
@@ -74,6 +80,12 @@ export async function POST(
           status: 'UNLOCKED'
         }
       })
+      if (clientModule.response) {
+        await prisma.moduleResponse.update({
+          where: { clientModuleId: id },
+          data: { approvedAt: null }
+        })
+      }
       return NextResponse.json({ success: true, action: 'UNLOCK' })
     }
 

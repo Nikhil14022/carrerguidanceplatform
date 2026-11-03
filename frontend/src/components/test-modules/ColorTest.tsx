@@ -32,67 +32,67 @@ interface ColorTestResponse {
 
 const SECTIONS: Section[] = [
   {
-    title: "Section I",
-    instruction: "At least 51% of the times I tend to...",
+    title: "Section I — How You Take In Information",
+    instruction: "At least 51% of the times I tend to... (Choose ONE option per row that best fits you in most situations)",
     colALabel: "Column A",
     colBLabel: "Column B",
     questions: [
-      { a: "Value accuracy more", b: "Value insights more" },
-      { a: "Be interested in concrete issues", b: "Be interested in abstract ideas" },
-      { a: "Prefer people who speak plainly", b: "Prefer unusual ways of expression" },
-      { a: "Remember many details", b: "Be vague about details" },
-      { a: "Be down to earth", b: "Be complex" },
-      { a: "Focus on the present", b: "Focus on future possibilities" },
-      { a: "Be valued for my common sense", b: "Be valued for seeing new trends" },
-      { a: "Be realistic and pragmatic", b: "Be theoretical and imaginative" },
-      { a: "Be trusting of the facts", b: "Be trusting of my intuition" },
+      { a: "Value accuracy more (exact facts & precision)", b: "Value insights more (deeper meanings & patterns)" },
+      { a: "Be interested in concrete issues (real, practical matters)", b: "Be interested in abstract ideas (concepts & theories)" },
+      { a: "Prefer people who speak plainly (direct & literal)", b: "Prefer unusual ways of expression (metaphors & creative style)" },
+      { a: "Remember many details (specifics, dates, facts)", b: "Be vague about details (remember the big picture instead)" },
+      { a: "Be down to earth (grounded & practical)", b: "Be complex (deep & multi-layered thinker)" },
+      { a: "Focus on the present (what is happening right now)", b: "Focus on future possibilities (what could happen next)" },
+      { a: "Be valued for my common sense", b: "Be valued for seeing new trends & ideas" },
+      { a: "Be realistic and pragmatic (what works in reality)", b: "Be theoretical and imaginative (exploring 'what if')" },
+      { a: "Be trusting of the facts (proven evidence)", b: "Be trusting of my intuition (gut feeling & instinct)" },
     ],
   },
   {
-    title: "Section II",
-    instruction: "At least 51% of the times I tend to...",
+    title: "Section II — How You Make Decisions",
+    instruction: "At least 51% of the times I tend to... (Choose ONE option per row that best fits you in most situations)",
     colALabel: "Column A",
     colBLabel: "Column B",
     questions: [
-      { a: "Frank and direct", b: "Tactful and diplomatic" },
-      { a: "Skeptical at first", b: "Accepting at first" },
-      { a: "Unemotional", b: "Emotional" },
-      { a: "Analytical", b: "Empathetic" },
-      { a: "Apt to meet conflict head on", b: "Apt to avoid conflict where possible" },
-      { a: "Principled", b: "Sympathetic" },
-      { a: "Objective when criticized", b: "Apt to take things personally" },
-      { a: "Impartial", b: "Compassionate" },
-      { a: "Competitive", b: "Supportive" },
+      { a: "Frank and direct (say things straight as they are)", b: "Tactful and diplomatic (say things gently to not hurt feelings)" },
+      { a: "Skeptical at first (questioning until proven)", b: "Accepting at first (trusting and open initially)" },
+      { a: "Unemotional (decide with logic over feelings)", b: "Emotional (guided strongly by feelings)" },
+      { a: "Analytical (break problems down logically)", b: "Empathetic (put myself in others' shoes)" },
+      { a: "Apt to meet conflict head on (address disagreements directly)", b: "Apt to avoid conflict where possible (keep peace & harmony)" },
+      { a: "Principled (stand firm on rules & fairness)", b: "Sympathetic (prioritize care & mercy for people)" },
+      { a: "Objective when criticized (take feedback neutrally)", b: "Apt to take things personally (feel hurt by criticism)" },
+      { a: "Impartial (treat everyone by the same standard)", b: "Compassionate (adapt based on each person's situation)" },
+      { a: "Competitive (driven to win and excel)", b: "Supportive (driven to help and collaborate)" },
     ],
   },
   {
-    title: "Section III",
-    instruction: "At least 51% of the times I tend to...",
+    title: "Section III — How You Organize Your Life & Work",
+    instruction: "At least 51% of the times I tend to... (Choose ONE option per row that best fits you in most situations)",
     colALabel: "Column @",
     colBLabel: "Column #",
     questions: [
-      { a: "Meet deadlines early", b: "Meet deadlines at the last minute" },
-      { a: "Make detailed plans before I start", b: "Handle problems as they arise" },
+      { a: "Meet deadlines early (finish well ahead of time)", b: "Meet deadlines at the last minute (work in a final burst)" },
+      { a: "Make detailed plans before I start", b: "Handle problems as they arise (improvise on the go)" },
       { a: "Be punctual and sometimes early", b: "Be leisurely, sometimes late" },
-      { a: "Like to be scheduled", b: "Prefer to be spontaneous" },
-      { a: "Like clear guidelines", b: "Like flexibility" },
-      { a: "Feel settled", b: "Often feel restless" },
-      { a: "Have a tidy workplace", b: "Have a workplace with many piles/papers" },
-      { a: "Be deliberate", b: "Be carefree" },
-      { a: "Like to make plans", b: "Like to wait and see" },
+      { a: "Like to be scheduled (structured routine)", b: "Prefer to be spontaneous (go with the flow)" },
+      { a: "Like clear guidelines (know exact expectations)", b: "Like flexibility (freedom to do things my own way)" },
+      { a: "Feel settled (decided and organized)", b: "Often feel restless (looking for change or variety)" },
+      { a: "Have a tidy workplace (everything in its place)", b: "Have a workplace with many piles/papers" },
+      { a: "Be deliberate (careful, planned, and methodical)", b: "Be carefree (relaxed and easygoing)" },
+      { a: "Like to make plans in advance", b: "Like to wait and see what happens" },
     ],
   },
   {
-    title: "Section IV",
-    instruction: "At least 51% of the times I tend to...",
+    title: "Section IV — How You Interact & Recharge Energy",
+    instruction: "At least 51% of the times I tend to... (Choose ONE option per row that best fits you in most situations)",
     colALabel: "Column (e)",
     colBLabel: "Column (i)",
     questions: [
-      { a: "Like to talk", b: "Prefer to listen" },
+      { a: "Like to talk and express thoughts out loud", b: "Prefer to listen and process internally" },
       { a: "Become bored when alone too much", b: "Need time alone to recharge batteries" },
-      { a: "Prefer to work with a group", b: "Prefer to work alone or with one another" },
-      { a: "Speak first\u2014then reflect", b: "Reflect first\u2014then speak" },
-      { a: "Be more interactive & energetic", b: "Be more reflective and thoughtful" },
+      { a: "Prefer to work with a group or team", b: "Prefer to work alone or one-on-one" },
+      { a: "Speak first—then reflect", b: "Reflect first—then speak" },
+      { a: "Be more interactive & energetic in groups", b: "Be more reflective and thoughtful" },
       { a: "Know a little about many topics", b: "Know a few topics in depth" },
       { a: "Initiate conversations at social gatherings", b: "Wait to be approached at social gatherings" },
     ],
@@ -303,10 +303,23 @@ export default function ColorTest({ answers, setAnswers, onSubmit, readOnly = fa
       </div>
 
       <div className="max-w-2xl w-full">
+        {/* Detailed Instructions Banner */}
+        <div className="mb-6 rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4 space-y-2">
+          <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-300 flex items-center gap-2">
+            <span>🎨</span> Instructions — How to Complete the Colour Test
+          </h3>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            For each row below, compare the two statements and <strong>select ONE option from either column</strong> — the one which you tend to be or do <strong>at least 51% of the times</strong> in most situations with most people.
+          </p>
+          <p className="text-[11px] text-slate-400 italic">
+            Tip: Even if both statements sometimes apply to you, pick the one that comes more naturally to you (51% vs 49%). Every row requires one selection.
+          </p>
+        </div>
+
         {/* Section header */}
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold mb-1">{currentSectionData.title}</h2>
-          <p className="text-gray-400 italic">{currentSectionData.instruction}</p>
+          <p className="text-gray-400 italic text-sm">{currentSectionData.instruction}</p>
           <div className="flex justify-between mt-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
             <span>{currentSectionData.colALabel}</span>
             <span>{currentSectionData.colBLabel}</span>
@@ -348,6 +361,23 @@ export default function ColorTest({ answers, setAnswers, onSubmit, readOnly = fa
               </div>
             );
           })}
+        </div>
+
+        {/* Client / Counsellor Notes Section */}
+        <div className="mt-6 rounded-xl border border-gray-800 bg-gray-900 p-4 space-y-2">
+          <label className="block text-xs font-bold uppercase tracking-widest text-gray-400">
+            Add Notes / Additional Thoughts for Colour Test (Optional)
+          </label>
+          <textarea
+            value={answers.__clientNotes || ""}
+            disabled={readOnly}
+            rows={3}
+            spellCheck={true}
+            autoCorrect="on"
+            placeholder="Write any additional notes or thoughts about your choices here..."
+            onChange={(e) => setAnswers({ ...answers, __clientNotes: e.target.value })}
+            className="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-indigo-500 resize-y"
+          />
         </div>
 
         {/* Navigation */}

@@ -49,19 +49,27 @@ export async function POST(
       return NextResponse.json({ error: 'Module not found' }, { status: 404 })
     }
 
+    const existingResponse = await prisma.moduleResponse.findUnique({
+      where: { clientModuleId: id }
+    })
+
     if (
       !isTeam &&
-      (clientModule.status === 'LOCKED' || clientModule.status === 'APPROVED')
+      (['LOCKED', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(clientModule.status) ||
+        Boolean(existingResponse?.approvedAt))
     ) {
       return NextResponse.json({ error: 'Module cannot be edited' }, { status: 403 })
     }
+
+    const isAlreadyCompleted = ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(clientModule.status)
 
     const response = await prisma.moduleResponse.upsert({
       where: { clientModuleId: id },
       update: {
         data: validatedData.data as any,
-        submittedAt: null,
-        approvedAt: null
+        ...(isTeam && isAlreadyCompleted
+          ? {}
+          : { submittedAt: null, approvedAt: null })
       },
       create: {
         clientModuleId: id,
@@ -71,10 +79,12 @@ export async function POST(
       }
     })
 
-    await prisma.clientModule.update({
-      where: { id },
-      data: { status: 'IN_PROGRESS' }
-    })
+    if (!isAlreadyCompleted) {
+      await prisma.clientModule.update({
+        where: { id },
+        data: { status: 'IN_PROGRESS' }
+      })
+    }
 
     return NextResponse.json({ success: true, response })
   } catch (error: any) {

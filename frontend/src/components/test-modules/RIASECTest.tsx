@@ -274,6 +274,28 @@ export default function RIASECTest({
   const activeTab = activeSection.key;
 
   /* helpers */
+  const computeSubScores = (data: RIASECResponse) => {
+    const breakdown: Record<SectionKey, { iAm: number; iCan: number; iLike: number; total: number }> = {
+      R: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+      I: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+      A: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+      S: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+      E: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+      C: { iAm: 0, iCan: 0, iLike: 0, total: 0 },
+    };
+    sections.forEach((sec) => {
+      const selected = new Set(data[sec.key] ?? []);
+      const iAmItems = sec.groups.find((g) => g.heading === "I AM")?.items ?? [];
+      const iCanItems = sec.groups.find((g) => g.heading === "I CAN")?.items ?? [];
+      const iLikeItems = sec.groups.find((g) => g.heading === "I LIKE TO")?.items ?? [];
+      const iAm = iAmItems.filter((item) => selected.has(item)).length;
+      const iCan = iCanItems.filter((item) => selected.has(item)).length;
+      const iLike = iLikeItems.filter((item) => selected.has(item)).length;
+      breakdown[sec.key] = { iAm, iCan, iLike, total: iAm + iCan + iLike };
+    });
+    return breakdown;
+  };
+
   const toggleItem = (section: SectionKey, item: string) => {
     if (readOnly) return;
     const current = testData[section] ?? [];
@@ -282,7 +304,8 @@ export default function RIASECTest({
       : [...current, item];
 
     const next: RIASECResponse = { ...testData, [section]: updated };
-    setAnswers({ ...answers, __testData: next });
+    const subScores = computeSubScores(next);
+    setAnswers({ ...answers, __testData: next, __riasecSubScores: subScores });
   };
 
   const isChecked = (section: SectionKey, item: string) =>
@@ -323,20 +346,72 @@ export default function RIASECTest({
     C: "text-teal-400",
   };
 
+  const headingDescriptions: Record<string, { subtitle: string; example: string }> = {
+    "I AM": {
+      subtitle: "Most of the times, I am this person (your natural personality & qualities).",
+      example: "Select all traits that describe how you naturally are most of the time.",
+    },
+    "I CAN": {
+      subtitle: "Irrespective of whether I like it or not, whether I know it or not — if somebody guides me, teaches me, or supports me, I can do this.",
+      example: "Select all skills/tasks you already can do or believe you can learn with guidance.",
+    },
+    "I LIKE TO": {
+      subtitle: "Irrespective of whether I can do it or not, if I like it, choose it.",
+      example: "Select all activities that interest or excite you, even if you haven't tried them yet.",
+    },
+  };
+
   return (
     <div className="space-y-5">
+      {/* ---- Detailed Instructions Banner from Original Document ---- */}
+      <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-5 space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-2">
+            <span>📋</span> Instructions — How to Complete the RIASEC Assessment
+          </h3>
+          <span className="text-xs font-semibold bg-indigo-500/20 text-indigo-200 px-3 py-1 rounded-full">
+            Select as many as apply to you — there is no limit!
+          </span>
+        </div>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          Go through each section and read the three categories (<strong className="text-slate-100">I AM</strong>, <strong className="text-slate-100">I CAN</strong>, <strong className="text-slate-100">I LIKE TO</strong>). Click to select as many statements as apply to you. There is no limitation to the number of things you choose.
+        </p>
+        <div className="grid md:grid-cols-3 gap-3 pt-1">
+          <div className="rounded-lg bg-slate-950/80 border border-slate-800 p-3">
+            <p className="text-xs font-extrabold text-indigo-400 uppercase tracking-wider mb-1">1. &ldquo;I AM&rdquo; means:</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              <strong>Most of the times, I am this person.</strong> Choose the words that describe your personality and nature.
+            </p>
+          </div>
+          <div className="rounded-lg bg-slate-950/80 border border-slate-800 p-3">
+            <p className="text-xs font-extrabold text-emerald-400 uppercase tracking-wider mb-1">2. &ldquo;I CAN&rdquo; means:</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              <strong>Irrespective of whether I like it or not, or whether I know it or not</strong> — if somebody guides me, teaches me, or supports me, I can do this.
+            </p>
+          </div>
+          <div className="rounded-lg bg-slate-950/80 border border-slate-800 p-3">
+            <p className="text-xs font-extrabold text-amber-400 uppercase tracking-wider mb-1">3. &ldquo;I LIKE TO&rdquo; means:</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              <strong>Irrespective of whether I can do it or not</strong> — if I like it or find it interesting, choose it!
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* ---- Step-by-Step progress indicator ---- */}
       <div className="flex overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
         {sections.map((sec, idx) => {
           const isActive = idx === currentIndex;
           const count = countFor(sec.key);
           return (
-            <div
+            <button
               key={sec.key}
-              className={`flex-1 min-w-[90px] border-b-2 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide transition-colors ${
+              type="button"
+              onClick={() => setCurrentIndex(idx)}
+              className={`flex-1 min-w-[90px] border-b-2 px-3 py-3 text-center text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer ${
                 isActive
                   ? tabColors[sec.key].active
-                  : "border-transparent text-slate-600"
+                  : "border-transparent text-slate-500 hover:text-slate-300"
               }`}
             >
               <span className="block text-base font-bold">{sec.key}</span>
@@ -348,7 +423,7 @@ export default function RIASECTest({
                   {count}
                 </span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
@@ -356,19 +431,33 @@ export default function RIASECTest({
       {/* ---- Active section content ---- */}
       <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-6">
         <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-          <h2 className={`text-lg font-bold ${barTextColors[activeTab]}`}>
-            {activeSection.label} Interest Area
-          </h2>
+          <div>
+            <h2 className={`text-lg font-bold ${barTextColors[activeTab]}`}>
+              {activeSection.label} ({activeSection.key}) — Select All That Apply to You
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Click on any statement below to select or deselect it.
+            </p>
+          </div>
           <span className="text-xs font-bold text-slate-500">
             Step {currentIndex + 1} of 6
           </span>
         </div>
 
-        {activeSection.groups.map((group) => (
-          <div key={group.heading}>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-              {group.heading}
-            </p>
+        {activeSection.groups.map((group) => {
+          const meta = headingDescriptions[group.heading];
+          return (
+          <div key={group.heading} className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+            <div className="mb-3">
+              <p className="text-xs font-extrabold uppercase tracking-widest text-indigo-400">
+                {group.heading}
+              </p>
+              {meta && (
+                <p className="text-xs text-slate-300 mt-1">
+                  {meta.subtitle} <span className="text-slate-400 italic">({meta.example})</span>
+                </p>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2">
               {group.items.map((item) => {
                 const checked = isChecked(activeTab, item);
@@ -401,7 +490,25 @@ export default function RIASECTest({
               })}
             </div>
           </div>
-        ))}
+          );
+        })}
+      </div>
+
+      {/* ---- Client / Counsellor Notes Section ---- */}
+      <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 space-y-2">
+        <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">
+          Add Notes / Additional Thoughts for RIASEC (Optional)
+        </label>
+        <textarea
+          value={answers.__clientNotes || ""}
+          disabled={readOnly}
+          rows={3}
+          spellCheck={true}
+          autoCorrect="on"
+          placeholder="Add any personal notes, reflections, or observations about these interests..."
+          onChange={(e) => setAnswers({ ...answers, __clientNotes: e.target.value })}
+          className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 resize-y"
+        />
       </div>
 
       {/* ---- Score summary bar ---- */}

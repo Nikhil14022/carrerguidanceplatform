@@ -290,15 +290,36 @@
   animation: float 6s ease-in-out infinite;
 }
 
-/* Style Chrome/Safari/Firefox date picker calendar icon to be visible in dark mode */
+/* Style Chrome/Safari/Firefox date picker calendar icon to be visible on light theme */
 input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+  filter: none;
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
+}
+
+/* Ensure all inputs, textareas, and selects on inverted light backgrounds have legible dark text */
+input,
+textarea,
+select {
+  color: #0f172a;
+}
+
+input.text-white,
+textarea.text-white,
+select.text-white,
+.bg-slate-950.text-white,
+.bg-slate-900.text-white,
+.bg-slate-800.text-white,
+.bg-slate-950\/80.text-white,
+.bg-slate-950\/50.text-white,
+.bg-slate-900\/90.text-white,
+.bg-slate-900\/80.text-white,
+.bg-slate-900\/50.text-white {
+  color: #0f172a !important;
 }
 
 /* Mobile responsiveness overrides */

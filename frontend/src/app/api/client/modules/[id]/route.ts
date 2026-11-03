@@ -58,6 +58,11 @@ export async function GET(
       return NextResponse.json({ error: 'Module is locked' }, { status: 403 })
     }
 
+    const effectiveStatus =
+      clientModule.response?.approvedAt && clientModule.status === 'UNLOCKED'
+        ? 'APPROVED'
+        : clientModule.status;
+
     return NextResponse.json({
       module: {
         id: clientModule.id,
@@ -65,7 +70,7 @@ export async function GET(
         title: clientModule.module.title,
         description: clientModule.module.description,
         schema: clientModule.module.schema,
-        status: clientModule.status,
+        status: effectiveStatus,
         mentorNotes: clientModule.mentorNotes,
       },
       response: clientModule.response

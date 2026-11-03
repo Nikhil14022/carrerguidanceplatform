@@ -60,31 +60,27 @@ export async function POST(
 
     if (
       !isTeam &&
-      (clientModule.status === 'LOCKED' || clientModule.status === 'APPROVED')
+      ['LOCKED', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(clientModule.status)
     ) {
-      return NextResponse.json({ error: 'Module cannot be submitted' }, { status: 403 })
+      return NextResponse.json({ error: 'Module is already submitted or locked and cannot be edited.' }, { status: 403 })
     }
 
-    // Fetch the module schema to check for testType
+    // Fetch the module schema to check for testType and existing response
     const moduleData = await prisma.clientModule.findFirst({
       where: { id },
-      include: { module: { select: { schema: true } } }
+      include: {
+        module: { select: { schema: true } },
+        response: { select: { approvedAt: true, submittedAt: true } }
+      }
     })
+
+    // Extra safety: if already approved, client cannot re-submit even if status was somehow altered
+    if (!isTeam && moduleData?.response?.approvedAt) {
+      return NextResponse.json({ error: 'Module is already approved and locked.' }, { status: 403 })
+    }
 
     const testType = (moduleData?.module?.schema as any)?.testType as TestType | undefined
     let responseData = validatedData.data as any
-
-    // Filter out fear ratings less than 5
-    if (responseData) {
-      Object.keys(responseData).forEach(key => {
-        if (key.startsWith('fear_')) {
-          const val = Number(responseData[key])
-          if (!isNaN(val) && val < 5) {
-            delete responseData[key]
-          }
-        }
-      })
-    }
 
     // If this is a test module, compute scores server-side
     if (testType && responseData.__testData) {
@@ -92,11 +88,13 @@ export async function POST(
       responseData = { ...responseData, __scored: scored }
     }
 
+    const preserveApproved = isTeam && clientModule.status === 'APPROVED';
+
     const response = await prisma.moduleResponse.upsert({
       where: { clientModuleId: id },
       update: {
         data: responseData,
-        submittedAt: new Date()
+        submittedAt: moduleData?.response?.submittedAt || new Date()
       },
       create: {
         clientModuleId: id,
@@ -107,29 +105,45 @@ export async function POST(
 
     await prisma.clientModule.update({
       where: { id },
-      data: { status: 'SUBMITTED' }
+      data: { status: preserveApproved ? 'APPROVED' : 'SUBMITTED' }
     })
 
-    // Find the next module in sequence
-    const nextModule = await prisma.clientModule.findFirst({
+    // Find subsequent modules in sequence to safely unlock the next uncompleted module
+    const subsequentModules = await prisma.clientModule.findMany({
       where: {
         clientProfileId: clientProfile.id,
-        order: clientModule.order + 1
-      }
+        order: { gt: clientModule.order }
+      },
+      include: {
+        response: { select: { submittedAt: true, approvedAt: true } }
+      },
+      orderBy: { order: 'asc' }
     })
 
-    // Update profile: increment stage and unlock next module
+    // Only unlock a module that is currently LOCKED and has NEVER been submitted or approved
+    const nextLockedUncompleted = subsequentModules.find(
+      m => m.status === 'LOCKED' && !m.response?.submittedAt && !m.response?.approvedAt
+    )
+
+    // Update profile: increment stage and unlock next uncompleted module if needed
     const updateData: any = {
       currentStage: { increment: 1 }
     }
 
-    if (nextModule) {
-      await prisma.clientModule.update({
-        where: { id: nextModule.id },
-        data: { status: 'UNLOCKED' }
-      })
-    } else {
-      // If no more modules, mark journey as "In Review" or "Completed"
+    if (nextLockedUncompleted) {
+      // Only auto-unlock if immediate next module is this one, OR all modules in between are already completed
+      const modulesBetween = subsequentModules.filter(m => m.order < nextLockedUncompleted.order)
+      const allBetweenCompleted = modulesBetween.every(
+        m => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status) || Boolean(m.response?.submittedAt || m.response?.approvedAt)
+      )
+      if (allBetweenCompleted) {
+        await prisma.clientModule.update({
+          where: { id: nextLockedUncompleted.id },
+          data: { status: 'UNLOCKED' }
+        })
+      }
+    } else if (subsequentModules.every(m => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status))) {
+      // If no more uncompleted modules, mark journey as "Analysis in Progress"
       updateData.journeyStatus = "Analysis in Progress"
     }
 

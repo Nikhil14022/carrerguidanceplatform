@@ -66,11 +66,17 @@ export async function POST(
       })
 
       const nextModule = clientProfile.modules.find(m => m.order === currentModule.order + 1)
-      if (nextModule) {
-        await prisma.clientModule.update({
-          where: { id: nextModule.id },
-          data: { status: 'UNLOCKED' }
+      if (nextModule && nextModule.status === 'LOCKED') {
+        const nextResp = await prisma.moduleResponse.findUnique({
+          where: { clientModuleId: nextModule.id },
+          select: { submittedAt: true, approvedAt: true }
         })
+        if (!nextResp?.submittedAt && !nextResp?.approvedAt) {
+          await prisma.clientModule.update({
+            where: { id: nextModule.id },
+            data: { status: 'UNLOCKED' }
+          })
+        }
       }
 
       return NextResponse.json({ success: true })

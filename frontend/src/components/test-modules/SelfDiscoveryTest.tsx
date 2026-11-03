@@ -524,9 +524,11 @@ export default function SelfDiscoveryTest({ answers, setAnswers, onSubmit, readO
                   value={ansVal}
                   onChange={(e) => !readOnly && handleAnswerChange(q.id, e.target.value)}
                   disabled={readOnly}
+                  spellCheck={true}
+                  autoCorrect="on"
                   placeholder="Type your thoughtful response here..."
                   rows={4}
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-5 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 transition-all text-sm md:text-base leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed resize-y"
                 />
               </div>
             );

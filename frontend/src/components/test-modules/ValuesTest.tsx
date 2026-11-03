@@ -229,9 +229,9 @@ export default function ValuesTest({ answers, setAnswers, onSubmit, readOnly = f
   const renderStep1 = () => (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-1">Select Your Values</h2>
+        <h2 className="text-xl font-bold text-slate-100 mb-1">Step 1: Select Your Core Values</h2>
         <p className="text-slate-400 text-sm">
-          Choose exactly 5 values from each genre ({totalSelected}/{TOTAL_REQUIRED} selected)
+          Choose exactly 5 values from each genre that resonate most with you ({totalSelected}/{TOTAL_REQUIRED} selected)
         </p>
       </div>
 
@@ -281,9 +281,9 @@ export default function ValuesTest({ answers, setAnswers, onSubmit, readOnly = f
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-1">Rank Your Top 10</h2>
+        <h2 className="text-xl font-bold text-slate-100 mb-1">Step 2: Rank Your Top 10 Values</h2>
         <p className="text-slate-400 text-sm">
-          Click values in order of importance. 1st click = most important. ({data.ranked.length}/{TOP_N} ranked)
+          Click values in order of importance. 1st click = #1 most important. ({data.ranked.length}/{TOP_N} ranked)
         </p>
       </div>
 
@@ -334,11 +334,25 @@ export default function ValuesTest({ answers, setAnswers, onSubmit, readOnly = f
 
   const renderStep3 = () => (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-white mb-1">Categorize Your Top 10</h2>
+      <div className="text-center space-y-2">
+        <h2 className="text-xl font-bold text-slate-100 mb-1">Step 3: Categorize Your Top 10 Values</h2>
         <p className="text-slate-400 text-sm">
-          Assign a category to each of your ranked values.
+          Assign one category to each of your top 10 values:
         </p>
+        <div className="grid sm:grid-cols-3 gap-2 text-left pt-2">
+          <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+            <span className="font-bold text-indigo-400 block">Ideal (ID)</span>
+            <span className="text-slate-300">A core guiding principle you aspire to live by</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+            <span className="font-bold text-emerald-400 block">Standard (S)</span>
+            <span className="text-slate-300">A non-negotiable baseline you hold yourself to</span>
+          </div>
+          <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+            <span className="font-bold text-amber-400 block">Want &amp; Preference (WPV)</span>
+            <span className="text-slate-300">Something you desire or prefer but can be flexible on</span>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -353,7 +367,7 @@ export default function ValuesTest({ answers, setAnswers, onSubmit, readOnly = f
                 <span className="w-6 h-6 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
                   {i + 1}
                 </span>
-                <span className="text-sm font-semibold text-white">{value}</span>
+                <span className="text-sm font-semibold text-slate-100">{value}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(CATEGORY_DESCRIPTIONS) as ValueCategory[]).map((cat) => (

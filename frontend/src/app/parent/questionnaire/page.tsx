@@ -5,7 +5,8 @@ const parentQuestions = [
     { id: 'q1', type: 'text', text: "What are your child's primary strengths as you observe them at home?" },
     { id: 'q2', type: 'text', text: "What career paths or industries has your child expressed interest in?" },
     { id: 'q3', type: 'text', text: "Are there any specific concerns you have regarding their career planning?" },
-    { id: 'q4', type: 'select', text: "How would you prefer to be involved in the mentoring process?", options: ["Regular updates only", "Monthly meetings", "Active participation in milestones"] }
+    { id: 'q4', type: 'select', text: "How would you prefer to be involved in the mentoring process?", options: ["Regular updates only", "Monthly meetings", "Active participation in milestones"] },
+    { id: 'notes', type: 'text', text: "Additional Notes / Observations (Optional)" }
 ];
 
 export default function ParentQuestionnairePage() {
@@ -71,7 +72,7 @@ export default function ParentQuestionnairePage() {
         <div className="space-y-8 animate-fade-in text-slate-100">
             <div className="bg-white/5 border shadow-sm rounded-2xl p-8 max-w-3xl mx-auto">
                 <h1 className="text-3xl font-bold tracking-tight text-slate-100 mb-2">Parent Questionnaire</h1>
-                <p className="text-slate-200 mb-8">Provide insights into your child's personality, interests, and strengths. Our experts use this information to create a holistic career trajectory.</p>
+                <p className="text-slate-200 mb-8">Provide insights into your child&apos;s personality, interests, and strengths. Our experts use this information to create a holistic career trajectory.</p>
 
                 {submitted ? (
                     <div className="bg-emerald-500/10 border border-emerald-200 p-8 rounded-xl text-center">
@@ -82,12 +83,12 @@ export default function ParentQuestionnairePage() {
                         <p className="text-emerald-400">Your insights have been securely submitted to the career expert. They will be reviewed shortly.</p>
 
                         <div className="mt-8 text-left border-t border-emerald-200 pt-6">
-                            <h3 className="font-bold text-emerald-900 mb-4 uppercase tracking-widest text-xs">Your Responses</h3>
+                            <h3 className="font-bold text-emerald-900 mb-4 uppercase tracking-widest text-xs">Your Responses (View Only)</h3>
                             <ul className="space-y-4">
                                 {parentQuestions.map(q => (
                                     <li key={q.id}>
                                         <p className="text-sm font-medium text-emerald-800 mb-1">{q.text}</p>
-                                        <p className="text-emerald-900 font-bold bg-white/50 p-2 rounded-lg">{responses[q.id] || 'N/A'}</p>
+                                        <p className="text-emerald-900 font-bold bg-white/50 p-2 rounded-lg whitespace-pre-wrap">{responses[q.id] || 'N/A'}</p>
                                     </li>
                                 ))}
                             </ul>
@@ -103,15 +104,17 @@ export default function ParentQuestionnairePage() {
                                     <label className="block text-slate-200 font-bold mb-3">{q.text}</label>
                                     {q.type === 'text' ? (
                                         <textarea
-                                            className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 h-28 resize-none shadow-sm"
+                                            className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 h-28 resize-y shadow-sm text-slate-100"
                                             placeholder="Type your response here..."
+                                            spellCheck={true}
+                                            autoCorrect="on"
                                             value={responses[q.id] || ''}
                                             onChange={(e) => handleChange(q.id, e.target.value)}
-                                            required
+                                            required={q.id !== 'notes'}
                                         />
                                     ) : (
                                         <select
-                                            className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+                                            className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm text-slate-100"
                                             value={responses[q.id] || ''}
                                             onChange={(e) => handleChange(q.id, e.target.value)}
                                             required

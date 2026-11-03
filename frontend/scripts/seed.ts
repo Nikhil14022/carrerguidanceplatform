@@ -409,7 +409,8 @@ export const modules = [
               { id: 'war', text: 'War' },
               { id: 'biography', text: 'Biography' },
               { id: 'western', text: 'Western' },
-              { id: 'short', text: 'Short Films' }
+              { id: 'short', text: 'Short Films' },
+              { id: 'other', text: 'Other' }
             ]
           },
           {
@@ -454,7 +455,8 @@ export const modules = [
               { id: 'war', text: 'War' },
               { id: 'biography', text: 'Biography' },
               { id: 'western', text: 'Western' },
-              { id: 'short', text: 'Short Films' }
+              { id: 'short', text: 'Short Films' },
+              { id: 'other', text: 'Other' }
             ]
           },
           {
@@ -728,9 +730,20 @@ export const modules = [
         questions: [
           {
             id: 'family_1',
-            type: 'text',
+            type: 'multiselect',
             question: "What does Family mean to you? If you must randomly give out words when you hear 'Family', what all would you say?",
-            placeholder: 'Share words or thoughts that come to mind when you think of family...'
+            options: [
+              "Love", "Home", "Belonging", "Safety", "Security", "Trust", "Care", "Support",
+              "Acceptance", "Respect", "Comfort", "Strength", "Togetherness", "Unity", "Connection",
+              "Loyalty", "Commitment", "Responsibility", "Sacrifice", "Protection", "Guidance",
+              "Stability", "Warmth", "Peace", "Happiness", "Joy", "Gratitude", "Compassion",
+              "Kindness", "Understanding", "Encouragement", "Forgiveness", "Patience", "Reliability",
+              "Dependability", "Authenticity", "Nurturing", "Growth", "Foundation", "Identity",
+              "Roots", "Tradition", "Values", "Legacy", "Purpose", "Motivation", "Inspiration",
+              "Refuge", "Sanctuary", "Anchor", "Haven", "Lifeline", "Bond", "Resilience", "Hope",
+              "Balance", "Harmony", "Presence", "Freedom", "Unconditional", "Companionship",
+              "Memories", "Celebration", "Empowerment"
+            ].map((opt, i) => ({ id: String(i + 1), text: opt }))
           },
           {
             id: 'family_2',
@@ -801,6 +814,24 @@ export const modules = [
             type: 'text',
             question: 'If you could change anything about your family as a whole or any particular family member, what would it be and why?',
             placeholder: 'Describe the changes you would make and your reasons...'
+          },
+          {
+            id: 'family_lives_with',
+            type: 'textarea',
+            question: 'Who all do you currently live with at home? (Mention family members, relatives, pets, or hostel/PG details)',
+            placeholder: 'e.g., Mother, Father, Younger Brother, Paternal Grandmother...'
+          },
+          {
+            id: 'family_arguments',
+            type: 'textarea',
+            question: 'What kind of arguments or disagreements do you usually have at home, and how are they resolved?',
+            placeholder: 'e.g., Disagreements over screen time, study schedule, career choices, sleep routine...'
+          },
+          {
+            id: 'family_repeated_statements',
+            type: 'textarea',
+            question: 'What are some statements or phrases your family members keep repeating to you (can be good or bad)?',
+            placeholder: 'e.g., "You have great potential if you just focus", "We are always proud of your honesty"...'
           }
         ]
       },

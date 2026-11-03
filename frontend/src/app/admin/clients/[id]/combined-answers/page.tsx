@@ -32,6 +32,7 @@ interface ModuleData {
     status: string;
     order: number;
     filledBy: string;
+    mentorNotes?: string | null;
     module: { title: string; description: string; schema: { questions?: QuestionSchema[]; testType?: string } };
     response: { data: Record<string, any>; submittedAt: string; approvedAt: string | null } | null;
 }
@@ -142,10 +143,21 @@ const formatValueForCopy = (q: any, val: any): string => {
         ['school', 'college', 'university'].forEach(level => {
             const d = (val as any)[level];
             if (d?.active) {
-                parts.push(`${level.toUpperCase()}: ${d.name || 'N/A'} (Grade: ${d.grade || 'N/A'})`);
+                const entries = Array.isArray(d.entries) && d.entries.length > 0
+                    ? d.entries
+                    : [{ name: d.name, grade: d.grade }];
+                entries.forEach((entry: any, idx: number) => {
+                    parts.push(`${level.toUpperCase()}${entries.length > 1 ? ` #${idx + 1}` : ''}: ${entry.name || 'N/A'} (Grade/Program: ${entry.grade || 'N/A'})`);
+                });
             }
         });
         return parts.join(' | ');
+    }
+
+    // 3b. Strength / Weakness object
+    if (val && typeof val === 'object' && !Array.isArray(val) && ((val as any).type === 'strength' || (val as any).type === 'weakness' || (val as any).rating !== undefined)) {
+        const typeStr = (val as any).type === 'strength' ? 'STRENGTH' : (val as any).type === 'weakness' ? 'WEAKNESS' : 'TRAIT';
+        return `[${typeStr}] Rating: ${(val as any).rating ?? 'N/A'}/10`;
     }
     
     // 4. Time-activity schedule object
@@ -194,6 +206,8 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editingValue, setEditingValue] = useState<any>(null);
     const [editingNotes, setEditingNotes] = useState<string | null>(null);
+    const [editingMentorNoteModuleId, setEditingMentorNoteModuleId] = useState<string | null>(null);
+    const [editingMentorNoteText, setEditingMentorNoteText] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState<{ type: string; msg: string } | null>(null);
 
@@ -255,6 +269,30 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
         }
     };
 
+    const handleSaveMentorNotes = async (moduleId: string, notesText: string) => {
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/mentor/modules/${moduleId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'SAVE_NOTES', notes: notesText })
+            });
+            const result = await res.json();
+            if (result.success) {
+                setNotification({ type: 'success', msg: 'Mentor notes saved for module' });
+                setEditingMentorNoteModuleId(null);
+                await fetchClientData(clientId);
+            } else {
+                setNotification({ type: 'error', msg: result.error || 'Failed to save mentor notes' });
+            }
+        } catch (err) {
+            setNotification({ type: 'error', msg: 'Network error occurred' });
+        } finally {
+            setSaving(false);
+            setTimeout(() => setNotification(null), 3000);
+        }
+    };
+
     // Filter modules based on selected filters and completion status
     const filteredModules = useMemo(() => {
         if (!client) return [];
@@ -265,7 +303,7 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
         });
     }, [client, selectedModuleFilters, statusFilter]);
 
-    // Format text summary of all modules and copy to clipboard
+    // Format text summary of filtered modules and copy to clipboard
     const handleCopyAll = () => {
         if (!client) return;
 
@@ -274,20 +312,21 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
         summaryText += `Date Generated: ${new Date().toLocaleDateString()}\n`;
         summaryText += `==========================================\n\n`;
 
-        client.modules.forEach(m => {
+        filteredModules.forEach(m => {
             const hasAns = m.response?.data;
-            if (!hasAns) return;
+            if (!hasAns && !m.mentorNotes) return;
 
             summaryText += `### ${m.module.title}\n`;
             summaryText += `Status: ${m.status}\n`;
             summaryText += `------------------------------------------\n`;
 
-            if (m.module.schema.testType === 'SELF_DISCOVERY') {
+            if (hasAns && m.module.schema.testType === 'SELF_DISCOVERY') {
                 Object.entries(hasAns).forEach(([key, val]) => {
+                    if (key.startsWith('__')) return;
                     const qText = SELF_DISCOVERY_QUESTIONS[key] || key;
                     summaryText += `Q: ${qText}\nA: ${formatValueForCopy(null, val)}\n\n`;
                 });
-            } else if (m.module.schema.testType && hasAns.__scored?.scores) {
+            } else if (hasAns && m.module.schema.testType && hasAns.__scored?.scores) {
                 // Formatting scores cleanly
                 summaryText += `Scored Results:\n`;
                 const scoreObj = hasAns.__scored.scores;
@@ -301,20 +340,26 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                     }
                 });
                 summaryText += `\n`;
-            } else if (m.module.schema.questions) {
+            } else if (hasAns && m.module.schema.questions) {
                 m.module.schema.questions.forEach((q: any) => {
                     const val = hasAns[q.id];
                     if (val !== undefined && val !== null) {
                         const displayVal = formatValueForCopy(q, val);
-                        summaryText += `Q: ${q.question}\nA: ${displayVal}\n\n`;
+                        summaryText += `Q: ${q.question}\nA: ${displayVal}\n`;
+                        if (hasAns[`${q.id}_other`]) summaryText += `Other: ${hasAns[`${q.id}_other`]}\n`;
+                        if (hasAns[`${q.id}_open_text`]) summaryText += `Note: ${hasAns[`${q.id}_open_text`]}\n`;
+                        summaryText += `\n`;
                     }
                 });
+            }
+            if (m.mentorNotes) {
+                summaryText += `Mentor / Counsellor Notes for ${m.module.title}:\n${m.mentorNotes}\n`;
             }
             summaryText += `\n`;
         });
 
         navigator.clipboard.writeText(summaryText);
-        setNotification({ type: 'success', msg: 'Combined answers copied to clipboard!' });
+        setNotification({ type: 'success', msg: 'Filtered answers copied to clipboard!' });
         setTimeout(() => setNotification(null), 3000);
     };
 
@@ -332,7 +377,7 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
 
     const isFileUrl = (val: any): boolean => {
         if (typeof val !== 'string') return false;
-        return val.startsWith('/uploads/') || (val.startsWith('http') && val.includes('/uploads/'));
+        return val.startsWith('/uploads/') || val.startsWith('/api/upload/') || (val.startsWith('http') && (val.includes('/uploads/') || val.includes('/api/upload/')));
     };
 
     if (loading) {
@@ -376,11 +421,11 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                     </p>
                 </div>
 
-                <div className="flex gap-3 print:hidden">
+                <div className="flex flex-wrap gap-3 print:hidden">
                     <button
                         onClick={handleCopyAll}
                         className="px-4 py-2.5 rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-300 text-xs font-bold uppercase tracking-widest hover:bg-orange-500/20 transition-all flex items-center gap-2"
-                        title="Copy text of all responses to paste in AI or analyze"
+                        title="Copy text of filtered responses to paste in AI or analyze"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -388,14 +433,40 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                         Copy Summary
                     </button>
                     <button
-                        onClick={() => window.open(`/api/mentor/clients/${clientId}/combined-answers/download`, '_blank')}
+                        onClick={() => {
+                            const modParam = filteredModules.map(m => m.id).join(',');
+                            window.open(`/api/mentor/clients/${clientId}/combined-answers/download?format=doc&modules=${encodeURIComponent(modParam)}`, '_blank');
+                        }}
+                        className="px-4 py-2.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-500/20 transition-all flex items-center gap-2"
+                        title="Download filtered modules as a clean Word (.doc) file with Mentor Notes"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Word ({filteredModules.length})
+                    </button>
+                    <button
+                        onClick={() => {
+                            const modParam = filteredModules.map(m => m.id).join(',');
+                            window.open(`/api/mentor/clients/${clientId}/combined-answers/download?format=pdf&modules=${encodeURIComponent(modParam)}`, '_blank');
+                        }}
                         className="px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-2"
-                        title="Download a formatted PDF of all questions and answers"
+                        title="Download a formatted PDF of the filtered modules and Mentor Notes"
                     >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Download PDF
+                        Download PDF ({filteredModules.length})
+                    </button>
+                    <button
+                        onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                        className="px-4 py-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-bold uppercase tracking-widest hover:bg-emerald-500/20 transition-all flex items-center gap-2"
+                        title="Download full structured Career Report in the exact Vanya Career Report Word format"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Vanya Format Report (.doc)
                     </button>
                 </div>
             </div>
@@ -896,7 +967,15 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                 </div>
                                                             ) : (
                                                                 <div className="text-slate-400 text-sm leading-relaxed pl-4 border-l border-slate-800 mt-1 whitespace-pre-wrap">
-                                                                    {Array.isArray(value) ? (
+                                                                    {Array.isArray(value) && value.length > 0 && value.every(isFileUrl) ? (
+                                                                        <div className="flex flex-wrap gap-2 mt-1">
+                                                                            {value.map((u: string, idx: number) => (
+                                                                                <a key={idx} href={u} target="_blank" rel="noreferrer" className="px-3 py-1.5 bg-slate-950/80 rounded-lg text-orange-400 hover:underline flex items-center gap-1.5 text-xs font-semibold border border-slate-850">
+                                                                                    📄 View Document File #{idx + 1}
+                                                                                </a>
+                                                                            ))}
+                                                                        </div>
+                                                                    ) : Array.isArray(value) ? (
                                                                         <div className="flex flex-wrap gap-1.5 mt-1">
                                                                             {value
                                                                                 .map((valItem: any) => {
@@ -942,13 +1021,23 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                             {['school', 'college', 'university'].map(level => {
                                                                                 const d = (value as any)[level];
                                                                                 if (!d?.active) return null;
-                                                                                return (
-                                                                                    <div key={level} className="p-2.5 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
-                                                                                        <span className="font-bold text-orange-400 capitalize">{level}: </span>
-                                                                                        {d.name || 'N/A'} — Grade: {d.grade || 'N/A'}
+                                                                                const entries = Array.isArray(d.entries) && d.entries.length > 0
+                                                                                    ? d.entries
+                                                                                    : [{ name: d.name, grade: d.grade }];
+                                                                                return entries.map((entry: any, eIdx: number) => (
+                                                                                    <div key={`${level}-${eIdx}`} className="p-2.5 bg-slate-950/80 rounded-lg text-xs text-slate-300 border border-slate-850">
+                                                                                        <span className="font-bold text-orange-400 capitalize">{level}{entries.length > 1 ? ` #${eIdx + 1}` : ''}: </span>
+                                                                                        {entry.name || 'N/A'} — Grade/Program: {entry.grade || 'N/A'}
                                                                                     </div>
-                                                                                );
+                                                                                ));
                                                                             })}
+                                                                        </div>
+                                                                    ) : value && typeof value === 'object' && !Array.isArray(value) && ((value as any).type === 'strength' || (value as any).type === 'weakness' || (value as any).rating !== undefined) ? (
+                                                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 rounded-lg text-xs border border-slate-850 mt-1">
+                                                                            <span className={`font-bold uppercase ${(value as any).type === 'strength' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                                                                {(value as any).type === 'strength' ? '✓ Strength' : (value as any).type === 'weakness' ? '⚠ Weakness' : 'Trait'}
+                                                                            </span>
+                                                                            <span className="text-slate-300">Rating: <strong>{(value as any).rating ?? 'N/A'}/10</strong></span>
                                                                         </div>
                                                                     ) : q.type === 'schedule' && Array.isArray(value) ? (
                                                                         <div className="space-y-4 mt-1">
@@ -977,8 +1066,12 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                                 </div>
                                                                             ))}
                                                                         </div>
-                                                                    ) : typeof value === 'object' ? (
-                                                                        <pre className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
+                                                                    ) : typeof value === 'object' && value !== null ? (
+                                                                        <div className="text-xs bg-slate-950 p-3 rounded-lg border border-slate-850 space-y-1">
+                                                                            {Object.entries(value).map(([k, v]) => (
+                                                                                <div key={k}><span className="font-bold text-slate-400 capitalize">{k.replace(/_/g, ' ')}:</span> <span className="text-slate-200">{typeof v === 'object' ? JSON.stringify(v) : String(v)}</span></div>
+                                                                            ))}
+                                                                        </div>
                                                                     ) : isFileUrl(value) ? (
                                                                         <a href={value} target="_blank" rel="noreferrer" className="text-orange-400 hover:underline flex items-center gap-1.5 text-xs font-semibold">
                                                                             📄 View Document File
@@ -989,13 +1082,34 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                                                                 const opt = q.options.find(o => o.id === value);
                                                                                 if (opt) return opt.text;
                                                                             }
-                                                                            return String(value);
+                                                                            return value !== undefined && value !== null ? String(value) : '';
                                                                         })() || <span className="italic text-slate-600">Not answered</span>
+                                                                    )}
+                                                                    {answers[`${q.id}_other`] && (
+                                                                        <div className="mt-2 text-xs text-amber-300 bg-amber-500/10 px-3 py-1.5 rounded-lg border border-amber-500/20 max-w-xl">
+                                                                            <span className="font-bold">Other (Specified): </span>{answers[`${q.id}_other`]}
+                                                                        </div>
+                                                                    )}
+                                                                    {q.id === 'demo_hobbies' && answers.demo_hobbies_notes && (
+                                                                        <div className="mt-2 text-xs text-slate-300 bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800 max-w-xl">
+                                                                            <span className="font-bold text-orange-400">Hobbies Details: </span>{answers.demo_hobbies_notes}
+                                                                        </div>
                                                                     )}
                                                                     {answers[`${q.id}_open_text`] && (
                                                                         <div className="mt-2 text-xs text-orange-400/85 italic bg-orange-500/5 px-3 py-2 rounded-xl border border-orange-500/10 max-w-xl">
                                                                             <span className="font-bold text-slate-500 not-italic">Note: </span>
                                                                             {answers[`${q.id}_open_text`]}
+                                                                        </div>
+                                                                    )}
+                                                                    {answers[`${q.id}_files`] && (
+                                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                                            {(Array.isArray(answers[`${q.id}_files`]) ? answers[`${q.id}_files`] : [answers[`${q.id}_files`]])
+                                                                                .filter(Boolean)
+                                                                                .map((u: string, fIdx: number) => (
+                                                                                    <a key={fIdx} href={u} target="_blank" rel="noreferrer" className="px-2.5 py-1 bg-slate-950 rounded-lg text-orange-400 hover:underline text-xs font-semibold border border-slate-800">
+                                                                                        📎 Attached File #{fIdx + 1}
+                                                                                    </a>
+                                                                                ))}
                                                                         </div>
                                                                     )}
                                                                 </div>
@@ -1006,6 +1120,63 @@ export default function AdminCombinedAnswersPage({ params }: { params: Promise<{
                                             </div>
                                         )
                                     )}
+
+                                    {/* Mentor / Counsellor Notes for this Module */}
+                                    <div className="mt-6 pt-4 border-t border-slate-800/80">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400 flex items-center gap-1.5">
+                                                📝 Mentor / Counsellor Notes for {m.module.title}
+                                            </span>
+                                            {editingMentorNoteModuleId !== m.id && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setEditingMentorNoteModuleId(m.id);
+                                                        setEditingMentorNoteText(m.mentorNotes || '');
+                                                    }}
+                                                    className="text-[10px] font-bold text-slate-400 hover:text-orange-400 uppercase tracking-wider print:hidden"
+                                                >
+                                                    {m.mentorNotes ? 'Edit Mentor Note' : '+ Add Mentor Note'}
+                                                </button>
+                                            )}
+                                        </div>
+                                        {editingMentorNoteModuleId === m.id ? (
+                                            <div className="space-y-2 print:hidden">
+                                                <textarea
+                                                    value={editingMentorNoteText}
+                                                    onChange={e => setEditingMentorNoteText(e.target.value)}
+                                                    rows={3}
+                                                    spellCheck={true}
+                                                    autoCorrect="on"
+                                                    placeholder="Write mentor/counsellor notes for this module (will appear at the end of this module in PDF & Word downloads)..."
+                                                    className="w-full bg-slate-950 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
+                                                />
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        type="button"
+                                                        disabled={saving}
+                                                        onClick={() => handleSaveMentorNotes(m.id, editingMentorNoteText)}
+                                                        className="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-[10px] font-bold uppercase tracking-widest hover:bg-amber-400 transition-all"
+                                                    >
+                                                        {saving ? 'Saving...' : 'Save Mentor Note'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setEditingMentorNoteModuleId(null)}
+                                                        className="px-3 py-1.5 rounded-lg bg-white/5 text-slate-400 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : m.mentorNotes ? (
+                                            <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-200 whitespace-pre-wrap leading-relaxed">
+                                                {m.mentorNotes}
+                                            </div>
+                                        ) : (
+                                            <p className="text-xs text-slate-600 italic print:hidden">No mentor notes added for this module yet.</p>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })
