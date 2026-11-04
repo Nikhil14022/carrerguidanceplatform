@@ -120,29 +120,12 @@ export async function POST(
       orderBy: { order: 'asc' }
     })
 
-    // Only unlock a module that is currently LOCKED and has NEVER been submitted or approved
-    const nextLockedUncompleted = subsequentModules.find(
-      m => m.status === 'LOCKED' && !m.response?.submittedAt && !m.response?.approvedAt
-    )
-
-    // Update profile: increment stage and unlock next uncompleted module if needed
+    // Modules are never auto-unlocked after submission; admin/mentor unlocks them manually.
     const updateData: any = {
       currentStage: { increment: 1 }
     }
 
-    if (nextLockedUncompleted) {
-      // Only auto-unlock if immediate next module is this one, OR all modules in between are already completed
-      const modulesBetween = subsequentModules.filter(m => m.order < nextLockedUncompleted.order)
-      const allBetweenCompleted = modulesBetween.every(
-        m => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status) || Boolean(m.response?.submittedAt || m.response?.approvedAt)
-      )
-      if (allBetweenCompleted) {
-        await prisma.clientModule.update({
-          where: { id: nextLockedUncompleted.id },
-          data: { status: 'UNLOCKED' }
-        })
-      }
-    } else if (subsequentModules.every(m => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status))) {
+    if (subsequentModules.every(m => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status))) {
       // If no more uncompleted modules, mark journey as "Analysis in Progress"
       updateData.journeyStatus = "Analysis in Progress"
     }

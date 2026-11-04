@@ -65,20 +65,7 @@ export async function POST(
         data: { status: 'APPROVED' }
       })
 
-      const nextModule = clientProfile.modules.find(m => m.order === currentModule.order + 1)
-      if (nextModule && nextModule.status === 'LOCKED') {
-        const nextResp = await prisma.moduleResponse.findUnique({
-          where: { clientModuleId: nextModule.id },
-          select: { submittedAt: true, approvedAt: true }
-        })
-        if (!nextResp?.submittedAt && !nextResp?.approvedAt) {
-          await prisma.clientModule.update({
-            where: { id: nextModule.id },
-            data: { status: 'UNLOCKED' }
-          })
-        }
-      }
-
+      // Next module is NOT auto-unlocked; admin/mentor unlocks modules manually.
       return NextResponse.json({ success: true })
     }
 
@@ -94,7 +81,7 @@ export async function POST(
         data: {
           clientProfileId: clientProfile.id,
           moduleId: validatedData.moduleId,
-          status: 'UNLOCKED',
+          status: 'LOCKED',
           order: maxOrder + 1
         }
       })

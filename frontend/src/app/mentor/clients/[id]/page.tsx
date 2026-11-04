@@ -415,15 +415,15 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                             className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors inline-flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-600/10"
-                            title="Download full client Career Report in the exact Vanya Career Report Word (.docx) structure"
+                            title={`Download ${client.user.name || 'Client'}'s Career Report (.docx)`}
                         >
-                            📥 Download Vanya Career Report (.docx)
+                            📥 Download {client.user.name || 'Client'}'s Career Report (.docx)
                         </button>
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
                             className="px-4 py-2.5 bg-slate-800 text-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors inline-flex items-center gap-2 border border-slate-700"
                         >
-                            📄 Preview Vanya Report
+                            📄 Preview {client.user.name || 'Client'}'s Report
                         </button>
                     </div>
                 </div>
@@ -563,7 +563,7 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/5 pb-3 gap-3">
                             <div>
                                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                                    <span>🤖 AI Report Generator &amp; Vanya Format</span>
+                                    <span>🤖 AI Report Generator &amp; Career Report — {client.user.name || 'Client'}</span>
                                     {approvedCount < client.modules.length && (
                                         <span className="text-[10px] bg-red-500/10 border border-red-500/20 text-red-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded">
                                             Locked
@@ -572,17 +572,17 @@ export default function MentorClientDetailPage({ params }: { params: Promise<{ i
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-1">
                                     {approvedCount < client.modules.length 
-                                        ? `Complete and approve all ${client.modules.length} modules to unlock AI report generation, or download the structured Vanya Career Report (.doc) anytime.`
-                                        : "Generate the career guidance report with optional custom instructions, or download the structured Vanya Career Report (.doc)."
+                                        ? `Complete and approve all ${client.modules.length} modules to unlock AI report generation, or download ${client.user.name || 'Client'}'s structured Career Report (.docx) anytime.`
+                                        : `Generate the career guidance report with optional custom instructions, or download ${client.user.name || 'Client'}'s structured Career Report (.docx).`
                                     }
                                 </p>
                             </div>
                             <div className="flex gap-2 shrink-0">
                                 <button
-                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                                     className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md"
                                 >
-                                    📥 Vanya Report (.doc)
+                                    📥 {client.user.name || 'Client'}'s Report (.docx)
                                 </button>
                                 <button
                                     onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}

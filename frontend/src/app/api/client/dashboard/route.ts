@@ -47,7 +47,8 @@ export async function GET() {
           modules: {
             create: moduleTemplates.map((template, idx) => ({
               moduleId: template.id,
-              status: idx === 0 ? 'UNLOCKED' : 'LOCKED',
+              // All modules start LOCKED; admin/mentor unlocks them manually
+              status: 'LOCKED',
               order: idx + 1,
               filledBy: 'CLIENT'
             }))
@@ -142,25 +143,7 @@ export async function GET() {
       clientProfile.modules = [...clientProfile.modules, ...newClientModules].sort((a, b) => a.order - b.order)
     }
 
-    // --- Auto-unlock Module 1 if all modules are locked ---
-    const hasAnyUnlocked = clientProfile.modules.some(
-      (m: any) => ['UNLOCKED', 'IN_PROGRESS', 'SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status)
-    );
-
-    if (!hasAnyUnlocked && clientProfile.modules.length > 0) {
-      const firstModule = clientProfile.modules[0];
-      await prisma.clientModule.update({
-        where: { id: firstModule.id },
-        data: { status: 'UNLOCKED' }
-      });
-      firstModule.status = 'UNLOCKED';
-      await prisma.clientProfile.update({
-        where: { id: clientProfile.id },
-        data: { journeyStatus: "In Progress" }
-      });
-      clientProfile.journeyStatus = "In Progress";
-    }
-    // ------------------------------------------
+    // NOTE: Modules are never auto-unlocked. Admin/mentor must unlock specific modules manually.
 
     const completedModules = clientProfile.modules.filter(
       (m: any) => ['SUBMITTED', 'UNDER_REVIEW', 'APPROVED'].includes(m.status)

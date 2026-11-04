@@ -934,18 +934,18 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                             className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors inline-flex items-center gap-2 border border-emerald-500/20 shadow-lg shadow-emerald-600/10"
-                            title="Download full client Career Report in the exact Vanya Career Report Word (.docx) structure"
+                            title={`Download ${client.user.name || 'Client'}'s Career Report (.docx)`}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Download Vanya Career Report (.docx)
+                            Download {client.user.name || 'Client'}'s Career Report (.docx)
                         </button>
                         <button
                             onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=html`, '_blank')}
                             className="px-4 py-2.5 bg-slate-800 text-slate-200 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-700 transition-colors inline-flex items-center gap-2 border border-slate-700"
                         >
-                            📄 Preview Vanya Report
+                            📄 Preview {client.user.name || 'Client'}'s Report
                         </button>
                     </div>
                 </div>
@@ -1134,7 +1134,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                         <div className="flex flex-col sm:flex-row justify-between sm:items-center border-b border-white/5 pb-3 gap-3">
                             <div>
                                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                                    <span>🤖 Report Generation &amp; Structured Vanya Format</span>
+                                    <span>🤖 Report Generation &amp; Structured Career Report — {client.user.name || 'Client'}</span>
                                     {approvedCount < client.modules.length && (
                                         <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold uppercase tracking-widest px-2 py-0.5 rounded animate-pulse">
                                             Incomplete Data Warning
@@ -1142,21 +1142,21 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                     )}
                                 </h3>
                                 <p className="text-xs text-slate-500 mt-1">
-                                    Generate AI Career Reports, download the structured Vanya Career Report (.doc), or chat with AI Counselor.
+                                    Generate AI Career Reports, download {client.user.name || 'Client'}'s structured Career Report (.docx), or chat with AI Counselor.
                                 </p>
                             </div>
                             <div className="flex gap-2 shrink-0">
                                 <button
-                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=doc`, '_blank')}
+                                    onClick={() => window.open(`/api/admin/clients/${clientId}/structured-report?format=docx`, '_blank')}
                                     className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md"
                                 >
-                                    📥 Vanya Report (.doc)
+                                    📥 {client.user.name || 'Client'}'s Report (.docx)
                                 </button>
                                 <button
                                     onClick={() => setAiTab('vanya')}
                                     className="px-3 py-2 rounded-xl bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 text-blue-300 text-[11px] font-bold uppercase tracking-wider transition-all"
                                 >
-                                    👁️ Preview Vanya Report
+                                    👁️ Preview {client.user.name || 'Client'}'s Report
                                 </button>
                             </div>
                         </div>
@@ -1190,7 +1190,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             : 'text-slate-400 hover:text-slate-200'
                                     }`}
                                 >
-                                    Vanya Career Report Format
+                                    {client.user.name || 'Client'}'s Career Report
                                 </button>
                                 <button
                                     onClick={() => setAiTab('chat')}
@@ -1231,9 +1231,9 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                     <div className="p-4 bg-slate-950 border border-emerald-500/30 rounded-2xl space-y-3">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                             <div>
-                                                <h4 className="text-sm font-bold text-emerald-300">Structured Career Report (Vanya Report Format)</h4>
+                                                <h4 className="text-sm font-bold text-emerald-300">Structured Career Report — {client.user.name || 'Client'}</h4>
                                                 <p className="text-xs text-slate-400 mt-0.5">
-                                                    Compiles all 12 sections (Index, Demographics, Values, Fears, 16PF, RIASEC, Color Test, Strengths &amp; Weaknesses, SMI, Movies &amp; Visual World, Lifestyle &amp; Needs/Wants, Risk Taking, and Overview) in the exact Vanya Career Report structure.
+                                                    Compiles all 12 sections (Index, Demographics, Values, Fears, 16PF, RIASEC, Color Test, Strengths &amp; Weaknesses, SMI, Movies &amp; Visual World, Lifestyle &amp; Needs/Wants, Risk Taking, and Overview) in the structured Career Report format.
                                                 </p>
                                             </div>
                                             <div className="flex gap-2 shrink-0">
@@ -1255,7 +1255,7 @@ export default function AdminClientDetailPage({ params }: { params: Promise<{ id
                                             <iframe
                                                 src={`/api/admin/clients/${clientId}/structured-report?format=html`}
                                                 className="w-full h-full border-0"
-                                                title="Vanya Career Report Preview"
+                                                title={`${client.user.name || 'Client'} Career Report Preview`}
                                             />
                                         </div>
                                     </div>

@@ -50,7 +50,8 @@ export async function POST(request: Request) {
                   })
                   .map((mod, index) => ({
                     moduleId: mod.id,
-                    status: index === 0 ? 'UNLOCKED' : 'LOCKED',
+                    // All modules start LOCKED; admin/mentor unlocks them manually
+                    status: 'LOCKED',
                     order: index + 1,
                     filledBy: 'CLIENT'
                   }))

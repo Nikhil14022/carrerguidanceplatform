@@ -168,7 +168,8 @@ export async function POST(request: Request) {
                 modules: {
                   create: moduleTemplates.map((template, idx) => ({
                     moduleId: template.id,
-                    status: idx === 0 ? 'UNLOCKED' : 'LOCKED',
+                    // All modules start LOCKED; admin/mentor unlocks them manually
+                    status: 'LOCKED',
                     order: idx + 1,
                     filledBy: 'CLIENT'
                   }))
