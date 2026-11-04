@@ -97,7 +97,7 @@ function DashboardContent() {
                     <div className="space-y-4">
                         <h2 className="text-3xl font-bold tracking-tight text-slate-100">Your Career Journey</h2>
                         <p className="text-slate-400 max-w-md">
-                            You've completed {stats?.completed || 0} of {stats?.total || 7} assessment checkpoints.
+                            You've completed {stats?.completed || 0} of {stats?.total || profile?.modules?.length || 19} assessment checkpoints.
                             {currentModule ? " Continue your progress to unlock personalized insights." : (stats?.completed && stats?.completed > 0) ? " Great job! You've completed all modules." : " Your journey is starting. Pick your next module below."}
                         </p>
                         <div className="flex gap-4 pt-4">

@@ -150,9 +150,27 @@ export async function GET() {
     ).length
 
     const totalModules = clientProfile.modules.length
-    let progressPercentage = totalModules > 0
+    const moduleProgress = totalModules > 0
       ? Math.round((completedModules / totalModules) * 100)
       : 0
+
+    // Auto-sync Stage 1 status if appropriate
+    const stage1 = stages.find((s: any) => s.stageNumber === 1);
+    if (stage1) {
+      if (completedModules === totalModules && totalModules > 0 && stage1.status !== 'COMPLETED') {
+        await prisma.clientStage.update({
+          where: { id: stage1.id },
+          data: { status: 'COMPLETED' }
+        });
+        stage1.status = 'COMPLETED';
+      } else if (completedModules > 0 && stage1.status === 'NOT_STARTED') {
+        await prisma.clientStage.update({
+          where: { id: stage1.id },
+          data: { status: 'IN_PROGRESS' }
+        });
+        stage1.status = 'IN_PROGRESS';
+      }
+    }
 
     const currentModule = clientProfile.modules.find(
       (m: any) => m.status === 'UNLOCKED' || m.status === 'IN_PROGRESS'
@@ -186,7 +204,7 @@ export async function GET() {
     const upcomingMeetings = appointments.filter(appt => new Date(appt.startTime) > new Date());
 
     const completedStages = stages.filter((s: any) => s.status === 'COMPLETED').length;
-    progressPercentage = Math.round((completedStages / 9) * 100);
+    const stageProgress = Math.round((completedStages / 9) * 100);
 
     return NextResponse.json({
       profile: {
@@ -196,7 +214,9 @@ export async function GET() {
       stats: {
         completed: completedModules,
         total: totalModules,
-        progress: progressPercentage,
+        progress: moduleProgress,
+        moduleProgress,
+        stageProgress,
         currentStage: clientProfile.currentStage,
         journeyStatus: clientProfile.journeyStatus,
         profileId: clientProfile.id

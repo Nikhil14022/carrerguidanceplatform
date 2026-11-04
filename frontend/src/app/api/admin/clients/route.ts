@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     const clients = await prisma.clientProfile.findMany({
       where,
       include: {
-        user: { select: { id: true, email: true, name: true, createdAt: true, updatedAt: true } },
+        user: { select: { id: true, email: true, name: true, age: true, createdAt: true, updatedAt: true } },
         modules: {
           select: { status: true }
         }
@@ -82,6 +82,7 @@ export async function GET(request: Request) {
         userId: client.userId,
         email: client.user.email,
         name: client.user.name,
+        age: client.user.age,
         currentStage: client.currentStage,
         journeyStatus: client.journeyStatus,
         stats: moduleStats,

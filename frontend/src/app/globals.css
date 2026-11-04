@@ -301,16 +301,49 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
-/* Ensure all inputs, textareas, and selects on inverted light backgrounds have legible dark text */
+/* Ensure all inputs, textareas, selects, and options on light backgrounds have legible dark text */
 input,
 textarea,
-select {
-  color: #0f172a;
+select,
+option,
+optgroup {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: #ffffff !important;
+  caret-color: #0f172a !important;
+}
+
+/* Ensure native option elements always render with solid dark text */
+option {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+option:checked,
+option:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+  opacity: 1 !important;
 }
 
 input.text-white,
 textarea.text-white,
 select.text-white,
+input.text-slate-100,
+textarea.text-slate-100,
+select.text-slate-100,
+input.text-slate-200,
+textarea.text-slate-200,
+select.text-slate-200,
 .bg-slate-950.text-white,
 .bg-slate-900.text-white,
 .bg-slate-800.text-white,
@@ -320,6 +353,7 @@ select.text-white,
 .bg-slate-900\/80.text-white,
 .bg-slate-900\/50.text-white {
   color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
 }
 
 /* Mobile responsiveness overrides */

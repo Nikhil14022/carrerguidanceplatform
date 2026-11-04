@@ -116,8 +116,13 @@ export async function GET() {
       orderBy: { id: 'desc' }
     })
 
+    const moduleProgress = totalModules > 0
+      ? Math.round((completedModules / totalModules) * 100)
+      : 0;
+
     const completedStages = stages.filter((s: any) => s.status === 'COMPLETED').length;
-    const progress = Math.round((completedStages / 9) * 100);
+    const stageProgress = Math.round((completedStages / 9) * 100);
+    const progress = completedStages > 0 ? stageProgress : moduleProgress;
 
     return NextResponse.json({
       child: {
@@ -128,6 +133,8 @@ export async function GET() {
         completed: completedModules,
         total: totalModules,
         progress,
+        moduleProgress,
+        stageProgress,
         currentStage: clientProfile.currentStage,
         journeyStatus: clientProfile.journeyStatus
       },

@@ -8,7 +8,8 @@ interface Assignment {
     permissions: string[];
     assignedAt: string;
     expiresAt: string | null;
-    client?: { user: { name: string; email: string } };
+    client?: { user: { name: string;
+    age?: number | null; email: string } };
 }
 
 interface Mentor {
@@ -35,6 +36,7 @@ interface Client {
     userId: string;
     email: string;
     name: string;
+    age?: number | null;
     currentStage: number;
     journeyStatus: string;
     status: string;
@@ -78,6 +80,69 @@ export default function AdminDashboardPage() {
         parentPassword: '',
         clientProfileId: ''
     });
+
+    
+    // Client Edit Form States (for Super Admin / Admin)
+    const [editingClient, setEditingClient] = useState<Client | null>(null);
+    const [editClientForm, setEditClientForm] = useState({
+        name: '',
+        email: '',
+        password: '',
+        age: '',
+        parentId: '',
+        mentorProfileId: '',
+        currentStage: 1,
+        journeyStatus: 'Started'
+    });
+    const [editClientError, setEditClientError] = useState<string | null>(null);
+
+    const handleOpenEditClient = (c: Client) => {
+        setEditingClient(c);
+        setEditClientError(null);
+        setEditClientForm({
+            name: c.name || '',
+            email: c.email || '',
+            password: '',
+            age: c.age !== undefined && c.age !== null ? String(c.age) : '',
+            parentId: c.parent?.id || '',
+            mentorProfileId: c.assignedMentors?.[0]?.id || '',
+            currentStage: c.currentStage || 1,
+            journeyStatus: c.journeyStatus || 'Started'
+        });
+    };
+
+    const handleSaveClient = async () => {
+        if (!editingClient) return;
+        setActionLoading(true);
+        setEditClientError(null);
+        try {
+            const res = await fetch(`/api/admin/clients/${editingClient.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: editClientForm.name,
+                    email: editClientForm.email,
+                    password: editClientForm.password || undefined,
+                    age: editClientForm.age ? parseInt(editClientForm.age, 10) : null,
+                    parentId: editClientForm.parentId,
+                    mentorProfileId: editClientForm.mentorProfileId,
+                    currentStage: parseInt(String(editClientForm.currentStage), 10),
+                    journeyStatus: editClientForm.journeyStatus
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setEditingClient(null);
+                fetchClients();
+            } else {
+                setEditClientError(data.error || 'Failed to update client');
+            }
+        } catch (err) {
+            setEditClientError('Network error while saving client');
+        } finally {
+            setActionLoading(false);
+        }
+    };
 
     const createClientOrParent = async () => {
         setActionLoading(true);
@@ -589,8 +654,8 @@ export default function AdminDashboardPage() {
                                 <div className="relative">
                                     <select value={assignForm.clientProfileId} onChange={e => setAssignForm({ ...assignForm, clientProfileId: e.target.value })}
                                         className="w-full border border-white/20 rounded-xl px-4 py-3 text-sm text-slate-100 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none appearance-none bg-white/5 shadow-sm cursor-pointer">
-                                        <option value="" disabled className="bg-slate-900 text-slate-100">-- Choose a client --</option>
-                                        {clients.map(c => <option key={c.id} value={c.id} className="bg-slate-900 text-slate-100">{c.name || 'Unnamed Client'} ({c.email})</option>)}
+                                        <option value="" disabled style={{ backgroundColor: "#ffffff", color: "#64748b" }}>-- Choose a client --</option>
+                                        {clients.map(c => <option key={c.id} value={c.id} style={{ backgroundColor: "#ffffff", color: "#0f172a" }}>{c.name || 'Unnamed Client'} ({c.email})</option>)}
                                     </select>
                                     <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">▼</div>
                                 </div>
@@ -682,9 +747,9 @@ export default function AdminDashboardPage() {
                                             <div className="relative">
                                                 <select value={clientForm.parentId} onChange={e => setClientForm({ ...clientForm, parentId: e.target.value })}
                                                     className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
-                                                    <option value="" className="bg-white text-slate-500">-- Select an existing parent --</option>
+                                                    <option value="" style={{ backgroundColor: "#ffffff", color: "#64748b" }}>-- Select an existing parent --</option>
                                                     {parents.map(p => (
-                                                        <option key={p.id} value={p.id} className="bg-white text-slate-900">
+                                                        <option key={p.id} value={p.id} style={{ backgroundColor: "#ffffff", color: "#0f172a" }}>
                                                             {p.name} ({p.email})
                                                         </option>
                                                     ))}
@@ -702,9 +767,9 @@ export default function AdminDashboardPage() {
                                             <div className="relative">
                                                 <select value={clientForm.mentorProfileId} onChange={e => setClientForm({ ...clientForm, mentorProfileId: e.target.value })}
                                                     className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
-                                                    <option value="" className="bg-white text-slate-500">-- Do not assign yet --</option>
+                                                    <option value="" style={{ backgroundColor: "#ffffff", color: "#64748b" }}>-- Do not assign yet --</option>
                                                     {mentors.map(m => (
-                                                        <option key={m.id} value={m.mentorProfile?.id || ''} className="bg-white text-slate-900">
+                                                        <option key={m.id} value={m.mentorProfile?.id || ''} style={{ backgroundColor: "#ffffff", color: "#0f172a" }}>
                                                             {m.name} ({m.email})
                                                         </option>
                                                     ))}
@@ -746,9 +811,9 @@ export default function AdminDashboardPage() {
                                             <div className="relative">
                                                 <select value={clientForm.clientProfileId} onChange={e => setClientForm({ ...clientForm, clientProfileId: e.target.value })}
                                                     className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none text-slate-900" style={{ backgroundColor: '#ffffff', color: '#000000', border: '1px solid #cbd5e1' }}>
-                                                    <option value="" className="bg-white text-slate-500">-- Select an existing student --</option>
+                                                    <option value="" style={{ backgroundColor: "#ffffff", color: "#64748b" }}>-- Select an existing student --</option>
                                                     {clients.map(c => (
-                                                        <option key={c.id} value={c.id} className="bg-white text-slate-900">
+                                                        <option key={c.id} value={c.id} style={{ backgroundColor: "#ffffff", color: "#0f172a" }}>
                                                             {c.name || 'Unnamed Student'} ({c.email})
                                                         </option>
                                                     ))}
@@ -776,7 +841,179 @@ export default function AdminDashboardPage() {
                             </button>
                         </div>
                     </div>
+        
+            {/* Edit Client Modal */}
+            {editingClient && mounted && createPortal(
+                <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6 lg:pl-64" style={{ zIndex: 99999 }} onClick={() => setEditingClient(null)}>
+                    <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-md" />
+                    <div className="relative z-10 w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up" style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1' }} onClick={e => e.stopPropagation()}>
+                        <div className="p-6 border-b shrink-0 flex items-center justify-between" style={{ backgroundColor: '#ffffff', borderBottomColor: '#e2e8f0' }}>
+                            <div>
+                                <h2 className="text-lg font-bold" style={{ color: '#0f172a' }}>Edit Client Details</h2>
+                                <p className="text-xs" style={{ color: '#64748b' }}>Update student information, parent link, and mentor assignment.</p>
+                            </div>
+                            <button onClick={() => setEditingClient(null)} className="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer">✕</button>
+                        </div>
+                        <div className="p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1" style={{ backgroundColor: '#ffffff' }}>
+                            {editClientError && (
+                                <div className="p-3 rounded-xl text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-700">
+                                    {editClientError}
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-3 gap-3">
+                                    <div className="col-span-2 space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Student Name *</label>
+                                        <input
+                                            type="text"
+                                            value={editClientForm.name}
+                                            onChange={e => setEditClientForm({ ...editClientForm, name: e.target.value })}
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none"
+                                            style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                            placeholder="Student Name"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Age</label>
+                                        <input
+                                            type="number"
+                                            value={editClientForm.age}
+                                            onChange={e => setEditClientForm({ ...editClientForm, age: e.target.value })}
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none"
+                                            style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                            placeholder="Age (e.g. 17)"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Email Address *</label>
+                                    <input
+                                        type="email"
+                                        value={editClientForm.email}
+                                        onChange={e => setEditClientForm({ ...editClientForm, email: e.target.value })}
+                                        className="w-full rounded-xl px-4 py-2.5 text-xs outline-none"
+                                        style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                        placeholder="student@example.com"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>
+                                        Reset Password <span className="text-[9px] font-normal text-slate-500">(Leave blank to keep unchanged)</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={editClientForm.password}
+                                        onChange={e => setEditClientForm({ ...editClientForm, password: e.target.value })}
+                                        className="w-full rounded-xl px-4 py-2.5 text-xs outline-none"
+                                        style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                        placeholder="Enter new password (optional)"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Linked Parent Account</label>
+                                    <div className="relative">
+                                        <select
+                                            value={editClientForm.parentId}
+                                            onChange={e => setEditClientForm({ ...editClientForm, parentId: e.target.value })}
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none"
+                                            style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                        >
+                                            <option value="" style={{ backgroundColor: '#ffffff', color: '#64748b' }}>-- No Linked Parent --</option>
+                                            {parents.map(p => (
+                                                <option key={p.id} value={p.id} style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>
+                                                    {p.name} ({p.email})
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Assigned Mentor</label>
+                                    <div className="relative">
+                                        <select
+                                            value={editClientForm.mentorProfileId}
+                                            onChange={e => setEditClientForm({ ...editClientForm, mentorProfileId: e.target.value })}
+                                            className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none"
+                                            style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                        >
+                                            <option value="" style={{ backgroundColor: '#ffffff', color: '#64748b' }}>-- No Assigned Mentor --</option>
+                                            {mentors.map(m => (
+                                                <option key={m.id} value={m.mentorProfile?.id || ''} style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>
+                                                    {m.name} ({m.email})
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Current Stage</label>
+                                        <div className="relative">
+                                            <select
+                                                value={editClientForm.currentStage}
+                                                onChange={e => setEditClientForm({ ...editClientForm, currentStage: Number(e.target.value) })}
+                                                className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none"
+                                                style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                            >
+                                                {Array.from({ length: 9 }, (_, i) => i + 1).map(num => (
+                                                    <option key={num} value={num} style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>
+                                                        Stage {num}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest block" style={{ color: '#475569' }}>Journey Status</label>
+                                        <div className="relative">
+                                            <select
+                                                value={editClientForm.journeyStatus}
+                                                onChange={e => setEditClientForm({ ...editClientForm, journeyStatus: e.target.value })}
+                                                className="w-full rounded-xl px-4 py-2.5 text-xs outline-none cursor-pointer appearance-none"
+                                                style={{ backgroundColor: '#ffffff', color: '#0f172a', border: '1px solid #cbd5e1' }}
+                                            >
+                                                <option value="Started" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>Started</option>
+                                                <option value="In Progress" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>In Progress</option>
+                                                <option value="Under Review" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>Under Review</option>
+                                                <option value="Completed" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>Completed</option>
+                                                <option value="On Hold" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>On Hold</option>
+                                            </select>
+                                            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500">▼</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-6 shrink-0 flex gap-3 border-t" style={{ backgroundColor: '#f8fafc', borderTopColor: '#e2e8f0' }}>
+                            <button
+                                onClick={() => setEditingClient(null)}
+                                className="flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveClient}
+                                disabled={actionLoading || !editClientForm.name.trim() || !editClientForm.email.trim()}
+                                className="flex-1 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-amber-600 hover:bg-amber-700 text-white transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                            >
+                                {actionLoading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </div>
+                    </div>
                 </div>,
+                document.body
+            )}
+
+        </div>,
                 document.body
             )}
         </>
